@@ -8,8 +8,54 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Be+Vietnam+Pro:wght@300;400;500;600&display=swap" rel="stylesheet" />
+    <style>
+      /* Pre-build splash — removed by React once mounted */
+      #preload-splash {
+        position: fixed;
+        inset: 0;
+        z-index: 99999;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background-color: #fcf9f0;
+        transition: opacity 0.5s ease, visibility 0.5s ease;
+      }
+      #preload-splash.fade-out {
+        opacity: 0;
+        visibility: hidden;
+      }
+      #preload-splash img {
+        width: min(70vw, 380px);
+        height: auto;
+        object-fit: contain;
+        margin-bottom: 2rem;
+        animation: float 3s ease-in-out infinite;
+      }
+      #preload-splash .splash-text {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: clamp(1.5rem, 5vw, 2.5rem);
+        font-weight: 800;
+        color: #37602c;
+        letter-spacing: -0.02em;
+        animation: pulse-text 2s ease-in-out infinite;
+      }
+      @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-12px); }
+      }
+      @keyframes pulse-text {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.4; }
+      }
+    </style>
   </head>
   <body>
+    <!-- Pre-build splash screen -->
+    <div id="preload-splash">
+      <img src="/loading.png" alt="Loading Buddies" />
+      <span class="splash-text">Loading...</span>
+    </div>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

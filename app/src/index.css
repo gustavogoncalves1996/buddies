@@ -64,6 +64,19 @@
 
   --shadow-cozy: 0 12px 40px rgba(55, 96, 44, 0.06);
   --shadow-float: 0 4px 12px rgba(0, 0, 0, 0.03);
+
+  --animate-float: float 3s ease-in-out infinite;
+  --animate-pulse-text: pulse-text 2s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+@keyframes pulse-text {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
 }
 
 @layer base {

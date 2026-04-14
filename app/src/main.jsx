@@ -11,3 +11,10 @@ createRoot(document.getElementById('root')).render(
     </BrowserRouter>
   </StrictMode>,
 )
+
+/* Fade out and remove the pre-build splash screen */
+const splash = document.getElementById('preload-splash')
+if (splash) {
+  splash.classList.add('fade-out')
+  splash.addEventListener('transitionend', () => splash.remove())
+}

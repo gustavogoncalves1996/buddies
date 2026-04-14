@@ -213,6 +213,7 @@ const useStore = create((set, get) => ({
   searchQuery: "",
   userLocation: null,          // { lat, lng } or null
   locationStatus: "pending",   // "pending" | "granted" | "denied" | "unavailable"
+  isLoading: false,            // global loading overlay flag
 
   /* ── Derived ── */
   getCurrentUser: () => {
@@ -242,6 +243,8 @@ const useStore = create((set, get) => ({
 
   /* ── Actions ── */
   setSearchQuery: (q) => set({ searchQuery: q }),
+
+  setLoading: (val) => set({ isLoading: val }),
 
   setUserLocation: (lat, lng) =>
     set({ userLocation: { lat, lng }, locationStatus: "granted" }),
