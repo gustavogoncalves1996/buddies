@@ -43,8 +43,8 @@ export default function CreateEvent() {
       maxSnackers,
       hostId: 1,
       currentSnackers: 0,
-      lat: 48.8566,
-      lng: 2.3422,
+      lat: 41.1579,
+      lng: -8.6291,
       image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCaZN-4WWPz68IO5galEggKHp4npqYWWQaCQuWND3wFUT5fh94ZDX7z3TkginTNzwxxOeXMuavXHhrAWM5VsQu6RJvMIdFr3WHY4voXMzPM6aV3BPE3iWs3O31YvpfD1qtZOaqPkULGeRZ4t9HIOA2YqiF7J1QhigpULIQwLPt1U_RaIv7PywUAyxgHNpPS68Ejqb4kdcPnI2xH7DKg-UeLeb0F9BjpwkVIGCsgJlCapg-vMNrAnHykfwCvPVBQg6Bo5J1gjoDnd-nQ",
       status: "planning",
       tag: "New",
@@ -185,7 +185,7 @@ export default function CreateEvent() {
                     <h2 className="text-base md:text-xl font-bold tracking-tight">Snack Size</h2>
                   </div>
                   <span className="bg-secondary-container text-on-secondary-container px-3 py-1 rounded-2xl md:rounded-lg text-sm font-bold">
-                    {snackSize}cm
+                    {snackSize} cm
                   </span>
                 </div>
 
@@ -198,17 +198,26 @@ export default function CreateEvent() {
                   </span>
                 </div>
 
-                <input
-                  type="range"
-                  min="1"
-                  max="50"
-                  value={snackSize}
-                  onChange={(e) => setSnackSize(Number(e.target.value))}
-                  className="w-full h-2 bg-surface-container-highest rounded-full appearance-none cursor-pointer accent-primary"
-                />
+                <div className="relative pt-2">
+                  <input
+                    type="range"
+                    min="1"
+                    max="50"
+                    value={snackSize}
+                    onChange={(e) => setSnackSize(Number(e.target.value))}
+                    className="w-full h-2 bg-surface-container-highest rounded-full appearance-none cursor-pointer accent-primary"
+                  />
+                  {/* Floating value indicator */}
+                  <div
+                    className="absolute -top-5 text-[10px] font-bold text-primary pointer-events-none transition-all duration-150"
+                    style={{ left: `calc(${((snackSize - 1) / 49) * 100}% - 10px)` }}
+                  >
+                    {snackSize}cm
+                  </div>
+                </div>
                 <div className="flex justify-between text-[10px] text-on-surface-variant font-medium px-1">
-                  <span>Cookie 🍪</span>
-                  <span>Cake 🎂</span>
+                  <span>1 cm 🍪</span>
+                  <span>50 cm 🎂</span>
                 </div>
               </section>
             </div>

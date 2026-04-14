@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Snack Sanctuary - Hosted Events</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Be+Vietnam+Pro:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<!-- Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-surface": "#31312b",
+                        "primary-fixed": "#c0f0ad",
+                        "on-surface-variant": "#42493e",
+                        "surface-container-highest": "#e5e2da",
+                        "surface-container-high": "#ebe8df",
+                        "on-error": "#ffffff",
+                        "surface-dim": "#dddad1",
+                        "background": "#fcf9f0",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "error": "#ba1a1a",
+                        "on-secondary-fixed": "#241a06",
+                        "primary": "#37602c",
+                        "surface-bright": "#fcf9f0",
+                        "secondary": "#6c5c43",
+                        "surface-variant": "#e5e2da",
+                        "primary-container": "#4f7942",
+                        "on-primary-fixed": "#022100",
+                        "on-primary-fixed-variant": "#28501e",
+                        "on-error-container": "#93000a",
+                        "on-secondary-container": "#706047",
+                        "outline": "#73796d",
+                        "on-primary-container": "#d3ffc1",
+                        "tertiary-container": "#846a50",
+                        "primary-fixed-dim": "#a4d393",
+                        "outline-variant": "#c2c9bb",
+                        "inverse-on-surface": "#f4f1e8",
+                        "surface-container": "#f1eee5",
+                        "surface": "#fcf9f0",
+                        "on-tertiary-container": "#fff0e5",
+                        "on-tertiary-fixed-variant": "#59422b",
+                        "error-container": "#ffdad6",
+                        "surface-tint": "#3f6833",
+                        "on-secondary-fixed-variant": "#53452d",
+                        "surface-container-low": "#f6f3ea",
+                        "on-tertiary-fixed": "#291805",
+                        "secondary-fixed": "#f5e0c0",
+                        "secondary-fixed-dim": "#d8c4a5",
+                        "on-surface": "#1c1c17",
+                        "tertiary": "#6a523a",
+                        "inverse-primary": "#a4d393",
+                        "on-primary": "#ffffff",
+                        "tertiary-fixed": "#ffdcbd",
+                        "tertiary-fixed-dim": "#e1c1a2",
+                        "secondary-container": "#f2ddbd",
+                        "on-background": "#1c1c17",
+                        "on-secondary": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Plus Jakarta Sans"],
+                        "body": ["Be Vietnam Pro"],
+                        "label": ["Be Vietnam Pro"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background font-body text-on-surface overflow-hidden">
+<!-- Top AppBar (from JSON) -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-6 h-16 bg-[#fcf9f0]/80 backdrop-blur-xl">
+<button class="flex items-center justify-center w-10 h-10 rounded-full hover:bg-[#e5e2da] transition-colors">
+<span class="material-symbols-outlined text-[#37602c]" data-icon="menu">menu</span>
+</button>
+<h1 class="text-xl font-extrabold text-[#37602c] font-headline tracking-tight">Snack Sanctuary</h1>
+<button class="flex items-center justify-center w-10 h-10 rounded-full hover:bg-[#e5e2da] transition-colors">
+<span class="material-symbols-outlined text-[#37602c]" data-icon="notifications">notifications</span>
+</button>
+</header>
+<!-- Map Background Section -->
+<main class="relative h-screen w-full">
+<!-- Interactive Map Mockup -->
+<div class="absolute inset-0 bg-[#f1eee5]">
+<img class="w-full h-full object-cover opacity-60 grayscale-[0.3]" data-alt="Minimalist artistic street map of a residential district with soft cream and pale green accents, clean lines and no heavy labels" data-location="Kyoto, Japan" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBSwYA3HvWrf7ytee7DJ9W-LCZnS6fnCUjILERDbhcf2w5d1_ZTg7EOqrgAorkE9B8j99aV0D1CAjvaot1wo1jRsaiku0EgfxbJj_Z2bazn-zh_B3d-jrK5zy6veCz533Q_1-EMXx9XsqkhHxqysxFwBsYKEtBoE_uUhmbbwzlCXc6XI1rVbuAiCvyj09zMpSvmrOjyYs9q5-6C2mqNBgyHeETPoS9cZgGaaFvomvt66HzJbcKit7cIEDfYZd9K_acT6YAvPDb9e64"/>
+<!-- Map Pin Overlay (Hosted Event 1) -->
+<div class="absolute top-[35%] left-[45%] group cursor-pointer">
+<div class="relative">
+<div class="bg-primary p-3 rounded-full shadow-lg scale-110 border-4 border-white">
+<span class="material-symbols-outlined text-white" data-icon="emoji_food_beverage" style="font-variation-settings: 'FILL' 1;">emoji_food_beverage</span>
+</div>
+<div class="absolute -bottom-10 left-1/2 -translate-x-1/2 bg-surface px-3 py-1 rounded-full shadow-sm whitespace-nowrap">
+<p class="text-[10px] font-bold text-primary">Matcha Morning</p>
+</div>
+</div>
+</div>
+<!-- Map Pin Overlay (Hosted Event 2) -->
+<div class="absolute top-[55%] left-[65%] group cursor-pointer">
+<div class="relative">
+<div class="bg-primary p-3 rounded-full shadow-lg border-4 border-white">
+<span class="material-symbols-outlined text-white" data-icon="cookie" style="font-variation-settings: 'FILL' 1;">cookie</span>
+</div>
+<div class="absolute -bottom-10 left-1/2 -translate-x-1/2 bg-surface px-3 py-1 rounded-full shadow-sm whitespace-nowrap opacity-60">
+<p class="text-[10px] font-bold text-primary">Biscuit Bake-off</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Floating Host Controls (Top Right) -->
+<div class="absolute top-20 right-6 flex flex-col gap-3">
+<button class="bg-primary text-on-primary w-14 h-14 rounded-full shadow-xl flex items-center justify-center hover:scale-105 active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-3xl" data-icon="add">add</span>
+</button>
+<button class="bg-surface-container-lowest text-primary w-14 h-14 rounded-full shadow-lg flex items-center justify-center hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined" data-icon="my_location">my_location</span>
+</button>
+</div>
+<!-- Bottom Carousel Section -->
+<section class="absolute bottom-32 left-0 w-full z-40">
+<div class="flex items-center justify-between px-6 mb-4">
+<h2 class="font-headline font-bold text-lg text-on-surface">Your Hosted Gatherings</h2>
+<span class="text-sm font-medium text-primary">2 Active</span>
+</div>
+<div class="flex overflow-x-auto gap-5 px-6 pb-4 hide-scrollbar snap-x snap-mandatory">
+<!-- Event Card 1 -->
+<article class="min-w-[320px] bg-surface-container-lowest rounded-lg shadow-[0_8px_30px_rgba(55,96,44,0.08)] snap-center flex flex-col overflow-hidden">
+<div class="p-5 border-b border-outline-variant/20">
+<div class="flex justify-between items-start mb-2">
+<span class="bg-primary-fixed text-on-primary-fixed text-[10px] px-2 py-1 rounded-full font-bold uppercase tracking-wider">Upcoming</span>
+<span class="text-on-surface-variant text-xs flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]" data-icon="calendar_today">calendar_today</span>
+                                Oct 24, 10:00 AM
+                            </span>
+</div>
+<h3 class="font-headline font-bold text-lg text-primary">Matcha &amp; Meditation Garden</h3>
+<p class="text-xs text-on-surface-variant mt-1">Kyoto Imperial Gardens • 4 Seats Left</p>
+</div>
+<!-- Pending Applications Section -->
+<div class="p-5 flex-1">
+<p class="text-[11px] font-bold text-on-surface-variant uppercase tracking-widest mb-4">Pending Applications (3)</p>
+<div class="space-y-4">
+<!-- Applicant 1 -->
+<div class="flex items-center gap-3">
+<img class="w-10 h-10 rounded-full object-cover bg-surface-container-highest" data-alt="Portrait of a young smiling man wearing a minimalist beige linen shirt in a soft sunlit interior" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCiyWv1IHO8rxFOqMJn2UcpRYtkseOz9okyP0ZKxWuGapo3tAEmZ4j3lBb7GtB_5qVnNMmaGrGoIUeTSygQg5oG1tXcDgmveZ8KJtCJUJpD82BcBOT1bnuy_KOeDr1RcHYCdPdeV0g2zDFAbdbPg2G_fS8sUHfLaBEupxaC8RoKz_TJpK7DDTvHPB6ueGbLnbLBd_IDrki9YFd-1Pd2TEkIm5ciMDGXKvW7fnHwU3G9JZ9llBsLoXqBRWxx1AAt8Lvwmg8MUySTiI8"/>
+<div class="flex-1">
+<h4 class="text-sm font-bold">Haruki S.</h4>
+<p class="text-xs text-on-surface-variant line-clamp-1 italic">"I'd love to share my homemade wagashi..."</p>
+</div>
+<div class="flex gap-1">
+<button class="w-8 h-8 rounded-full bg-primary-fixed/50 text-primary flex items-center justify-center hover:bg-primary-fixed transition-colors">
+<span class="material-symbols-outlined text-lg" data-icon="check">check</span>
+</button>
+<button class="w-8 h-8 rounded-full bg-surface-container-highest text-on-surface-variant flex items-center justify-center hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-lg" data-icon="close">close</span>
+</button>
+</div>
+</div>
+<!-- Applicant 2 -->
+<div class="flex items-center gap-3">
+<img class="w-10 h-10 rounded-full object-cover bg-surface-container-highest" data-alt="Elegant woman with soft features wearing a dark green sweater, smiling gently in a cozy cafe setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBkscg3uLvpuiXjDMcWhddxjSd9PnME4LlCgsoTcheWTgyZm3GbF3iJKZrwhsMJ-lupSyO2svUhXusFb2mqoVXxvHEn5Q-3_CVjXZTxEwTrisnqOPARxvMh61Z2K5jmcykf3bBnHfdf08pluyy0nm0aQn5jX5b101wszY4r-vLoG6a2mgq0Gn2NTFzyPuFNFbgA6do8NR4IU6DMMPHAQIxJUW-laEkMVKWJBII1qPUfGesoJHpB-7v6_uxrkPpmHi34msmaifCLVaE"/>
+<div class="flex-1">
+<h4 class="text-sm font-bold">Elena R.</h4>
+<p class="text-xs text-on-surface-variant line-clamp-1 italic">"First time in Kyoto, looking for snack buds!"</p>
+</div>
+<div class="flex gap-1">
+<button class="w-8 h-8 rounded-full bg-primary-fixed/50 text-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-lg" data-icon="check">check</span>
+</button>
+<button class="w-8 h-8 rounded-full bg-surface-container-highest text-on-surface-variant flex items-center justify-center">
+<span class="material-symbols-outlined text-lg" data-icon="close">close</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<button class="w-full bg-surface-container-low py-4 text-sm font-bold text-primary hover:bg-surface-container transition-colors">
+                        View Guest List (2)
+                    </button>
+</article>
+<!-- Event Card 2 -->
+<article class="min-w-[320px] bg-surface-container-lowest/90 backdrop-blur-sm rounded-lg shadow-sm snap-center flex flex-col overflow-hidden border border-outline-variant/10">
+<div class="p-5 border-b border-outline-variant/20">
+<div class="flex justify-between items-start mb-2">
+<span class="bg-surface-container-highest text-on-surface-variant text-[10px] px-2 py-1 rounded-full font-bold uppercase tracking-wider">Draft</span>
+<span class="text-on-surface-variant text-xs flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]" data-icon="schedule">schedule</span>
+                                TBD
+                            </span>
+</div>
+<h3 class="font-headline font-bold text-lg text-primary opacity-60">Artisanal Biscuit Tasting</h3>
+<p class="text-xs text-on-surface-variant mt-1">Studio Arashiyama • Pending Approval</p>
+</div>
+<div class="p-5 flex-1 flex flex-col items-center justify-center text-center">
+<span class="material-symbols-outlined text-4xl text-outline-variant mb-3" data-icon="edit_note">edit_note</span>
+<p class="text-sm text-on-surface-variant font-medium">Complete your event details to start receiving applications</p>
+</div>
+<button class="w-full bg-primary py-4 text-sm font-bold text-on-primary">
+                        Complete Setup
+                    </button>
+</article>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Bar (from JSON) -->
+<nav class="fixed bottom-0 w-full z-50 flex justify-around items-center px-4 pt-3 pb-6 bg-[#fcf9f0] rounded-t-[2rem] shadow-[0_-8px_30px_rgb(55,96,44,0.06)]">
+<a class="flex flex-col items-center justify-center text-[#42493e] px-5 py-1 hover:opacity-80 transition-opacity" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="home">home</span>
+<span class="font-['Be_Vietnam_Pro'] text-[11px] font-medium">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#42493e] px-5 py-1 hover:opacity-80 transition-opacity" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="search">search</span>
+<span class="font-['Be_Vietnam_Pro'] text-[11px] font-medium">Discover</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#42493e] px-5 py-1 hover:opacity-80 transition-opacity" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="add_circle">add_circle</span>
+<span class="font-['Be_Vietnam_Pro'] text-[11px] font-medium">Share</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-[#c0f0ad] text-[#022100] rounded-full px-5 py-1 scale-110 duration-300 ease-out" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="auto_awesome">auto_awesome</span>
+<span class="font-['Be_Vietnam_Pro'] text-[11px] font-medium">Moments</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#42493e] px-5 py-1 hover:opacity-80 transition-opacity" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="person">person</span>
+<span class="font-['Be_Vietnam_Pro'] text-[11px] font-medium">Profile</span>
+</a>
+</nav>
+</body></html>

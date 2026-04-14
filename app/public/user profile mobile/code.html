@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SnackShare | Profile</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&amp;family=Be+Vietnam+Pro:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "inverse-on-surface": "#f4f1e8",
+                    "on-primary": "#ffffff",
+                    "tertiary": "#6a523a",
+                    "inverse-surface": "#31312b",
+                    "on-secondary-fixed": "#241a06",
+                    "inverse-primary": "#a4d393",
+                    "on-surface-variant": "#42493e",
+                    "on-primary-fixed-variant": "#28501e",
+                    "surface-variant": "#e5e2da",
+                    "surface-bright": "#fcf9f0",
+                    "secondary-fixed": "#f5e0c0",
+                    "on-error": "#ffffff",
+                    "surface-container": "#f1eee5",
+                    "secondary": "#6c5c43",
+                    "tertiary-fixed": "#ffdcbd",
+                    "surface": "#fcf9f0",
+                    "primary-fixed": "#c0f0ad",
+                    "on-background": "#1c1c17",
+                    "error-container": "#ffdad6",
+                    "on-secondary": "#ffffff",
+                    "on-tertiary": "#ffffff",
+                    "surface-container-low": "#f6f3ea",
+                    "background": "#fcf9f0",
+                    "surface-dim": "#dddad1",
+                    "surface-container-lowest": "#ffffff",
+                    "primary-container": "#4f7942",
+                    "on-tertiary-container": "#fff0e5",
+                    "on-surface": "#1c1c17",
+                    "tertiary-container": "#846a50",
+                    "error": "#ba1a1a",
+                    "tertiary-fixed-dim": "#e1c1a2",
+                    "on-secondary-container": "#706047",
+                    "secondary-fixed-dim": "#d8c4a5",
+                    "on-secondary-fixed-variant": "#53452d",
+                    "on-tertiary-fixed": "#291805",
+                    "on-primary-container": "#d3ffc1",
+                    "surface-container-high": "#ebe8df",
+                    "outline-variant": "#c2c9bb",
+                    "outline": "#73796d",
+                    "surface-container-highest": "#e5e2da",
+                    "primary-fixed-dim": "#a4d393",
+                    "on-error-container": "#93000a",
+                    "on-tertiary-fixed-variant": "#59422b",
+                    "secondary-container": "#f2ddbd",
+                    "on-primary-fixed": "#022100",
+                    "surface-tint": "#3f6833",
+                    "primary": "#37602c"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Plus Jakarta Sans"],
+                    "body": ["Be Vietnam Pro"],
+                    "label": ["Be Vietnam Pro"]
+            }
+          },
+        }
+      }
+    </script>
+<style>
+        .smokey-gradient {
+            background: linear-gradient(180deg, #1c1c17 0%, #37602c 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        .smoke-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 50% 20%, rgba(252, 249, 240, 0.05) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface font-body text-on-surface antialiased">
+<!-- Top Navigation Shell -->
+<header class="w-full top-0 sticky z-50 bg-[#fcf9f0] dark:bg-stone-950 flex justify-between items-center px-6 py-4">
+<div class="flex items-center gap-3">
+<button class="text-[#37602c] active:scale-95 duration-200 transition-opacity hover:opacity-80">
+<span class="material-symbols-outlined">search</span>
+</button>
+</div>
+<h1 class="font-plus-jakarta-sans font-bold text-2xl tracking-tight text-[#37602c] dark:text-green-500">SnackShare</h1>
+<div class="flex items-center">
+<button class="text-[#37602c] active:scale-95 duration-200 transition-opacity hover:opacity-80">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+</div>
+</header>
+<main class="min-h-screen pb-32">
+<!-- Profile Header Section with Smokey Aesthetic -->
+<section class="smokey-gradient pt-12 pb-20 px-6 rounded-b-xl relative">
+<div class="smoke-overlay"></div>
+<div class="relative z-10 flex flex-col items-center">
+<!-- Large Circular Profile Photo -->
+<div class="w-40 h-40 rounded-full p-1 bg-primary-fixed/20 mb-6">
+<img alt="User profile" class="w-full h-full object-cover rounded-full border-4 border-surface shadow-2xl" data-alt="Close-up portrait of a woman with a kind smile in soft morning sunlight, natural hair and warm skin tones" src="https://lh3.googleusercontent.com/aida-public/AB6AXuANF-CFeFdqqdHDT_bsUOHYORFCoy1-CXJDBp3wbrbJlwYgH088ownG5Q98qbrwzXwKsupMIoJJ-9CHi4wau35LOl4Rcc6N07R0iGnoQpdPSiXefi0V5lSfraCixnz35D0iCF-LglEeUYs36azZ3nd13Ole4xKaEwmq6DD7SkKDzE8Op-0Yh4plDW-Yy0pZ7DBDdr4aMB-eDSzCYhszQqUQcHMYWSr6lLUSnNIkEg0dq8Ze8zuQwa9awIwqGtiYMWhxzff-NZHjws4"/>
+</div>
+<h2 class="text-surface font-headline text-3xl mb-1 tracking-tight">Elena Thorne</h2>
+<p class="text-primary-fixed-dim font-medium mb-8">Master Alchemist of Flavors</p>
+<!-- Achievement Badges -->
+<div class="flex gap-4 w-full justify-center">
+<div class="glass-card px-4 py-3 rounded-lg flex items-center gap-3">
+<div class="w-10 h-10 bg-secondary-container rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-on-secondary-container" data-weight="fill" style="font-variation-settings: 'FILL' 1;">workspace_premium</span>
+</div>
+<div>
+<p class="text-[10px] uppercase tracking-widest text-surface-variant font-bold">Achievement</p>
+<p class="text-surface text-sm font-semibold">Snack Size Mastery</p>
+</div>
+</div>
+<div class="glass-card px-4 py-3 rounded-lg flex items-center gap-3">
+<div class="w-10 h-10 bg-primary-fixed rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-fixed" data-weight="fill" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+</div>
+<div>
+<p class="text-[10px] uppercase tracking-widest text-surface-variant font-bold">Badge</p>
+<p class="text-surface text-sm font-semibold">Shared Moments</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Stats Section (Floating Tonal Layer) -->
+<section class="px-6 -mt-10 relative z-20">
+<div class="bg-surface-container-lowest rounded-lg p-6 shadow-[0_20px_40px_rgba(55,96,44,0.08)] flex justify-around">
+<div class="text-center">
+<p class="text-2xl font-headline font-bold text-primary">124</p>
+<p class="text-xs text-on-surface-variant font-medium">Snacks Shared</p>
+</div>
+<div class="w-[1px] bg-surface-container-high"></div>
+<div class="text-center">
+<p class="text-2xl font-headline font-bold text-primary">2.4k</p>
+<p class="text-xs text-on-surface-variant font-medium">Followers</p>
+</div>
+<div class="w-[1px] bg-surface-container-high"></div>
+<div class="text-center">
+<p class="text-2xl font-headline font-bold text-primary">89</p>
+<p class="text-xs text-on-surface-variant font-medium">Recipes</p>
+</div>
+</div>
+</section>
+<!-- Gallery Section -->
+<section class="mt-12 px-6">
+<div class="flex justify-between items-end mb-6">
+<h3 class="font-headline text-2xl text-on-surface">Past Snacks</h3>
+<span class="text-primary font-semibold text-sm hover:underline cursor-pointer">View All</span>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<!-- Gallery Item 1 -->
+<div class="group relative aspect-square overflow-hidden rounded-lg bg-surface-container-low transition-transform active:scale-95">
+<img alt="Matcha Bowl" class="w-full h-full object-cover" data-alt="Top down view of a frothy matcha tea in a textured ceramic bowl on a light wooden surface with organic shadows" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6UaeeNy63jdysxPYbbYEh6jjJ_s2vqy1JlTB3AfZQIduOFIaOMYu-9G9bko4br04E04oe1jLpNSmYFJSkLkpGCA4VMK9Cc26RFOoihpCYCaodvxd-PRrCl7AaCZo0aYy9e94naB8O7A8Hee01Wd9p6Tfd1X3B4WFTr6e6gqCZSm3lJ1S8p6jdkLWx4WwlL2VKWnfL26UzNao2-FaCkojcGB0QSdqkjw9KT2loRg2PuiySYBVVApnktdbUpImXHTi0Jx7IyRBTNsw"/>
+<div class="absolute inset-0 bg-gradient-to-t from-on-surface/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
+<p class="text-surface text-xs font-medium">Morning Whisk</p>
+</div>
+</div>
+<!-- Gallery Item 2 -->
+<div class="group relative aspect-square overflow-hidden rounded-lg bg-surface-container-low transition-transform active:scale-95">
+<img alt="Pastry" class="w-full h-full object-cover" data-alt="Macro photo of a golden flaky croissant on an artisanal linen cloth, warm editorial lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCK4p0sbZNZTEYcJTxWhffs7h8Ff9ODbu0DlMyMZBjTvKFqYayTeRtUyXUr3Yw51FkrV58bAuVp9cleTm15F88sQmmblzZfrfOCFwLlZGQtKvYX_jpmLkRZOkvq_6ey6TkSxuralnMt1XT5sOsnWKALW6fQX2ba6gCsCiJiM52zqzqPLM4FJRljcntZG1QYPEAsJmIFDI9Kql_6rhQqmEInSxHHcgfAMCQSSM4OBTj5dy59zrYa7Cl9yjtrQBQhuKcs4LXlHHhHryM"/>
+<div class="absolute inset-0 bg-gradient-to-t from-on-surface/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
+<p class="text-surface text-xs font-medium">Golden Hour Flakes</p>
+</div>
+</div>
+<!-- Gallery Item 3 -->
+<div class="group relative aspect-square overflow-hidden rounded-lg bg-surface-container-low transition-transform active:scale-95">
+<img alt="Artisanal Dessert" class="w-full h-full object-cover" data-alt="Elegant small dessert with edible flowers and cream on a dark green ceramic plate, fine dining aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuACgQltWw0eHxL_dbbKBXqy5cI6lDZOp6r9CbxIsUqS-A0KRVYWtfm9EH3NOo1irNFsP0-lS9XUBM999ymL3v6xlaCI5hBAf0jb2A7A2pzzf-Phi3Im0j78Zb5VZ2GhXQHcwR7NC4FAxFXOCkk0FQcL3ZLfRzt1DBhS_i-cWQagGcBh3bUolcyee0o08Qaoorwhk5i0N4656dENo3E1L_xPn0aDqqLwpxlc3x65fyuGky1iaA3UY3PU9axwXxXraU6BDkUAaWlxqZw"/>
+<div class="absolute inset-0 bg-gradient-to-t from-on-surface/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
+<p class="text-surface text-xs font-medium">Spring Bloom</p>
+</div>
+</div>
+<!-- Gallery Item 4 -->
+<div class="group relative aspect-square overflow-hidden rounded-lg bg-surface-container-low transition-transform active:scale-95">
+<img alt="Fresh Fruits" class="w-full h-full object-cover" data-alt="Vibrant sliced dragon fruit and kiwi on a marble surface with soft natural light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCtkJxKkWhZAoJ_4a6O6wHhN4bGWPK6ZL4DFMyh1ZBlwyIcs1Wj3drn9P1_QuyrUN_qKkMaeBOemIH-lSJ2y5o_2KRYoD0P1hrLDFSR0UYVTgkRjnlosfVifZNPgldduShg_w-6v8hMgJfiLpFYgdUT8zXU-TZaJs1j89AJJJsOkJFQvpep_eqJrahz4e6b99L5OArYKrRVlGCpBQO8QauBbOtMCVFYAJdT4_FPFPMKu3UdGhD68fY9pYoM9dgUHYlThZpV3LDLR8M"/>
+<div class="absolute inset-0 bg-gradient-to-t from-on-surface/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
+<p class="text-surface text-xs font-medium">Zen Slices</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Social Proof/Bio Section -->
+<section class="mt-12 px-6">
+<div class="bg-surface-container-low p-8 rounded-lg">
+<p class="italic text-on-surface-variant leading-relaxed text-lg font-medium text-center">
+                    "Searching for the perfect balance between the bitterness of ceremonial matcha and the buttery crunch of a fresh biscuit."
+                </p>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Shell -->
+<nav class="fixed bottom-0 w-full z-50 flex justify-around items-center px-4 pb-8 pt-4 bg-white/80 dark:bg-stone-900/80 backdrop-blur-xl rounded-t-[2rem] shadow-[0_-4px_40px_rgba(55,96,44,0.06)]">
+<button class="flex items-center justify-center text-[#42493e] p-3 hover:bg-[#f1eee5] dark:hover:bg-stone-800 rounded-full active:scale-90 transition-transform">
+<span class="material-symbols-outlined">map</span>
+</button>
+<button class="flex items-center justify-center text-[#42493e] p-3 hover:bg-[#f1eee5] dark:hover:bg-stone-800 rounded-full active:scale-90 transition-transform">
+<span class="material-symbols-outlined">add_circle</span>
+</button>
+<button class="flex items-center justify-center text-[#42493e] p-3 hover:bg-[#f1eee5] dark:hover:bg-stone-800 rounded-full active:scale-90 transition-transform">
+<span class="material-symbols-outlined">inventory_2</span>
+</button>
+<!-- Active Tab: Profile (person) -->
+<button class="flex items-center justify-center bg-[#c0f0ad] dark:bg-green-900/40 text-[#022100] rounded-full p-3 active:scale-90 transition-transform">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person</span>
+</button>
+</nav>
+</body></html>

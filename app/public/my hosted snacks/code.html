@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&amp;family=Be+Vietnam+Pro:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-low": "#f6f3ea",
+                    "surface-dim": "#dddad1",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary": "#ffffff",
+                    "on-background": "#1c1c17",
+                    "inverse-on-surface": "#f4f1e8",
+                    "on-primary-container": "#d3ffc1",
+                    "tertiary": "#6a523a",
+                    "secondary-container": "#f2ddbd",
+                    "secondary-fixed-dim": "#d8c4a5",
+                    "secondary": "#6c5c43",
+                    "on-secondary-container": "#706047",
+                    "on-secondary-fixed-variant": "#53452d",
+                    "on-secondary": "#ffffff",
+                    "on-primary-fixed": "#022100",
+                    "on-tertiary-fixed-variant": "#59422b",
+                    "outline-variant": "#c2c9bb",
+                    "surface-bright": "#fcf9f0",
+                    "surface-variant": "#e5e2da",
+                    "surface-container": "#f1eee5",
+                    "primary-fixed": "#c0f0ad",
+                    "on-surface-variant": "#42493e",
+                    "primary-container": "#4f7942",
+                    "on-tertiary": "#ffffff",
+                    "on-error": "#ffffff",
+                    "tertiary-fixed": "#ffdcbd",
+                    "tertiary-container": "#846a50",
+                    "surface-container-highest": "#e5e2da",
+                    "surface-container-high": "#ebe8df",
+                    "secondary-fixed": "#f5e0c0",
+                    "inverse-surface": "#31312b",
+                    "inverse-primary": "#a4d393",
+                    "surface-tint": "#3f6833",
+                    "tertiary-fixed-dim": "#e1c1a2",
+                    "on-tertiary-fixed": "#291805",
+                    "surface": "#fcf9f0",
+                    "on-tertiary-container": "#fff0e5",
+                    "on-surface": "#1c1c17",
+                    "error": "#ba1a1a",
+                    "primary": "#37602c",
+                    "outline": "#73796d",
+                    "on-error-container": "#93000a"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Plus Jakarta Sans"],
+                    "body": ["Be Vietnam Pro"],
+                    "label": ["Be Vietnam Pro"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Be Vietnam Pro', sans-serif; }
+        .font-plus-jakarta-sans { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .map-gradient-overlay {
+            background: linear-gradient(to bottom, rgba(252, 249, 240, 0.4) 0%, transparent 15%, transparent 70%, rgba(252, 249, 240, 0.9) 100%);
+        }
+        ::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface selection:bg-primary-fixed selection:text-on-primary-fixed overflow-hidden">
+<!-- Shared TopNavBar -->
+<header class="bg-[#ffffffcc] dark:bg-[#1c1c17cc] backdrop-blur-xl shadow-[0_12px_40px_rgba(55,96,44,0.06)] top-0 z-50 sticky">
+<div class="flex justify-between items-center px-12 py-4 w-full">
+<div class="flex items-center gap-12">
+<span class="text-2xl font-bold text-[#37602c] dark:text-[#c0f0ad] italic font-plus-jakarta-sans">The Culinary Hearth</span>
+<!-- Navigation Links -->
+<nav class="hidden md:flex items-center gap-8 font-plus-jakarta-sans tracking-tight">
+<a class="text-[#42493e] dark:text-[#c2c9bb] font-medium hover:text-[#37602c] transition-colors" href="#">Map</a>
+<a class="text-[#42493e] dark:text-[#c2c9bb] font-medium hover:text-[#37602c] transition-colors" href="#">Create</a>
+<a class="text-[#37602c] dark:text-[#c0f0ad] font-bold border-b-2 border-[#37602c] dark:border-[#c0f0ad] pb-1" href="#">Manage</a>
+</nav>
+</div>
+<!-- Integrated Search Bar -->
+<div class="flex-1 max-w-xl mx-8">
+<div class="relative group">
+<div class="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-outline">search</span>
+</div>
+<input class="w-full bg-surface-container-highest border-none rounded-full py-3 pl-12 pr-4 focus:ring-2 focus:ring-primary-container text-on-surface-variant font-body" placeholder="Search your hosted events..." type="text"/>
+</div>
+</div>
+<!-- Trailing Actions -->
+<div class="flex items-center gap-4">
+<button class="p-2 hover:bg-[#f1eee5] dark:hover:bg-[#32362d] rounded-full transition-all duration-300 scale-95 active:scale-90 cursor-pointer">
+<span class="material-symbols-outlined text-[#42493e] dark:text-[#c2c9bb]">notifications</span>
+</button>
+<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary-fixed scale-95 active:scale-90 transition-transform cursor-pointer">
+<img alt="User profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDG9lvQOTfX-l1rdquMHIV5iW-beaAPgQru5cQCgAOonadA9j4p_YYMNDcmhXS5fiDaFOUMdYQZxIHdovAZpVzBdJ8q0fUMJFSXNjZVV2hPuekmUpVIyp7DXCtvTVXo6mQB26tLUXp3nVi_r3crUvxS3Pn-OSp62uJ6gxlQ-oLMNkAqg9Ma_y9n4Eue3X4iuiocA4cX7SpyT3JPPxdPHL-xnM-H_ULmokmLJMr0hFHLADDOOqIi7hjullxqCirqY98GEfMypHyjDZ8f"/>
+</div>
+</div>
+</div>
+<div class="bg-[#f6f3ea] dark:bg-[#2a2d26] h-[1px] w-full"></div>
+</header>
+<main class="relative h-[calc(100vh-80px)] w-full overflow-hidden">
+<!-- Interactive Map Background -->
+<div class="absolute inset-0 z-0">
+<img class="w-full h-full object-cover grayscale-[20%] sepia-[10%] brightness-[105%]" data-alt="soft aesthetic illustrated map of a European city with cream and soft green tones and minimal clean street lines" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA4u_fZkxryBIAUrwYvXjBC1kvwk3BnQotg79MTKjdG_p9n4IvHGPZjhFynSy_el4SJy_0LL139kCnw7yF8NjB9s-q7ziSP6OnX8LmWDuF-VmIjflgQkkDMSdFM-zGLMEIg7rBqIAd0RlP5FzxowG4ySOnG8b5ff9zO8VLaYRGcTIodHCNuXjIJl7ZbFSP-sqE7KMi4XLyfUygpjGkqPYbB1PobUwCyezSnh2-Lw329g9bZD8qyb6sLQc69xSaVimTdK6Vdc3bPkw9s"/>
+<div class="absolute inset-0 map-gradient-overlay pointer-events-none"></div>
+</div>
+<!-- Map Pins for Hosted Snacks -->
+<div class="absolute inset-0 z-10 pointer-events-none">
+<!-- Pin 1: Matcha Workshop -->
+<div class="absolute top-[35%] left-[30%] pointer-events-auto group cursor-pointer">
+<div class="flex flex-col items-center">
+<div class="bg-primary p-3 rounded-full shadow-lg group-hover:scale-110 transition-transform duration-300 border-2 border-surface">
+<span class="material-symbols-outlined text-on-primary" style="font-variation-settings: 'FILL' 1;">eco</span>
+</div>
+<div class="mt-2 bg-surface-container-lowest px-3 py-1 rounded-full shadow-md">
+<span class="text-xs font-bold text-on-surface font-plus-jakarta-sans tracking-tight">Matcha Workshop</span>
+</div>
+</div>
+</div>
+<!-- Pin 2: Sourdough Brunch -->
+<div class="absolute top-[55%] left-[55%] pointer-events-auto group cursor-pointer">
+<div class="flex flex-col items-center">
+<div class="bg-primary p-3 rounded-full shadow-lg group-hover:scale-110 transition-transform duration-300 border-2 border-surface">
+<span class="material-symbols-outlined text-on-primary" style="font-variation-settings: 'FILL' 1;">bakery_dining</span>
+</div>
+<div class="mt-2 bg-surface-container-lowest px-3 py-1 rounded-full shadow-md">
+<span class="text-xs font-bold text-on-surface font-plus-jakarta-sans tracking-tight">Sourdough Brunch</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Title Overlay -->
+<div class="absolute top-8 left-12 z-20">
+<h1 class="text-4xl font-bold font-plus-jakarta-sans text-primary tracking-tight">My Hosted Snacks</h1>
+<p class="text-on-surface-variant font-body mt-1">Real-time status of your culinary gatherings</p>
+</div>
+<!-- Floating Controls -->
+<div class="absolute top-8 right-8 z-20 flex flex-col gap-4">
+<button class="w-14 h-14 bg-surface-container-lowest rounded-full shadow-xl flex items-center justify-center hover:bg-surface-container-low transition-colors group">
+<span class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform">add</span>
+</button>
+<button class="w-14 h-14 bg-surface-container-lowest rounded-full shadow-xl flex items-center justify-center hover:bg-surface-container-low transition-colors group">
+<span class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform">my_location</span>
+</button>
+</div>
+<!-- Hosted Events Carousel -->
+<section class="absolute bottom-0 left-0 right-0 z-30 pb-12 pt-20 px-12 bg-gradient-to-t from-surface via-surface/90 to-transparent">
+<div class="max-w-7xl mx-auto">
+<div class="flex justify-between items-end mb-6 px-4">
+<div class="flex gap-2">
+<button class="px-6 py-2 rounded-full bg-primary text-on-primary font-bold text-sm">Upcoming</button>
+<button class="px-6 py-2 rounded-full bg-surface-container-high text-on-surface-variant font-medium text-sm hover:bg-surface-dim">Past</button>
+</div>
+<div class="flex gap-3">
+<button class="p-3 rounded-full bg-surface-container-high text-on-surface hover:bg-secondary-container transition-colors">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<button class="p-3 rounded-full bg-surface-container-high text-on-surface hover:bg-secondary-container transition-colors">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+<div class="flex gap-6 overflow-x-auto pb-4 scroll-smooth">
+<!-- Event Card 1 -->
+<div class="min-w-[420px] bg-surface-container-lowest rounded-lg overflow-hidden shadow-[0_12px_40px_rgba(55,96,44,0.06)] group border border-outline-variant/10">
+<div class="flex h-48">
+<div class="w-2/5 relative">
+<img class="w-full h-full object-cover" data-alt="Matcha preparation" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBRs5jw8kZcjl2qzWjpxdbb3SuOWe6a4ejMRq73OpFU7c45_7A1QI6os1FQRa5XzzcoIe119B8uwj87o9aJR144ALi8FZQDsPJnzWzLIXYG_jDsoJmsh79RuH-UcJqf0tv_qECOA3v_auzJR0BSmR9hxCqO__kZAwt80fILDofuxcDY8ufPE8r95BbTHm6y_y6mk3osjTL6goY8AM1zzM53Ns4osISHKtxbrDna0jUwZhTfpoICIU7nVame-7ngStfaePpuFFDmKgfR"/>
+<div class="absolute top-2 left-2 bg-primary/90 text-on-primary text-[10px] font-bold px-2 py-1 rounded-full">CONFIRMED</div>
+</div>
+<div class="w-3/5 p-6 flex flex-col justify-between">
+<div>
+<h3 class="text-xl font-plus-jakarta-sans font-bold text-on-surface leading-tight">Artisanal Matcha Workshop</h3>
+<div class="flex items-center gap-2 mt-2">
+<span class="material-symbols-outlined text-primary text-xs">schedule</span>
+<span class="text-xs font-bold text-on-surface-variant">Sat, Oct 24 • 14:00</span>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-primary text-sm">group</span>
+<span class="text-xs font-bold text-on-surface-variant">4/6 Guests</span>
+</div>
+<button class="text-primary text-xs font-bold hover:underline">Manage Guests</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Event Card 2 -->
+<div class="min-w-[420px] bg-surface-container-lowest rounded-lg overflow-hidden shadow-[0_12px_40px_rgba(55,96,44,0.06)] group border border-outline-variant/10">
+<div class="flex h-48">
+<div class="w-2/5 relative">
+<img class="w-full h-full object-cover" data-alt="Sourdough bread" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA3cR--3TpUYLwCDG6AstPxxuERcRfpPDpdfaklG8V3WlqjNjLIrIQuxVjJ6x_lvMRMsw2696ZMSjD_sF6-5EutFld9S2Jv4gwZ5KSLuJzE-ZVmBMYFrCiWDvArv2mDFfw5iExdqL2tlWuQPHJA85ODIv-eWk2W8Ck4WbVIIkblCq8OW45UmEnUQzsAilREBIPDRCjFOZ_myCw1HEK_gHD5vnfxvndjxZGjya8wmx-ooW_lTwqBUKGxPa2vgNESHnA0DpVKL7lzqteb"/>
+<div class="absolute top-2 left-2 bg-tertiary/90 text-on-primary text-[10px] font-bold px-2 py-1 rounded-full uppercase">Planning</div>
+</div>
+<div class="w-3/5 p-6 flex flex-col justify-between">
+<div>
+<h3 class="text-xl font-plus-jakarta-sans font-bold text-on-surface leading-tight">Sourdough &amp; Stories Brunch</h3>
+<div class="flex items-center gap-2 mt-2">
+<span class="material-symbols-outlined text-primary text-xs">schedule</span>
+<span class="text-xs font-bold text-on-surface-variant">Sun, Oct 25 • 10:00</span>
+</div>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-primary text-sm">location_on</span>
+<span class="text-xs font-bold text-on-surface-variant">0.4 km (Home)</span>
+</div>
+<button class="text-primary text-xs font-bold hover:underline">Edit Details</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+</body></html>

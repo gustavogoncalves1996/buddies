@@ -1,10 +1,25 @@
-import { useState } from "react";
+import { useState, useRef, useCallback, useMemo, useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import { Search, Locate, ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import useStore from "../store/useStore";
 import "leaflet/dist/leaflet.css";
+
+/* ── Haversine (duplicated for local filtering via useMemo) ── */
+function haversineKm(lat1, lng1, lat2, lng2) {
+  const toRad = (v) => (v * Math.PI) / 180;
+  const R = 6371;
+  const dLat = toRad(lat2 - lat1);
+  const dLng = toRad(lng2 - lng1);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+const RADIUS_KM = 10;
+const DEFAULT_CENTER = [41.1579, -8.6291]; // Porto fallback
 
 function createPinIcon(emoji) {
   return L.divIcon({
@@ -25,11 +40,29 @@ const userIcon = L.divIcon({
 
 const pinEmojis = ["🍪", "🍵", "☕", "🥐"];
 
+/** Automatically re-center map once user location is obtained */
+function RecenterMap() {
+  const map = useMap();
+  const userLocation = useStore((s) => s.userLocation);
+  useEffect(() => {
+    if (userLocation) {
+      map.setView([userLocation.lat, userLocation.lng], 14);
+    }
+  }, [userLocation, map]);
+  return null;
+}
+
 function LocateButton() {
   const map = useMap();
+  const userLocation = useStore((s) => s.userLocation);
   return (
     <button
-      onClick={() => map.setView([48.8566, 2.3422], 14)}
+      onClick={() => {
+        const target = userLocation
+          ? [userLocation.lat, userLocation.lng]
+          : DEFAULT_CENTER;
+        map.setView(target, 14);
+      }}
       className="absolute top-4 right-4 z-1000 w-11 h-11 bg-surface-container-lowest rounded-full shadow-cozy flex items-center justify-center hover:bg-surface-container-low transition-colors"
     >
       <Locate size={18} className="text-primary" />
@@ -41,7 +74,29 @@ export default function Home() {
   const [search, setSearch] = useState("");
   const events = useStore((s) => s.events);
   const users = useStore((s) => s.users);
-  const center = [48.8566, 2.3422];
+  const userLocation = useStore((s) => s.userLocation);
+  const carouselRef = useRef(null);
+
+  const center = userLocation
+    ? [userLocation.lat, userLocation.lng]
+    : DEFAULT_CENTER;
+
+  /* Filter events within 10 km of user (show all if location unknown) */
+  const nearbyEvents = useMemo(() => {
+    if (!userLocation) return events;
+    return events.filter(
+      (e) =>
+        e.lat != null &&
+        haversineKm(userLocation.lat, userLocation.lng, e.lat, e.lng) <= RADIUS_KM
+    );
+  }, [events, userLocation]);
+
+  const scrollCarousel = useCallback((direction) => {
+    const el = carouselRef.current;
+    if (!el) return;
+    const cardWidth = el.querySelector("a")?.offsetWidth || 400;
+    el.scrollBy({ left: direction * (cardWidth + 24), behavior: "smooth" });
+  }, []);
 
   return (
     <div className="relative h-[calc(100vh-64px)] md:h-[calc(100vh-73px)] w-full overflow-hidden">
@@ -57,7 +112,7 @@ export default function Home() {
           attribution='&copy; <a href="https://carto.com/">CARTO</a>'
         />
         <Marker position={center} icon={userIcon} />
-        {events.map((ev, i) => (
+        {nearbyEvents.map((ev, i) => (
           <Marker
             key={ev.id}
             position={[ev.lat, ev.lng]}
@@ -70,6 +125,7 @@ export default function Home() {
           </Marker>
         ))}
         <LocateButton />
+        <RecenterMap />
       </MapContainer>
 
       {/* Mobile search */}
@@ -86,13 +142,6 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Desktop floating controls */}
-      <div className="hidden md:flex absolute top-8 right-8 z-20 flex-col gap-4">
-        <button className="w-14 h-14 bg-surface-container-lowest rounded-full shadow-xl flex items-center justify-center hover:bg-surface-container-low transition-colors group">
-          <Locate size={20} className="text-primary group-hover:scale-110 transition-transform" />
-        </button>
-      </div>
-
       {/* Bottom carousel */}
       <section className="absolute bottom-0 left-0 right-0 z-30 pb-20 md:pb-12 pt-20 px-4 md:px-12 bg-linear-to-t from-surface via-surface/90 to-transparent">
         <div className="max-w-7xl mx-auto">
@@ -102,21 +151,37 @@ export default function Home() {
                 Discover Nearby Experiences
               </h2>
               <p className="hidden md:block text-on-surface-variant font-body mt-1 italic">
-                Curated artisan snack pop-ups within 2km
+                Curated artisan snack pop-ups within {RADIUS_KM} km
               </p>
             </div>
             <div className="hidden md:flex gap-3">
-              <button className="p-3 rounded-full bg-surface-container-high text-on-surface hover:bg-secondary-container transition-colors">
+              <button
+                onClick={() => scrollCarousel(-1)}
+                className="p-3 rounded-full bg-surface-container-high text-on-surface hover:bg-secondary-container transition-colors"
+              >
                 <ChevronLeft size={20} />
               </button>
-              <button className="p-3 rounded-full bg-surface-container-high text-on-surface hover:bg-secondary-container transition-colors">
+              <button
+                onClick={() => scrollCarousel(1)}
+                className="p-3 rounded-full bg-surface-container-high text-on-surface hover:bg-secondary-container transition-colors"
+              >
                 <ChevronRight size={20} />
               </button>
             </div>
           </div>
 
-          <div className="flex gap-4 md:gap-6 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-hide">
-            {events.map((ev) => {
+          <div
+            ref={carouselRef}
+            className="flex gap-4 md:gap-6 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-hide"
+          >
+            {nearbyEvents.length === 0 && (
+              <div className="w-full text-center py-8">
+                <p className="text-on-surface-variant text-sm font-body">
+                  No snack events found within {RADIUS_KM} km. Try expanding your search area!
+                </p>
+              </div>
+            )}
+            {nearbyEvents.map((ev) => {
               const host = users.find((u) => u.id === ev.hostId);
               return (
                 <Link

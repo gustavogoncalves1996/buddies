@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>The Culinary Hearth | Host a Snack Gathering</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Be+Vietnam+Pro:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-low": "#f6f3ea",
+                    "surface-dim": "#dddad1",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary": "#ffffff",
+                    "on-background": "#1c1c17",
+                    "inverse-on-surface": "#f4f1e8",
+                    "on-primary-container": "#d3ffc1",
+                    "tertiary": "#6a523a",
+                    "secondary-container": "#f2ddbd",
+                    "secondary-fixed-dim": "#d8c4a5",
+                    "secondary": "#6c5c43",
+                    "on-secondary-container": "#706047",
+                    "on-secondary-fixed-variant": "#53452d",
+                    "on-secondary": "#ffffff",
+                    "on-primary-fixed": "#022100",
+                    "on-tertiary-fixed-variant": "#59422b",
+                    "outline-variant": "#c2c9bb",
+                    "surface-bright": "#fcf9f0",
+                    "surface-variant": "#e5e2da",
+                    "surface-container": "#f1eee5",
+                    "primary-fixed": "#c0f0ad",
+                    "on-surface-variant": "#42493e",
+                    "primary-container": "#4f7942",
+                    "on-tertiary": "#ffffff",
+                    "on-error": "#ffffff",
+                    "tertiary-fixed": "#ffdcbd",
+                    "tertiary-container": "#846a50",
+                    "surface-container-highest": "#e5e2da",
+                    "surface-container-high": "#ebe8df",
+                    "secondary-fixed": "#f5e0c0",
+                    "inverse-surface": "#31312b",
+                    "inverse-primary": "#a4d393",
+                    "surface-tint": "#3f6833",
+                    "tertiary-fixed-dim": "#e1c1a2",
+                    "on-tertiary-fixed": "#291805",
+                    "surface": "#fcf9f0",
+                    "on-tertiary-container": "#fff0e5",
+                    "on-surface": "#1c1c17",
+                    "error": "#ba1a1a",
+                    "primary": "#37602c",
+                    "outline": "#73796d",
+                    "on-error-container": "#93000a"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Plus Jakarta Sans"],
+                    "body": ["Be Vietnam Pro"],
+                    "label": ["Be Vietnam Pro"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Be Vietnam Pro', sans-serif; }
+        h1, h2, h3 { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .bg-matcha-gradient {
+            background: linear-gradient(135deg, #37602c 0%, #4f7942 100%);
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #37602c;
+            cursor: pointer;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface min-h-screen">
+<!-- TopNavBar -->
+<nav class="bg-[#ffffffcc] dark:bg-[#1c1c17cc] backdrop-blur-xl shadow-[0_12px_40px_rgba(55,96,44,0.06)] flex justify-between items-center px-12 py-4 w-full sticky top-0 z-50">
+<div class="flex items-center gap-8">
+<span class="text-2xl font-bold text-[#37602c] dark:text-[#c0f0ad] italic font-plus-jakarta-sans tracking-tight">The Culinary Hearth</span>
+<div class="hidden md:flex items-center gap-6">
+<a class="text-[#42493e] dark:text-[#c2c9bb] font-medium hover:text-[#37602c] transition-colors font-plus-jakarta-sans tracking-tight" href="#">Map</a>
+<a class="text-[#37602c] dark:text-[#c0f0ad] font-bold border-b-2 border-[#37602c] dark:border-[#c0f0ad] pb-1 font-plus-jakarta-sans tracking-tight" href="#">Create</a>
+<a class="text-[#42493e] dark:text-[#c2c9bb] font-medium hover:text-[#37602c] transition-colors font-plus-jakarta-sans tracking-tight" href="#">Manage</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden lg:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-xl">search</span>
+<input class="pl-10 pr-4 py-2 bg-surface-container-low border-none rounded-full w-64 focus:ring-2 focus:ring-primary text-sm" placeholder="Search culinary events..." type="text"/>
+</div>
+<button class="p-2 hover:bg-[#f1eee5] dark:hover:bg-[#32362d] rounded-full transition-all duration-300 scale-95 active:scale-90 cursor-pointer">
+<span class="material-symbols-outlined text-[#37602c] dark:text-[#c0f0ad]">notifications</span>
+</button>
+<button class="p-2 hover:bg-[#f1eee5] dark:hover:bg-[#32362d] rounded-full transition-all duration-300 scale-95 active:scale-90 cursor-pointer">
+<span class="material-symbols-outlined text-[#37602c] dark:text-[#c0f0ad]">person</span>
+</button>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="max-w-3xl mx-auto px-6 py-12 md:py-20">
+<!-- Header Section -->
+<header class="text-center mb-12">
+<h1 class="text-5xl font-extrabold text-on-surface tracking-tight mb-4">Host a Snack Gathering</h1>
+<p class="text-on-surface-variant text-lg max-w-xl mx-auto">Create a cozy space for fellow foodies to share delightful bites and warm conversations.</p>
+</header>
+<!-- Form Card Container -->
+<div class="bg-surface-container-lowest rounded-lg p-8 md:p-12 shadow-[0_12px_40px_rgba(55,96,44,0.06)] relative overflow-hidden">
+<!-- Decorative Accent -->
+<div class="absolute top-0 left-0 w-full h-2 bg-matcha-gradient"></div>
+<form class="space-y-12">
+<!-- Location Section -->
+<section class="space-y-4">
+<div class="flex items-center gap-3 mb-2">
+<span class="material-symbols-outlined text-primary">location_on</span>
+<h2 class="text-xl font-bold tracking-tight">Gathering Spot</h2>
+</div>
+<div class="relative group">
+<input class="w-full bg-surface-container-highest border-none rounded-full px-6 py-4 text-on-surface focus:ring-2 focus:ring-primary transition-all placeholder:text-on-surface-variant/60" placeholder="Search for a park, cafe, or private address..." type="text"/>
+<span class="material-symbols-outlined absolute right-6 top-1/2 -translate-y-1/2 text-on-surface-variant">my_location</span>
+</div>
+</section>
+<!-- Date & Time Section -->
+<section class="space-y-4">
+<div class="flex items-center gap-3 mb-2">
+<span class="material-symbols-outlined text-primary">calendar_today</span>
+<h2 class="text-xl font-bold tracking-tight">When shall we meet?</h2>
+</div>
+<div class="grid md:grid-cols-2 gap-4">
+<div class="relative">
+<label class="block text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-2 ml-4">Date</label>
+<input class="w-full bg-surface-container-highest border-none rounded-full px-6 py-4 text-on-surface focus:ring-2 focus:ring-primary appearance-none" type="date"/>
+</div>
+<div class="relative">
+<label class="block text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-2 ml-4">Time</label>
+<input class="w-full bg-surface-container-highest border-none rounded-full px-6 py-4 text-on-surface focus:ring-2 focus:ring-primary appearance-none" type="time"/>
+</div>
+</div>
+</section>
+<div class="grid md:grid-cols-2 gap-12">
+<!-- Max Snackers Stepper -->
+<section class="space-y-4">
+<div class="flex items-center gap-3 mb-2">
+<span class="material-symbols-outlined text-primary">group</span>
+<h2 class="text-xl font-bold tracking-tight">Max Snackers</h2>
+</div>
+<div class="flex items-center justify-between bg-surface-container-highest rounded-full p-2">
+<button class="w-12 h-12 flex items-center justify-center rounded-full bg-surface hover:bg-white transition-colors text-primary shadow-sm" onclick="const s = this.nextElementSibling; s.innerText = Math.max(1, parseInt(s.innerText)-1)" type="button">
+<span class="material-symbols-outlined">remove</span>
+</button>
+<span class="text-2xl font-bold px-8">8</span>
+<button class="w-12 h-12 flex items-center justify-center rounded-full bg-primary text-on-primary hover:opacity-90 transition-opacity shadow-md" onclick="const s = this.previousElementSibling; s.innerText = parseInt(s.innerText)+1" type="button">
+<span class="material-symbols-outlined">add</span>
+</button>
+</div>
+</section>
+<!-- Snack Size Slider -->
+<section class="space-y-4">
+<div class="flex items-center justify-between mb-2">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">bakery_dining</span>
+<h2 class="text-xl font-bold tracking-tight">Snack Size (cm)</h2>
+</div>
+<span class="bg-secondary-container text-on-secondary-container px-3 py-1 rounded-md text-sm font-bold" id="snack-val">12cm</span>
+</div>
+<div class="space-y-6">
+<input class="w-full h-2 bg-surface-container-highest rounded-full appearance-none cursor-pointer accent-primary" id="snack-slider" max="30" min="5" oninput="document.getElementById('snack-val').innerText = this.value + 'cm'; document.getElementById('snack-visual').style.width = (this.value * 5) + 'px'" step="1" type="range" value="12"/>
+<!-- Visual Representation of Snack -->
+<div class="flex justify-center items-center h-12 bg-surface-container-low rounded-xl overflow-hidden relative border border-outline-variant/10">
+<div class="h-4 bg-[#d8c4a5] rounded-full transition-all duration-200 relative shadow-sm border-r-4 border-tertiary/20" id="snack-visual" style="width: 60px;">
+<!-- Biscuit detail/texture -->
+<div class="absolute inset-0 flex justify-around items-center px-2 opacity-30">
+<div class="w-1 h-1 bg-tertiary rounded-full"></div>
+<div class="w-1 h-1 bg-tertiary rounded-full"></div>
+<div class="w-1 h-1 bg-tertiary rounded-full"></div>
+<div class="w-1 h-1 bg-tertiary rounded-full"></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Action Button -->
+<div class="pt-8 flex flex-col items-center">
+<button class="w-full md:w-auto md:px-16 py-5 bg-matcha-gradient text-on-primary text-xl font-bold rounded-xl shadow-[0_12px_40px_rgba(55,96,44,0.2)] hover:scale-[1.02] active:scale-95 transition-all duration-300 flex items-center justify-center gap-3" type="submit">
+<span>Publish Event</span>
+<span class="material-symbols-outlined">auto_awesome</span>
+</button>
+<p class="mt-6 text-sm text-on-surface-variant font-medium italic">Ready to welcome the hearth?</p>
+</div>
+</form>
+</div>
+</main>
+<!-- Visual Footer Filler -->
+<div class="w-full h-48 relative overflow-hidden mt-12 opacity-30">
+<div class="absolute inset-0 bg-matcha-gradient opacity-5"></div>
+<div class="flex justify-around items-end h-full px-12 gap-8 translate-y-12">
+<div class="w-24 h-48 bg-surface-container-highest rounded-t-full"></div>
+<div class="w-24 h-64 bg-primary/20 rounded-t-full"></div>
+<div class="w-24 h-32 bg-surface-container-highest rounded-t-full"></div>
+<div class="w-24 h-56 bg-primary/20 rounded-t-full"></div>
+<div class="w-24 h-48 bg-surface-container-highest rounded-t-full"></div>
+</div>
+</div>
+</body></html>

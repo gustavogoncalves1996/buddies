@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&amp;family=Be+Vietnam+Pro:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "inverse-on-surface": "#f4f1e8",
+                    "on-primary": "#ffffff",
+                    "tertiary": "#6a523a",
+                    "inverse-surface": "#31312b",
+                    "on-secondary-fixed": "#241a06",
+                    "inverse-primary": "#a4d393",
+                    "on-surface-variant": "#42493e",
+                    "on-primary-fixed-variant": "#28501e",
+                    "surface-variant": "#e5e2da",
+                    "surface-bright": "#fcf9f0",
+                    "secondary-fixed": "#f5e0c0",
+                    "on-error": "#ffffff",
+                    "surface-container": "#f1eee5",
+                    "secondary": "#6c5c43",
+                    "tertiary-fixed": "#ffdcbd",
+                    "surface": "#fcf9f0",
+                    "primary-fixed": "#c0f0ad",
+                    "on-background": "#1c1c17",
+                    "error-container": "#ffdad6",
+                    "on-secondary": "#ffffff",
+                    "on-tertiary": "#ffffff",
+                    "surface-container-low": "#f6f3ea",
+                    "background": "#fcf9f0",
+                    "surface-dim": "#dddad1",
+                    "surface-container-lowest": "#ffffff",
+                    "primary-container": "#4f7942",
+                    "on-tertiary-container": "#fff0e5",
+                    "on-surface": "#1c1c17",
+                    "tertiary-container": "#846a50",
+                    "error": "#ba1a1a",
+                    "tertiary-fixed-dim": "#e1c1a2",
+                    "on-secondary-container": "#706047",
+                    "secondary-fixed-dim": "#d8c4a5",
+                    "on-secondary-fixed-variant": "#53452d",
+                    "on-tertiary-fixed": "#291805",
+                    "on-primary-container": "#d3ffc1",
+                    "surface-container-high": "#ebe8df",
+                    "outline-variant": "#c2c9bb",
+                    "outline": "#73796d",
+                    "surface-container-highest": "#e5e2da",
+                    "primary-fixed-dim": "#a4d393",
+                    "on-error-container": "#93000a",
+                    "on-tertiary-fixed-variant": "#59422b",
+                    "secondary-container": "#f2ddbd",
+                    "on-primary-fixed": "#022100",
+                    "surface-tint": "#3f6833",
+                    "primary": "#37602c"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1.5rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Plus Jakarta Sans"],
+                    "body": ["Be Vietnam Pro"],
+                    "label": ["Be Vietnam Pro"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Be Vietnam Pro', sans-serif; }
+        h1, h2, h3 { font-family: 'Plus Jakarta Sans', sans-serif; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface min-h-screen">
+<!-- Header Navigation -->
+<header class="fixed top-0 left-0 right-0 z-50 flex justify-between items-center px-6 py-4 pointer-events-none">
+<button class="bg-surface-container-lowest/80 backdrop-blur-md p-3 rounded-full text-on-surface pointer-events-auto active:scale-95 transition-transform shadow-sm">
+<span class="material-symbols-outlined block">arrow_back</span>
+</button>
+<button class="bg-surface-container-lowest/80 backdrop-blur-md p-3 rounded-full text-on-surface pointer-events-auto active:scale-95 transition-transform shadow-sm">
+<span class="material-symbols-outlined block">share</span>
+</button>
+</header>
+<!-- Hero Section -->
+<section class="relative h-[40vh] w-full">
+<img alt="Matcha tea ceremony" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCyz6Ull0mq7djKCfN6il3kd9AuTo8fBwvq017CuKJ0g3XpLrO8Q4OzOmCd34EITBqSi2l61iz7SHx-EJ-VWINzMSvfIf_yqmyz5eY7qqjMf35DiS_neoQyiIovZTbyE7VbXCXRi_5FQu723wv245INvoFmCxWmpDTuSt6msAsINoJEDworLOS6b2A9HtVc5zr9cgaKwIP9a4ANE-WXkee3BeQ7UwE-QIcM4YeZDYi22m4wCuQnKnkWECttNovBSUmouED-yJGA6YE"/>
+<div class="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-surface to-transparent"></div>
+</section>
+<!-- Main Content -->
+<main class="px-6 -mt-8 relative z-10 pb-12">
+<!-- Title & Badges -->
+<div class="mb-6">
+<div class="flex items-center gap-2 mb-3">
+<span class="bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase">Artisan Session</span>
+<span class="bg-primary-fixed text-on-primary-fixed px-3 py-1 rounded-full text-[10px] font-bold tracking-wider uppercase">Open Now</span>
+</div>
+<h1 class="text-3xl font-extrabold text-on-surface leading-tight tracking-tight mb-2">Afternoon Whisk &amp; Wag</h1>
+<p class="text-on-surface-variant text-base leading-relaxed">A cozy gathering for matcha enthusiasts and their furry companions at The Sunken Parlor.</p>
+</div>
+<!-- Primary Action - Moved Prominently Higher -->
+<div class="mb-8">
+<button class="w-full bg-primary text-on-primary py-4 rounded-full font-bold text-lg shadow-lg active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+<span>Apply to Join</span>
+<span class="material-symbols-outlined text-xl">send</span>
+</button>
+</div>
+<!-- Bento Grid Details -->
+<div class="grid grid-cols-2 gap-4 mb-4">
+<!-- Snack Size -->
+<div class="bg-surface-container-low p-5 rounded-lg flex flex-col justify-between min-h-[140px]">
+<div class="flex items-center gap-2 text-primary opacity-80">
+<span class="material-symbols-outlined text-lg">cookie</span>
+<span class="text-[10px] font-black uppercase tracking-[0.1em]">Snack Size</span>
+</div>
+<div>
+<p class="text-xl font-bold text-on-surface leading-tight">Light Pairing</p>
+<p class="text-xs text-on-surface-variant mt-1">Matcha &amp; mochi bites</p>
+</div>
+</div>
+<!-- Availability -->
+<div class="bg-surface-container-low p-5 rounded-lg flex flex-col justify-between min-h-[140px]">
+<div class="flex items-center gap-2 text-primary opacity-80">
+<span class="material-symbols-outlined text-lg">groups</span>
+<span class="text-[10px] font-black uppercase tracking-[0.1em]">Availability</span>
+</div>
+<div>
+<p class="text-xl font-bold text-on-surface leading-tight">4 Seats Left</p>
+<p class="text-xs text-on-surface-variant mt-1">Out of 8 total</p>
+</div>
+</div>
+</div>
+<!-- Location & Map Card -->
+<div class="bg-surface-container-low rounded-lg overflow-hidden flex flex-col mb-8">
+<div class="p-5">
+<div class="flex justify-between items-start mb-2">
+<div class="flex items-center gap-2 text-primary opacity-80">
+<span class="material-symbols-outlined text-lg">location_on</span>
+<span class="text-[10px] font-black uppercase tracking-[0.1em]">Location</span>
+</div>
+<button class="text-primary text-xs font-bold flex items-center gap-1">
+                        Get Directions <span class="material-symbols-outlined text-xs">open_in_new</span>
+</button>
+</div>
+<p class="text-xl font-bold text-on-surface leading-tight">The Sunken Parlor</p>
+<p class="text-xs text-on-surface-variant mt-1">242 Biscuit Street, West Village</p>
+</div>
+<div class="h-32 w-full relative">
+<img alt="Map location" class="w-full h-full object-cover grayscale-[0.3] opacity-60" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAygdKgy20bRKAA_iQ2vbjl1hiVvQ50zec1dvl92YJ5tcZy_Kp3EJbaRGEBggRSTY5v0ZavMmMNdxaQq6NdbznMQhBh5G_cSYPdrEKCp-btLNwLmr_hkerO3Fs15Rbj_cbMqg9eXE1_29zLYxTi6x_joJ1uZ4WhIyRaLvZdzvPiCWhirnWuxxDPIDoG8RhXGJLU6ZjIH2wgZRyoMJvR-t9jfYaa4ep3_7U5XClg1nK5qXCuCNB8-wMyOiqx5-uZ2dfbgIXPVb60Ip0"/>
+<div class="absolute inset-0 flex items-center justify-center">
+<div class="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center">
+<div class="w-3 h-3 bg-primary rounded-full border-2 border-white"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Simplified Host Footer -->
+<div class="flex items-center justify-between p-4 bg-surface-container-highest/30 rounded-full">
+<div class="flex items-center gap-3">
+<img alt="Elena Whisks" class="w-10 h-10 rounded-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDto9YroEAEeAcH-874yJAxazL8VLTrZW_SMMneqLkwfhDCZ4EX5MqSRxYVqfg-NuItJ3stdWaIk8Sf-I6fxGnc91eIwzUlHNAv4WxTOnM-uZzG8O_biVhDHwR96t7j-kqzR_d_nDoggbLApePt4zl58Ks8gHb63o1Oj02Cbf5AD8kuQmPlYXwlIrCJQOXSAXegpJIKq8lrdQxxFBUMu1aAncXVFS-xhGw5y5FNozM9rCVEwt7Y2MV8FEdUV6RsdwGXpR2AWjKtC7I"/>
+<div>
+<p class="font-bold text-sm leading-none mb-1">Elena Whisks</p>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[10px] text-yellow-600" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="text-[10px] font-bold">4.9</span>
+</div>
+</div>
+</div>
+<button class="bg-primary-container/20 p-2 rounded-full text-primary">
+<span class="material-symbols-outlined text-xl block">chat_bubble</span>
+</button>
+</div>
+</main>
+<footer class="h-10"></footer>
+</body></html>

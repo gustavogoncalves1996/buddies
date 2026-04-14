@@ -48,9 +48,9 @@ const initialEvents = [
     hostId: 2,
     date: "2026-04-20",
     time: "14:00",
-    location: "Kyoto Sanctuary Gardens",
-    lat: 48.8606,
-    lng: 2.3376,
+    location: "Jardim do Morro, Vila Nova de Gaia",
+    lat: 41.1375,
+    lng: -8.6093,
     maxSnackers: 8,
     currentSnackers: 5,
     snackSize: 12,
@@ -68,9 +68,9 @@ const initialEvents = [
     hostId: 3,
     date: "2026-04-21",
     time: "10:00",
-    location: "Nordic Bakehouse, Copenhagen",
-    lat: 48.853,
-    lng: 2.3499,
+    location: "Rua das Flores, Porto",
+    lat: 41.1456,
+    lng: -8.6147,
     maxSnackers: 6,
     currentSnackers: 4,
     snackSize: 8,
@@ -88,9 +88,9 @@ const initialEvents = [
     hostId: 1,
     date: "2026-04-22",
     time: "16:00",
-    location: "Artisan Roastery, Berlin",
-    lat: 48.865,
-    lng: 2.32,
+    location: "Majestic Café, Rua Santa Catarina, Porto",
+    lat: 41.1505,
+    lng: -8.6050,
     maxSnackers: 5,
     currentSnackers: 2,
     snackSize: 15,
@@ -108,9 +108,9 @@ const initialEvents = [
     hostId: 1,
     date: "2026-04-25",
     time: "10:00",
-    location: "Home Kitchen, Copenhagen",
-    lat: 48.848,
-    lng: 2.345,
+    location: "Mercado do Bolhão, Porto",
+    lat: 41.1530,
+    lng: -8.6070,
     maxSnackers: 10,
     currentSnackers: 6,
     snackSize: 20,
@@ -126,7 +126,7 @@ const initialPastEvents = [
   {
     id: 10,
     title: "The Charred Selection",
-    location: "Kyoto, Japan",
+    location: "Ribeira, Porto",
     date: "Oct 2023",
     image:
       "https://lh3.googleusercontent.com/aida-public/AB6AXuCnXof_8InVM3DwD02u31Gid2Sz75dbHA-WCAwNUJQKrggGF2bceaRppRrlwXd3sxYY5YUPH4_EgCK1xpTkXJpYS8fk9rdqGuXXxCG2AWr8G-UZPENbuD-pdv9cHtLHIZ4OAir4gufkLAWXbb2ebDFEg4wP-kQ57QG7QJIG-HFBBpmxWFPBwk3x48pvh8EjtCg2FvZ78NiOwdjYdX6MpbVqMy1Tx66sZNyKx2loyBzo5-k5w_pXb1cx8RIGWmufefRXiVRRAB_w5mo",
@@ -135,7 +135,7 @@ const initialPastEvents = [
   {
     id: 11,
     title: "Aged Comté Pairings",
-    location: "Lyon, France",
+    location: "Foz do Douro, Porto",
     date: "Sep 2023",
     image:
       "https://lh3.googleusercontent.com/aida-public/AB6AXuCNO49MbcZopFIovg558OEa-29Pfm_DfXREQS-6YKd3vKV9_ZIVrwI15zop6tYfpJoQDGExf7hLphrNfbQ4Sgz5zVCABRolysE-sry9SFqQhPjpKUqx2oZOlD2c2kyXZTpkk1FSevULuldRabfMrfVeoaBTjuLpuV-NwVEYb0PH8YHWk27wCRJHoCZhBgOUZdpWs7Sr4JOi6S0ApIZwltfF1e9DEvdUZ9a-dxW4J8hbLXUWrFoVg9dFTwRWrip0nhjc2_K1R4Ut6tc",
@@ -143,7 +143,7 @@ const initialPastEvents = [
   {
     id: 12,
     title: "Zen Morning Whisk",
-    location: "Tokyo, Japan",
+    location: "Cedofeita, Porto",
     date: "Aug 2023",
     image:
       "https://lh3.googleusercontent.com/aida-public/AB6AXuAHn5XEb5aejP3POZuRV25u4ZITDVpH4DsD_Xl_UKP_vZ1bXDQJ9Zz5O5vA9Vy8tIWj5osQleAWOlT0luji2GOKD4HpqHFomdb3dXTehmhWuQg3Prbo8qet1qIS9bKg_ZwDl_vtHNN7C9Ih9zfuYQON7_Qs4_zVHQUOdzQCPIFRIVMw2EVQpKe3a7v_EgLo4Tk7XWKPrub1LQ3o2fN2cjUuz61YWo7wAIGal9j21kOhn3t8lRb6wsVh44DEeHkBDJgg-AKyvpn43rc",
@@ -151,7 +151,7 @@ const initialPastEvents = [
   {
     id: 13,
     title: "Dust & Cacao",
-    location: "Brussels, Belgium",
+    location: "Boavista, Porto",
     date: "Jul 2023",
     image:
       "https://lh3.googleusercontent.com/aida-public/AB6AXuDrqY8HSkXlSZgE2rtFzYNKOGWAJQC4hKKmFSF8D95gQyAaiTnvCoqK8VkONK7qx8CUtF1MztWaXcS1qvH83pHl8SRyxP5i43FSDLDEYMBbei8sLiWLkV9j4ODH9TRtrsrsyF2npu4kK8iGa6pjL4tua-96Tw2xT9OxXU13Hj9_JUVITFKzLvjZ4R-JDt7YD3U8h59pfQ1NykpRWAevyXHgrYtQ3E1Bydxh6TKYvFmHib95dzJPMVTlsJvcMgbvSLV5N1awaKyz6I8",
@@ -190,6 +190,18 @@ const initialApplicants = [
   },
 ];
 
+/* ── Haversine distance in km ── */
+function haversineKm(lat1, lng1, lat2, lng2) {
+  const toRad = (v) => (v * Math.PI) / 180;
+  const R = 6371;
+  const dLat = toRad(lat2 - lat1);
+  const dLng = toRad(lng2 - lng1);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
 /* ── Zustand Store ── */
 const useStore = create((set, get) => ({
   /* ── State ── */
@@ -199,6 +211,8 @@ const useStore = create((set, get) => ({
   applicants: initialApplicants,
   currentUserId: 1,
   searchQuery: "",
+  userLocation: null,          // { lat, lng } or null
+  locationStatus: "pending",   // "pending" | "granted" | "denied" | "unavailable"
 
   /* ── Derived ── */
   getCurrentUser: () => {
@@ -214,8 +228,42 @@ const useStore = create((set, get) => ({
   getApplicantsForEvent: (eventId) =>
     get().applicants.filter((a) => a.eventId === eventId),
 
+  /** Return events within `radiusKm` of the user (default 10 km).
+   *  Falls back to ALL events if location is unknown. */
+  getNearbyEvents: (radiusKm = 10) => {
+    const { events, userLocation } = get();
+    if (!userLocation) return events;
+    return events.filter(
+      (e) =>
+        e.lat != null &&
+        haversineKm(userLocation.lat, userLocation.lng, e.lat, e.lng) <= radiusKm
+    );
+  },
+
   /* ── Actions ── */
   setSearchQuery: (q) => set({ searchQuery: q }),
+
+  setUserLocation: (lat, lng) =>
+    set({ userLocation: { lat, lng }, locationStatus: "granted" }),
+
+  setLocationStatus: (status) => set({ locationStatus: status }),
+
+  /** Call once on app mount to request browser geolocation */
+  requestLocation: () => {
+    if (!navigator.geolocation) {
+      set({ locationStatus: "unavailable" });
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (pos) =>
+        set({
+          userLocation: { lat: pos.coords.latitude, lng: pos.coords.longitude },
+          locationStatus: "granted",
+        }),
+      () => set({ locationStatus: "denied" }),
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  },
 
   addEvent: (event) =>
     set((s) => ({

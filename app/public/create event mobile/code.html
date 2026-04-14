@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Host a Snack Gathering</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&amp;family=Be+Vietnam+Pro:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "inverse-on-surface": "#f4f1e8",
+                    "on-primary": "#ffffff",
+                    "tertiary": "#6a523a",
+                    "inverse-surface": "#31312b",
+                    "on-secondary-fixed": "#241a06",
+                    "inverse-primary": "#a4d393",
+                    "on-surface-variant": "#42493e",
+                    "on-primary-fixed-variant": "#28501e",
+                    "surface-variant": "#e5e2da",
+                    "surface-bright": "#fcf9f0",
+                    "secondary-fixed": "#f5e0c0",
+                    "on-error": "#ffffff",
+                    "surface-container": "#f1eee5",
+                    "secondary": "#6c5c43",
+                    "tertiary-fixed": "#ffdcbd",
+                    "surface": "#fcf9f0",
+                    "primary-fixed": "#c0f0ad",
+                    "on-background": "#1c1c17",
+                    "error-container": "#ffdad6",
+                    "on-secondary": "#ffffff",
+                    "on-tertiary": "#ffffff",
+                    "surface-container-low": "#f6f3ea",
+                    "background": "#fcf9f0",
+                    "surface-dim": "#dddad1",
+                    "surface-container-lowest": "#ffffff",
+                    "primary-container": "#4f7942",
+                    "on-tertiary-container": "#fff0e5",
+                    "on-surface": "#1c1c17",
+                    "tertiary-container": "#846a50",
+                    "error": "#ba1a1a",
+                    "tertiary-fixed-dim": "#e1c1a2",
+                    "on-secondary-container": "#706047",
+                    "secondary-fixed-dim": "#d8c4a5",
+                    "on-secondary-fixed-variant": "#53452d",
+                    "on-tertiary-fixed": "#291805",
+                    "on-primary-container": "#d3ffc1",
+                    "surface-container-high": "#ebe8df",
+                    "outline-variant": "#c2c9bb",
+                    "outline": "#73796d",
+                    "surface-container-highest": "#e5e2da",
+                    "primary-fixed-dim": "#a4d393",
+                    "on-error-container": "#93000a",
+                    "on-tertiary-fixed-variant": "#59422b",
+                    "secondary-container": "#f2ddbd",
+                    "on-primary-fixed": "#022100",
+                    "surface-tint": "#3f6833",
+                    "primary": "#37602c"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Plus Jakarta Sans"],
+                    "body": ["Be Vietnam Pro"],
+                    "label": ["Be Vietnam Pro"]
+            }
+          },
+        }
+      }
+    </script>
+<style>
+        body { font-family: 'Be Vietnam Pro', sans-serif; background-color: #fcf9f0; color: #1c1c17; }
+        .font-headline { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        
+        /* Custom slider appearance */
+        input[type=range] { -webkit-appearance: none; background: transparent; }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 8px; cursor: pointer; background: #e5e2da; border-radius: 999px; }
+        input[type=range]::-webkit-slider-thumb { border: 4px solid #ffffff; height: 28px; width: 28px; border-radius: 50%; background: #37602c; cursor: pointer; -webkit-appearance: none; margin-top: -10px; box-shadow: 0 4px 12px rgba(55,96,44,0.15); }
+        
+        body {
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface">
+<!-- Header Navigation -->
+<header class="w-full fixed top-0 bg-surface/80 backdrop-blur-md z-50 px-6 py-6 flex justify-between items-center max-w-md mx-auto left-0 right-0">
+<div class="flex items-center gap-4">
+<button class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-low text-on-surface-variant active:scale-95 transition-transform">
+<span class="material-symbols-outlined">close</span>
+</button>
+<h1 class="text-lg font-headline font-bold tracking-tight text-primary">SnackShare</h1>
+</div>
+</header>
+<!-- Main Content Container: Perfectly Centralized -->
+<main class="flex-1 w-full max-w-md mx-auto px-6 pt-24 pb-32 flex flex-col justify-center">
+<div class="space-y-8 w-full">
+<!-- Editorial Title -->
+<section class="space-y-2">
+<h2 class="text-4xl font-headline font-extrabold tracking-tight text-on-surface leading-tight">
+                    Host a Snack Gathering
+                </h2>
+<p class="text-on-surface-variant body-lg">Fill in the details to invite your local snack community.</p>
+</section>
+<!-- Form Sections -->
+<div class="space-y-8">
+<!-- Location Search -->
+<div class="space-y-4">
+<label class="font-headline font-bold text-xs uppercase tracking-widest text-primary flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">location_on</span>
+                        Where is the meet?
+                    </label>
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-5 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="w-full pl-14 pr-6 py-5 bg-surface-container-highest border-none rounded-full focus:ring-2 focus:ring-primary-fixed-dim placeholder:text-outline transition-all" placeholder="Search a cozy spot..." type="text"/>
+</div>
+</div>
+<!-- Date & Time Row -->
+<div class="grid grid-cols-2 gap-4">
+<div class="space-y-4">
+<label class="font-headline font-bold text-xs uppercase tracking-widest text-primary flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">calendar_today</span>
+                            When
+                        </label>
+<div class="bg-surface-container-low p-4 rounded-full flex items-center justify-between active:scale-95 transition-transform cursor-pointer px-6">
+<span class="text-on-surface font-medium">Oct 24</span>
+<span class="material-symbols-outlined text-outline text-lg">expand_more</span>
+</div>
+</div>
+<div class="space-y-4">
+<label class="font-headline font-bold text-xs uppercase tracking-widest text-primary flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">schedule</span>
+                            At
+                        </label>
+<div class="bg-surface-container-low p-4 rounded-full flex items-center justify-between active:scale-95 transition-transform cursor-pointer px-6">
+<span class="text-on-surface font-medium">4:30 PM</span>
+<span class="material-symbols-outlined text-outline text-lg">expand_more</span>
+</div>
+</div>
+</div>
+<!-- Max Snackers Stepper -->
+<div class="space-y-4">
+<div class="flex justify-between items-end">
+<label class="font-headline font-bold text-xs uppercase tracking-widest text-primary flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">groups</span>
+                            Max Snackers
+                        </label>
+<span class="text-3xl font-headline font-extrabold text-on-surface">8</span>
+</div>
+<div class="bg-surface-container-low p-2 rounded-full flex items-center justify-between">
+<button class="w-12 h-12 bg-surface-container-highest rounded-full flex items-center justify-center text-primary active:scale-90 transition-transform">
+<span class="material-symbols-outlined">remove</span>
+</button>
+<div class="flex-1 text-center">
+<span class="text-on-surface-variant text-xs font-medium">Limited spots foster better chats</span>
+</div>
+<button class="w-12 h-12 bg-primary rounded-full flex items-center justify-center text-on-primary active:scale-90 transition-transform">
+<span class="material-symbols-outlined">add</span>
+</button>
+</div>
+</div>
+<!-- Snack Size Slider -->
+<div class="space-y-6">
+<label class="font-headline font-bold text-xs uppercase tracking-widest text-primary flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">restaurant</span>
+                        Snack Size
+                    </label>
+<div class="relative h-40 bg-surface-container-low rounded-2xl overflow-hidden flex items-center justify-center">
+<div class="relative">
+<div class="absolute inset-0 bg-primary/10 blur-2xl rounded-full scale-150"></div>
+<div class="w-40 h-8 bg-gradient-to-r from-secondary-fixed to-[#d3ffc1] rounded-full border-4 border-white shadow-lg transition-all duration-300 transform" id="snack-visual">
+<div class="absolute right-0 top-0 bottom-0 w-1/4 bg-primary-container rounded-r-full opacity-40"></div>
+<div class="absolute left-2 top-1/2 -translate-y-1/2 w-2 h-2 bg-white/50 rounded-full"></div>
+</div>
+</div>
+</div>
+<div class="space-y-4">
+<input class="w-full" max="100" min="0" type="range" value="50"/>
+<div class="flex justify-between text-[10px] font-bold text-outline uppercase tracking-wider">
+<span>Light Nibble</span>
+<span>Full Platter</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Sticky Footer CTA -->
+<div class="fixed bottom-0 left-0 right-0 p-6 bg-surface/90 backdrop-blur-xl z-50 max-w-md mx-auto">
+<button class="w-full py-5 bg-gradient-to-br from-primary to-primary-container text-on-primary text-lg font-headline font-bold rounded-full shadow-[0_12px_40px_rgba(55,96,44,0.2)] active:scale-95 transition-all">
+            Publish Gathering
+        </button>
+</div>
+<!-- Contextual Aesthetic Decoration -->
+<div class="fixed top-0 right-0 w-64 h-64 bg-primary-fixed/30 rounded-full blur-[100px] pointer-events-none -z-10 translate-x-1/2 -translate-y-1/2"></div>
+<div class="fixed bottom-0 left-0 w-80 h-80 bg-secondary-container/20 rounded-full blur-[120px] pointer-events-none -z-10 -translate-x-1/2 translate-y-1/2"></div>
+</body></html>
