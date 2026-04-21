@@ -1,6 +1,7 @@
 import { useState, useMemo, useCallback } from "react";
-import { MapContainer, TileLayer, Marker } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
 import { CalendarDays, MapPin, Users, ChevronDown, ChevronUp, Check, X } from "lucide-react";
+import { useEffect } from "react";
 import L from "leaflet";
 import useStore from "../store/useStore";
 
@@ -18,20 +19,58 @@ const activeMarkerIcon = L.divIcon({
   iconAnchor: [11, 11],
 });
 
+/** Re-center the map once the user's geolocation arrives */
+function RecenterOnUser() {
+  const map = useMap();
+  const userLocation = useStore((s) => s.userLocation);
+  useEffect(() => {
+    if (userLocation) map.setView([userLocation.lat, userLocation.lng], 12);
+  }, [userLocation, map]);
+  return null;
+}
+
 export default function MyHostedSnacks() {
   const [tab, setTab] = useState("upcoming");
   const [expandedId, setExpandedId] = useState(null);
   const [selectedEventId, setSelectedEventId] = useState(null);
 
   const allEvents = useStore((s) => s.events);
-  const currentUserId = useStore((s) => s.currentUserId);
+  const session = useStore((s) => s.session);
+  const users = useStore((s) => s.users);
   const pastEvents = useStore((s) => s.pastEvents);
   const applicants = useStore((s) => s.applicants);
-  const updateStatus = useStore((s) => s.updateApplicantStatus);
+  const updateApplicantStatus = useStore((s) => s.updateApplicantStatus);
+  const pushToast = useStore((s) => s.pushToast);
+
+  const updateStatus = useCallback(
+    async (applicantId, status) => {
+      const applicant = applicants.find((a) => a.id === applicantId);
+      try {
+        await updateApplicantStatus(applicantId, status);
+        pushToast(
+          status === "accepted"
+            ? `${applicant?.name || "Snacker"} is in! 🎉`
+            : `${applicant?.name || "Snacker"}'s application was declined.`,
+          status === "accepted" ? "success" : "info"
+        );
+      } catch (err) {
+        pushToast(
+          "Couldn't update application: " + (err.message || "unknown error"),
+          "error"
+        );
+      }
+    },
+    [applicants, updateApplicantStatus, pushToast]
+  );
+
+  const currentUser = useMemo(
+    () => (session ? users.find((u) => u.authId === session.user.id) : null),
+    [users, session]
+  );
 
   const myEvents = useMemo(
-    () => allEvents.filter((e) => e.hostId === currentUserId),
-    [allEvents, currentUserId]
+    () => allEvents.filter((e) => e.hostId === currentUser?.id),
+    [allEvents, currentUser]
   );
   const getApplicants = useMemo(
     () => (eventId) => applicants.filter((a) => a.eventId === eventId),
@@ -67,6 +106,7 @@ export default function MyHostedSnacks() {
         <div className="absolute inset-0 z-0">
           <MapContainer center={center} zoom={12} className="h-full w-full" zoomControl={false}>
             <TileLayer url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png" />
+            <RecenterOnUser />
             {mappableEvents.map((e) => (
               <Marker
                 key={e.id}
@@ -211,6 +251,7 @@ export default function MyHostedSnacks() {
         <div className="flex-1 w-full relative">
           <MapContainer center={center} zoom={11} className="h-full w-full" zoomControl={false}>
             <TileLayer url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png" />
+            <RecenterOnUser />
             {mappableEvents.map((e) => (
               <Marker
                 key={e.id}

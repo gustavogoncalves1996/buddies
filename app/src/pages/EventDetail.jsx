@@ -7,21 +7,86 @@ export default function EventDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [message, setMessage] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   const events = useStore((s) => s.events);
   const users = useStore((s) => s.users);
+  const applicants = useStore((s) => s.applicants);
+  const session = useStore((s) => s.session);
   const applyToEvent = useStore((s) => s.applyToEvent);
+  const pushToast = useStore((s) => s.pushToast);
 
   const event = useMemo(() => events.find((e) => e.id === Number(id)) || events[0], [events, id]);
   const host = useMemo(() => users.find((u) => u.id === event.hostId), [users, event.hostId]);
+  const currentUser = useMemo(
+    () => (session ? users.find((u) => u.authId === session.user.id) : null),
+    [users, session]
+  );
 
+  const myApplication = useMemo(
+    () =>
+      currentUser
+        ? applicants.find(
+            (a) => a.eventId === event.id && a.userId === currentUser.id
+          )
+        : null,
+    [applicants, currentUser, event.id]
+  );
+
+  const isHost = currentUser?.id === event.hostId;
   const spotsLeft = event.maxSnackers - event.currentSnackers;
   const fillPercent = (event.currentSnackers / event.maxSnackers) * 100;
 
-  const handleApply = () => {
-    applyToEvent(event.id, message);
-    alert("Application sent!");
+  const handleApply = async () => {
+    if (!currentUser) {
+      pushToast("Please log in to apply.", "error");
+      return;
+    }
+    if (isHost) {
+      pushToast("You're the host of this gathering. 🌿", "info");
+      return;
+    }
+    if (myApplication) {
+      pushToast("You've already applied to this snack.", "info");
+      return;
+    }
+    if (spotsLeft <= 0) {
+      pushToast("This gathering is fully booked.", "error");
+      return;
+    }
+    if (!message.trim()) {
+      pushToast("Add a short note so the host gets to know you.", "error");
+      return;
+    }
+    setSubmitting(true);
+    try {
+      await applyToEvent(event.id, message.trim());
+      setMessage("");
+      pushToast("Application sent! The host will review it soon. 🍪", "success");
+    } catch (err) {
+      pushToast(
+        err?.code === "DUPLICATE_APPLICATION"
+          ? "You've already applied to this snack."
+          : "Couldn't send your application: " + (err.message || "unknown error"),
+        "error"
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
+
+  const applyButtonLabel = (() => {
+    if (submitting) return "Sending...";
+    if (isHost) return "You're hosting this 🌿";
+    if (myApplication?.status === "accepted") return "You're in! 🎉";
+    if (myApplication?.status === "rejected") return "Application declined";
+    if (myApplication?.status === "pending") return "Application pending...";
+    if (spotsLeft <= 0) return "Fully booked";
+    return "Apply to Join";
+  })();
+
+  const applyDisabled =
+    submitting || isHost || !!myApplication || spotsLeft <= 0;
 
   return (
     <div className="min-h-screen bg-surface pb-24 md:pb-12">
@@ -68,9 +133,10 @@ export default function EventDetail() {
             {/* Desktop apply button */}
             <button
               onClick={handleApply}
-              className="hidden md:block w-full py-6 bg-primary text-on-primary text-2xl font-bold rounded-full shadow-[0_12px_40px_rgba(55,96,44,0.15)] hover:scale-[1.01] active:scale-95 transition-all duration-300"
+              disabled={applyDisabled}
+              className="hidden md:block w-full py-6 bg-primary text-on-primary text-2xl font-bold rounded-full shadow-[0_12px_40px_rgba(55,96,44,0.15)] hover:scale-[1.01] active:scale-95 transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
-              Apply to Join
+              {applyButtonLabel}
             </button>
 
             {/* Quick Info Row */}
@@ -178,9 +244,10 @@ export default function EventDetail() {
                 />
                 <button
                   onClick={handleApply}
-                  className="w-full py-4 bg-linear-to-br from-primary to-primary-container text-on-primary text-base font-bold rounded-full shadow-[0_12px_40px_rgba(55,96,44,0.15)] hover:scale-[1.01] active:scale-95 transition-all duration-300"
+                  disabled={applyDisabled}
+                  className="w-full py-4 bg-linear-to-br from-primary to-primary-container text-on-primary text-base font-bold rounded-full shadow-[0_12px_40px_rgba(55,96,44,0.15)] hover:scale-[1.01] active:scale-95 transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
                 >
-                  Submit Application to Join
+                  {applyButtonLabel === "Apply to Join" ? "Submit Application to Join" : applyButtonLabel}
                 </button>
               </div>
             </div>

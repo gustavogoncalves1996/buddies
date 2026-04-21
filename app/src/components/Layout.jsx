@@ -1,5 +1,6 @@
-import { NavLink, Outlet, useLocation } from "react-router-dom";
-import { Map, PlusCircle, CalendarDays, User, Search, Bell } from "lucide-react";
+import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { Map, PlusCircle, CalendarDays, User, Search, Bell, LogOut, Sparkles } from "lucide-react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import useStore from "../store/useStore";
 
 export default function Layout() {
@@ -18,10 +19,19 @@ export default function Layout() {
 function TopNav() {
   const searchQuery = useStore((s) => s.searchQuery);
   const setSearchQuery = useStore((s) => s.setSearchQuery);
+  const session = useStore((s) => s.session);
   const users = useStore((s) => s.users);
-  const currentUserId = useStore((s) => s.currentUserId);
-  const currentUser = users.find((u) => u.id === currentUserId);
+  const signOut = useStore((s) => s.signOut);
+  const navigate = useNavigate();
+  const currentUser = session
+    ? users.find((u) => u.authId === session.user.id)
+    : null;
   const location = useLocation();
+
+  const handleLogout = async () => {
+    await signOut();
+    navigate("/login");
+  };
 
   const navLinks = [
     { to: "/", label: "Map" },
@@ -76,8 +86,13 @@ function TopNav() {
 
         {/* Right — Actions */}
         <div className="flex items-center gap-4">
-          <button className="p-2 hover:bg-surface-container rounded-full transition-all duration-300">
-            <Bell size={20} className="text-primary" />
+          <NotificationsBell currentUser={currentUser} />
+          <button
+            onClick={handleLogout}
+            title="Log out"
+            className="p-2 hover:bg-surface-container rounded-full transition-all duration-300"
+          >
+            <LogOut size={20} className="text-primary" />
           </button>
           <NavLink
             to="/profile"
@@ -135,5 +150,98 @@ function BottomNav() {
         ))}
       </div>
     </nav>
+  );
+}
+
+/* ─── Notifications Bell w/ Popover ─── */
+function NotificationsBell({ currentUser }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+  const events = useStore((s) => s.events);
+  const applicants = useStore((s) => s.applicants);
+
+  /* Real notifications = applicants applying to MY events */
+  const notifications = useMemo(() => {
+    if (!currentUser) return [];
+    const myEventIds = events
+      .filter((e) => e.hostId === currentUser.id)
+      .map((e) => e.id);
+    return applicants
+      .filter((a) => myEventIds.includes(a.eventId) && a.status === "pending")
+      .map((a) => {
+        const ev = events.find((e) => e.id === a.eventId);
+        return { ...a, eventTitle: ev?.title || "um evento" };
+      });
+  }, [currentUser, events, applicants]);
+
+  useEffect(() => {
+    const handler = (e) => {
+      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="relative p-2 hover:bg-surface-container rounded-full transition-all duration-300"
+      >
+        <Bell size={20} className="text-primary" />
+        {notifications.length > 0 && (
+          <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-error rounded-full border-2 border-surface" />
+        )}
+      </button>
+
+      {open && (
+        <div className="absolute right-0 mt-3 w-80 bg-surface-container-lowest rounded-2xl shadow-cozy overflow-hidden z-50 border border-outline-variant/30">
+          <div className="px-5 py-4 bg-secondary-container flex items-center justify-between">
+            <h3 className="font-headline font-extrabold text-on-secondary-container text-sm">
+              Notificações
+            </h3>
+            <span className="text-[10px] font-bold text-on-secondary-container/70">
+              {notifications.length} novas
+            </span>
+          </div>
+
+          {notifications.length === 0 ? (
+            <div className="p-6 text-center">
+              <div className="text-5xl mb-3 select-none">🫖</div>
+              <div className="inline-flex items-center gap-1.5 bg-primary-fixed/40 rounded-full px-3 py-1 mb-3">
+                <Sparkles size={12} className="text-primary" />
+                <span className="text-[10px] font-bold uppercase tracking-widest text-primary">
+                  Caixa de entrada vazia
+                </span>
+              </div>
+              <h4 className="font-headline text-base font-extrabold text-on-surface leading-tight">
+                Tudo calmo por aqui. 😌
+              </h4>
+              <p className="text-xs text-on-surface-variant mt-2 leading-relaxed">
+                Sem novas notificações. Aproveita para saborear a vida devagar —
+                talvez um chá, um bolinho, e uma conversa com quem gostas. ☕✨
+              </p>
+            </div>
+          ) : (
+            <ul className="max-h-80 overflow-y-auto divide-y divide-outline-variant/20">
+              {notifications.map((n) => (
+                <li key={n.id} className="flex items-start gap-3 p-4 hover:bg-surface-container-low">
+                  <img src={n.avatar} alt={n.name} className="w-9 h-9 rounded-full object-cover shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs text-on-surface leading-snug">
+                      <span className="font-bold">{n.name}</span> candidatou-se ao teu evento{" "}
+                      <span className="font-bold text-primary">{n.eventTitle}</span>
+                    </p>
+                    <p className="text-[10px] text-on-surface-variant mt-1 line-clamp-2">
+                      "{n.message}"
+                    </p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
+    </div>
   );
 }

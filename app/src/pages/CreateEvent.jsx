@@ -2,9 +2,10 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { MapPin, CalendarDays, Clock, Users, Cookie, Sparkles, ChevronLeft } from "lucide-react";
+import { MapPin, CalendarDays, Users, Cookie, Sparkles, ChevronLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import useStore from "../store/useStore";
+import AddressAutocomplete from "../components/AddressAutocomplete";
 
 const schema = z.object({
   location: z.string().min(3, "Please enter a location"),
@@ -15,15 +16,32 @@ const schema = z.object({
 export default function CreateEvent() {
   const navigate = useNavigate();
   const addEvent = useStore((s) => s.addEvent);
+  const setLoading = useStore((s) => s.setLoading);
+  const pushToast = useStore((s) => s.pushToast);
+  const session = useStore((s) => s.session);
+  const users = useStore((s) => s.users);
+  const currentUser = session
+    ? users.find((u) => u.authId === session.user.id)
+    : null;
   const [snackSize, setSnackSize] = useState(12);
   const [maxSnackers, setMaxSnackers] = useState(8);
   const [emojiSize, setEmojiSize] = useState(24);
+  const [geocoded, setGeocoded] = useState(null); // { label, lat, lng }
 
   const {
     register,
     handleSubmit,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm({ resolver: zodResolver(schema) });
+
+  const locationValue = watch("location") || "";
+
+  // Register location manually so the autocomplete drives it via setValue
+  useEffect(() => {
+    register("location");
+  }, [register]);
 
   useEffect(() => {
     setEmojiSize(16 + (snackSize / 50) * 48);
@@ -36,24 +54,46 @@ export default function CreateEvent() {
     return "🎂";
   };
 
-  const onSubmit = (data) => {
-    addEvent({
-      ...data,
-      snackSize,
-      maxSnackers,
-      hostId: 1,
-      currentSnackers: 0,
-      lat: 41.1579,
-      lng: -8.6291,
-      image: "https://lh3.googleusercontent.com/aida-public/AB6AXuCaZN-4WWPz68IO5galEggKHp4npqYWWQaCQuWND3wFUT5fh94ZDX7z3TkginTNzwxxOeXMuavXHhrAWM5VsQu6RJvMIdFr3WHY4voXMzPM6aV3BPE3iWs3O31YvpfD1qtZOaqPkULGeRZ4t9HIOA2YqiF7J1QhigpULIQwLPt1U_RaIv7PywUAyxgHNpPS68Ejqb4kdcPnI2xH7DKg-UeLeb0F9BjpwkVIGCsgJlCapg-vMNrAnHykfwCvPVBQg6Bo5J1gjoDnd-nQ",
-      status: "planning",
-      tag: "New",
-      walkTime: "Near you",
-      title: "New Snack Gathering",
-      description: "A fresh snack gathering at " + data.location,
-    });
-    alert("Event created! 🎉");
-    navigate("/manage");
+  const onSubmit = async (data) => {
+    if (!currentUser) {
+      pushToast("Please log in to host a snack gathering.", "error");
+      return;
+    }
+    if (!geocoded) {
+      pushToast(
+        "Pick a location from the dropdown so we can place it on the map.",
+        "error"
+      );
+      return;
+    }
+    setLoading(true);
+    try {
+      await addEvent({
+        ...data,
+        snackSize,
+        maxSnackers,
+        hostId: currentUser.id,
+        currentSnackers: 0,
+        lat: geocoded.lat,
+        lng: geocoded.lng,
+        image:
+          "https://lh3.googleusercontent.com/aida-public/AB6AXuCaZN-4WWPz68IO5galEggKHp4npqYWWQaCQuWND3wFUT5fh94ZDX7z3TkginTNzwxxOeXMuavXHhrAWM5VsQu6RJvMIdFr3WHY4voXMzPM6aV3BPE3iWs3O31YvpfD1qtZOaqPkULGeRZ4t9HIOA2YqiF7J1QhigpULIQwLPt1U_RaIv7PywUAyxgHNpPS68Ejqb4kdcPnI2xH7DKg-UeLeb0F9BjpwkVIGCsgJlCapg-vMNrAnHykfwCvPVBQg6Bo5J1gjoDnd-nQ",
+        status: "planning",
+        tag: "New",
+        walkTime: "Near you",
+        title: "New Snack Gathering",
+        description: "A fresh snack gathering at " + data.location,
+      });
+      pushToast("Snack gathering created! 🎉", "success");
+      navigate("/manage");
+      setTimeout(() => setLoading(false), 400);
+    } catch (err) {
+      setLoading(false);
+      pushToast(
+        "Couldn't create your event: " + (err.message || "unknown error"),
+        "error"
+      );
+    }
   };
 
   return (
@@ -99,14 +139,25 @@ export default function CreateEvent() {
                 <MapPin size={18} className="text-primary" />
                 <h2 className="text-base md:text-xl font-bold tracking-tight">Gathering Spot</h2>
               </div>
-              <div className="relative">
-                <input
-                  {...register("location")}
-                  placeholder="Search for a park, cafe, or address..."
-                  className="w-full bg-surface-container-highest border-none rounded-full px-5 md:px-6 py-3.5 md:py-4 text-sm text-on-surface placeholder:text-on-surface-variant/60 focus:outline-none focus:ring-2 focus:ring-primary-fixed transition-all"
-                />
-                <MapPin size={16} className="absolute right-5 md:right-6 top-1/2 -translate-y-1/2 text-on-surface-variant" />
-              </div>
+              <AddressAutocomplete
+                value={locationValue}
+                onChange={(v) => {
+                  setValue("location", v, { shouldValidate: true });
+                  if (!v) setGeocoded(null);
+                }}
+                onSelect={(item) => {
+                  setValue("location", item.label, { shouldValidate: true });
+                  setGeocoded(item);
+                }}
+                placeholder="Search for a park, cafe, or address..."
+                inputClassName="w-full bg-surface-container-highest border-none rounded-full px-5 md:px-6 py-3.5 md:py-4 text-sm text-on-surface placeholder:text-on-surface-variant/60 focus:outline-none focus:ring-2 focus:ring-primary-fixed transition-all pr-12"
+              />
+              {geocoded && (
+                <p className="ml-4 text-xs text-primary flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary inline-block" />
+                  Pinned on map · {geocoded.lat.toFixed(4)}, {geocoded.lng.toFixed(4)}
+                </p>
+              )}
               {errors.location && (
                 <p className="text-error text-xs ml-4">{errors.location.message}</p>
               )}

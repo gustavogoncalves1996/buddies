@@ -67,6 +67,7 @@
 
   --animate-float: float 3s ease-in-out infinite;
   --animate-pulse-text: pulse-text 2s ease-in-out infinite;
+  --animate-toast-in: toast-in 0.25s cubic-bezier(0.2, 0.9, 0.3, 1.2);
 }
 
 @keyframes float {
@@ -77,6 +78,11 @@
 @keyframes pulse-text {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.4; }
+}
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(-8px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 @layer base {
