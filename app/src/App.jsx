@@ -6,11 +6,14 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import ErrorBoundary from "./components/ErrorBoundary";
 import ErrorScreen from "./components/ErrorScreen";
 import ToastHost from "./components/Toast";
+import OfflineBanner from "./components/OfflineBanner";
+import PushPrompt from "./components/PushPrompt";
 import Home from "./pages/Home";
 import CreateEvent from "./pages/CreateEvent";
 import EventDetail from "./pages/EventDetail";
 import MyHostedSnacks from "./pages/MyHostedSnacks";
 import Profile from "./pages/Profile";
+import ConfirmedEvents from "./pages/ConfirmedEvents";
 import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
 import useStore from "./store/useStore";
@@ -29,6 +32,8 @@ export default function App() {
     <ErrorBoundary>
       {isLoading && <LoadingScreen />}
       <ToastHost />
+      <OfflineBanner />
+      <PushPrompt />
       <Routes>
         {/* Public auth routes */}
         <Route path="/login" element={<Login />} />
@@ -42,6 +47,7 @@ export default function App() {
             <Route path="/event/:id" element={<EventDetail />} />
             <Route path="/manage" element={<MyHostedSnacks />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/confirmed" element={<ConfirmedEvents />} />
           </Route>
         </Route>
 
