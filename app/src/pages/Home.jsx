@@ -4,6 +4,7 @@ import L from "leaflet";
 import { Search, Locate, ChevronLeft, ChevronRight, Car, Footprints } from "lucide-react";
 import { Link } from "react-router-dom";
 import useStore from "../store/useStore";
+import LoadingScreen from "../components/LoadingScreen";
 import "leaflet/dist/leaflet.css";
 
 /* ── Travel helpers ── */
@@ -136,6 +137,11 @@ export default function Home() {
     const cardWidth = el.querySelector("a")?.offsetWidth || 400;
     el.scrollBy({ left: direction * (cardWidth + 24), behavior: "smooth" });
   }, []);
+
+  /* Hold the cozy loader until we know the user's location (or it fails) */
+  if (!userLocation && locationStatus === "pending") {
+    return <LoadingScreen message="Loading cozy times for you..." />;
+  }
 
   return (
     <div className="relative h-[calc(100vh-64px)] md:h-[calc(100vh-73px)] w-full overflow-hidden">

@@ -254,6 +254,38 @@ const useStore = create((set, get) => ({
     set({ applicants: (data || []).map(mapApplicant) });
   },
 
+  /* ─────────────────── STORAGE ─────────────────── */
+
+  /** Upload a cover image to the public `event-images` bucket and return its URL. */
+  uploadEventImage: async (file) => {
+    if (!file) throw new Error("No file provided");
+    if (!file.type?.startsWith("image/")) {
+      throw new Error("Please select an image file.");
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      throw new Error("Image is too large (max 5 MB).");
+    }
+    const me = get().getCurrentUser();
+    const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
+    const path = `${me?.id || "anon"}/${Date.now()}-${Math.random()
+      .toString(36)
+      .slice(2, 8)}.${ext}`;
+
+    const { error } = await supabase.storage
+      .from("event-images")
+      .upload(path, file, {
+        cacheControl: "3600",
+        upsert: false,
+        contentType: file.type,
+      });
+    if (error) {
+      console.error("uploadEventImage", error);
+      throw error;
+    }
+    const { data } = supabase.storage.from("event-images").getPublicUrl(path);
+    return data.publicUrl;
+  },
+
   /* ─────────────────── MUTATIONS ─────────────────── */
 
   addEvent: async (event) => {

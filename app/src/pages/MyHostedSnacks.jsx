@@ -4,6 +4,7 @@ import { CalendarDays, MapPin, Users, ChevronDown, ChevronUp, Check, X } from "l
 import { useEffect } from "react";
 import L from "leaflet";
 import useStore from "../store/useStore";
+import LoadingScreen from "../components/LoadingScreen";
 
 const markerIcon = L.divIcon({
   className: "",
@@ -85,6 +86,7 @@ export default function MyHostedSnacks() {
   );
 
   const userLocation = useStore((s) => s.userLocation);
+  const locationStatus = useStore((s) => s.locationStatus);
 
   const handleMarkerClick = useCallback((eventId) => {
     setSelectedEventId((prev) => (prev === eventId ? null : eventId));
@@ -97,6 +99,11 @@ export default function MyHostedSnacks() {
           mappableEvents.reduce((a, e) => a + e.lng, 0) / mappableEvents.length,
         ]
       : [41.1579, -8.6291];
+
+  /* Hold the cozy loader until we know the user's location (or it fails) */
+  if (!userLocation && locationStatus === "pending") {
+    return <LoadingScreen message="Loading cozy times for you..." />;
+  }
 
   return (
     <div className="min-h-screen bg-surface pb-24 md:pb-0">

@@ -2,10 +2,14 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { MapPin, CalendarDays, Users, Cookie, Sparkles, ChevronLeft } from "lucide-react";
+import { MapPin, CalendarDays, Users, Cookie, Sparkles, ChevronLeft, Image as ImageIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import useStore from "../store/useStore";
 import AddressAutocomplete from "../components/AddressAutocomplete";
+import ImageUpload from "../components/ImageUpload";
+
+const DEFAULT_EVENT_IMAGE =
+  "https://lh3.googleusercontent.com/aida-public/AB6AXuCaZN-4WWPz68IO5galEggKHp4npqYWWQaCQuWND3wFUT5fh94ZDX7z3TkginTNzwxxOeXMuavXHhrAWM5VsQu6RJvMIdFr3WHY4voXMzPM6aV3BPE3iWs3O31YvpfD1qtZOaqPkULGeRZ4t9HIOA2YqiF7J1QhigpULIQwLPt1U_RaIv7PywUAyxgHNpPS68Ejqb4kdcPnI2xH7DKg-UeLeb0F9BjpwkVIGCsgJlCapg-vMNrAnHykfwCvPVBQg6Bo5J1gjoDnd-nQ";
 
 const schema = z.object({
   location: z.string().min(3, "Please enter a location"),
@@ -16,6 +20,7 @@ const schema = z.object({
 export default function CreateEvent() {
   const navigate = useNavigate();
   const addEvent = useStore((s) => s.addEvent);
+  const uploadEventImage = useStore((s) => s.uploadEventImage);
   const setLoading = useStore((s) => s.setLoading);
   const pushToast = useStore((s) => s.pushToast);
   const session = useStore((s) => s.session);
@@ -27,6 +32,7 @@ export default function CreateEvent() {
   const [maxSnackers, setMaxSnackers] = useState(8);
   const [emojiSize, setEmojiSize] = useState(24);
   const [geocoded, setGeocoded] = useState(null); // { label, lat, lng }
+  const [imageFile, setImageFile] = useState(null);
 
   const {
     register,
@@ -68,6 +74,19 @@ export default function CreateEvent() {
     }
     setLoading(true);
     try {
+      let imageUrl = DEFAULT_EVENT_IMAGE;
+      if (imageFile) {
+        try {
+          imageUrl = await uploadEventImage(imageFile);
+        } catch (err) {
+          setLoading(false);
+          pushToast(
+            "Couldn't upload your image: " + (err.message || "unknown error"),
+            "error"
+          );
+          return;
+        }
+      }
       await addEvent({
         ...data,
         snackSize,
@@ -76,8 +95,7 @@ export default function CreateEvent() {
         currentSnackers: 0,
         lat: geocoded.lat,
         lng: geocoded.lng,
-        image:
-          "https://lh3.googleusercontent.com/aida-public/AB6AXuCaZN-4WWPz68IO5galEggKHp4npqYWWQaCQuWND3wFUT5fh94ZDX7z3TkginTNzwxxOeXMuavXHhrAWM5VsQu6RJvMIdFr3WHY4voXMzPM6aV3BPE3iWs3O31YvpfD1qtZOaqPkULGeRZ4t9HIOA2YqiF7J1QhigpULIQwLPt1U_RaIv7PywUAyxgHNpPS68Ejqb4kdcPnI2xH7DKg-UeLeb0F9BjpwkVIGCsgJlCapg-vMNrAnHykfwCvPVBQg6Bo5J1gjoDnd-nQ",
+        image: imageUrl,
         status: "planning",
         tag: "New",
         walkTime: "Near you",
@@ -161,6 +179,18 @@ export default function CreateEvent() {
               {errors.location && (
                 <p className="text-error text-xs ml-4">{errors.location.message}</p>
               )}
+            </section>
+
+            {/* Cover Image */}
+            <section className="space-y-3 md:space-y-4">
+              <div className="flex items-center gap-2.5 md:gap-3">
+                <ImageIcon size={18} className="text-primary" />
+                <h2 className="text-base md:text-xl font-bold tracking-tight">Cover Image</h2>
+                <span className="text-xs text-on-surface-variant font-medium">
+                  · optional
+                </span>
+              </div>
+              <ImageUpload value={imageFile} onChange={setImageFile} />
             </section>
 
             {/* Date & Time */}
