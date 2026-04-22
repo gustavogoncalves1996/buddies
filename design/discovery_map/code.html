@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&amp;family=Be+Vietnam+Pro:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-low": "#f6f3ea",
+                    "surface-dim": "#dddad1",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary": "#ffffff",
+                    "on-background": "#1c1c17",
+                    "inverse-on-surface": "#f4f1e8",
+                    "on-primary-container": "#d3ffc1",
+                    "tertiary": "#6a523a",
+                    "secondary-container": "#f2ddbd",
+                    "secondary-fixed-dim": "#d8c4a5",
+                    "secondary": "#6c5c43",
+                    "on-secondary-container": "#706047",
+                    "on-secondary-fixed-variant": "#53452d",
+                    "on-secondary": "#ffffff",
+                    "on-primary-fixed": "#022100",
+                    "on-tertiary-fixed-variant": "#59422b",
+                    "outline-variant": "#c2c9bb",
+                    "surface-bright": "#fcf9f0",
+                    "surface-variant": "#e5e2da",
+                    "surface-container": "#f1eee5",
+                    "primary-fixed": "#c0f0ad",
+                    "on-surface-variant": "#42493e",
+                    "primary-container": "#4f7942",
+                    "on-tertiary": "#ffffff",
+                    "on-error": "#ffffff",
+                    "tertiary-fixed": "#ffdcbd",
+                    "tertiary-container": "#846a50",
+                    "surface-container-highest": "#e5e2da",
+                    "surface-container-high": "#ebe8df",
+                    "secondary-fixed": "#f5e0c0",
+                    "inverse-surface": "#31312b",
+                    "inverse-primary": "#a4d393",
+                    "surface-tint": "#3f6833",
+                    "tertiary-fixed-dim": "#e1c1a2",
+                    "on-tertiary-fixed": "#291805",
+                    "surface": "#fcf9f0",
+                    "on-tertiary-container": "#fff0e5",
+                    "on-surface": "#1c1c17",
+                    "error": "#ba1a1a",
+                    "primary": "#37602c",
+                    "outline": "#73796d",
+                    "on-error-container": "#93000a"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Plus Jakarta Sans"],
+                    "body": ["Be Vietnam Pro"],
+                    "label": ["Be Vietnam Pro"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Be Vietnam Pro', sans-serif; }
+        .font-plus-jakarta-sans { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .map-gradient-overlay {
+            background: linear-gradient(to bottom, rgba(252, 249, 240, 0.4) 0%, transparent 15%, transparent 70%, rgba(252, 249, 240, 0.9) 100%);
+        }
+        ::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface selection:bg-primary-fixed selection:text-on-primary-fixed overflow-hidden">
+<!-- Shared TopNavBar -->
+<header class="bg-[#ffffffcc] dark:bg-[#1c1c17cc] backdrop-blur-xl shadow-[0_12px_40px_rgba(55,96,44,0.06)] docked full-width top-0 z-50 sticky">
+<div class="flex justify-between items-center px-12 py-4 w-full">
+<div class="flex items-center gap-12">
+<span class="text-2xl font-bold text-[#37602c] dark:text-[#c0f0ad] italic font-plus-jakarta-sans">The Culinary Hearth</span>
+<!-- Navigation Links -->
+<nav class="hidden md:flex items-center gap-8 font-plus-jakarta-sans tracking-tight">
+<a class="text-[#37602c] dark:text-[#c0f0ad] font-bold border-b-2 border-[#37602c] dark:border-[#c0f0ad] pb-1" href="#">Map</a>
+<a class="text-[#42493e] dark:text-[#c2c9bb] font-medium hover:text-[#37602c] transition-colors" href="#">Create</a>
+<a class="text-[#42493e] dark:text-[#c2c9bb] font-medium hover:text-[#37602c] transition-colors" href="#">Manage</a>
+</nav>
+</div>
+<!-- Integrated Search Bar -->
+<div class="flex-1 max-w-xl mx-8">
+<div class="relative group">
+<div class="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-outline">search</span>
+</div>
+<input class="w-full bg-surface-container-highest border-none rounded-full py-3 pl-12 pr-4 focus:ring-2 focus:ring-primary-container text-on-surface-variant font-body" placeholder="Search for cozy snack events..." type="text"/>
+</div>
+</div>
+<!-- Trailing Actions -->
+<div class="flex items-center gap-4">
+<button class="p-2 hover:bg-[#f1eee5] dark:hover:bg-[#32362d] rounded-full transition-all duration-300 scale-95 active:scale-90 cursor-pointer">
+<span class="material-symbols-outlined text-[#42493e] dark:text-[#c2c9bb]">notifications</span>
+</button>
+<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary-fixed scale-95 active:scale-90 transition-transform cursor-pointer">
+<img alt="User profile" class="w-full h-full object-cover" data-alt="close-up portrait of a smiling young man with warm lighting in a cozy indoor setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBoyo1wCEEzPVAkcskd-NIoWhASM4Qfd1O1iGFv0x8CUAcQvwMZ7R_qfA4uj0LZ8m7f_w7yWgARVU1RHC42tIeQk6fyGZNQhea6rvg-OZF2A-TTgEaGKuMmd8zk0qribKHou3IKZPTlQ9Q6668VnDwp2JmO-wxEWJWDKygttKTRQwXiQvdjYcZybc0Fx-u_5caZUKV0PfkVeDHF5ZHvlHP48b0e76fjJNDgXSg02XYiFBVoDUIVT9ul9c3sYpM83MnkK6xs95JhxRxn"/>
+</div>
+</div>
+</div>
+<div class="bg-[#f6f3ea] dark:bg-[#2a2d26] h-[1px] w-full"></div>
+</header>
+<main class="relative h-[calc(100vh-80px)] w-full overflow-hidden">
+<!-- Interactive Map Canvas -->
+<div class="absolute inset-0 z-0">
+<img class="w-full h-full object-cover grayscale-[20%] sepia-[10%] brightness-[105%]" data-alt="soft aesthetic illustrated map of a European city with cream and soft green tones and minimal clean street lines" data-location="Copenhagen" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA4u_fZkxryBIAUrwYvXjBC1kvwk3BnQotg79MTKjdG_p9n4IvHGPZjhFynSy_el4SJy_0LL139kCnw7yF8NjB9s-q7ziSP6OnX8LmWDuF-VmIjflgQkkDMSdFM-zGLMEIg7rBqIAd0RlP5FzxowG4ySOnG8b5ff9zO8VLaYRGcTIodHCNuXjIJl7ZbFSP-sqE7KMi4XLyfUygpjGkqPYbB1PobUwCyezSnh2-Lw329g9bZD8qyb6sLQc69xSaVimTdK6Vdc3bPkw9s"/>
+<div class="absolute inset-0 map-gradient-overlay pointer-events-none"></div>
+</div>
+<!-- Map Pins & User Avatar -->
+<div class="absolute inset-0 z-10 pointer-events-none">
+<!-- Centered User Avatar -->
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-auto">
+<div class="relative flex items-center justify-center">
+<div class="absolute w-24 h-24 bg-primary-container/20 rounded-full animate-pulse"></div>
+<div class="w-12 h-12 rounded-full border-4 border-surface-container-lowest shadow-xl overflow-hidden z-20">
+<img alt="User" class="w-full h-full object-cover" data-alt="professional male headshot with warm aesthetic" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAvaBM2KESHMj9arpU6eBTQJMduK09BN7H5EpcsOQTNcRStWjFvNEHuyU4i5lwvkGo6mNofKuNbVmh6dXp_UuJX2NSXkllSHcZpUF9MvCHqJMMsIn2ABRUEkBy1FDvMHHum_e7TYnVUqis5EryL7ahInfem9pVugfKo_FTf7638nkuJwe5s8khHLht7XJ6RrmEzOhCJp4UES98cj-sHxaVVI0OjNjz7_IpF3Cq5_8_l-jPmOFf0MP_VGf-dqB3nRkwlbbgeHxgQdUI_"/>
+</div>
+</div>
+</div>
+<!-- Cookie Pin 1 -->
+<div class="absolute top-[30%] left-[25%] pointer-events-auto group cursor-pointer">
+<div class="flex flex-col items-center">
+<div class="bg-secondary-container p-3 rounded-full shadow-lg group-hover:scale-110 transition-transform duration-300">
+<span class="material-symbols-outlined text-on-secondary-container" style="font-variation-settings: 'FILL' 1;">cookie</span>
+</div>
+<div class="mt-2 bg-surface-container-lowest px-3 py-1 rounded-full shadow-md">
+<span class="text-xs font-bold text-on-surface font-plus-jakarta-sans tracking-tight">The Butter Nook</span>
+</div>
+</div>
+</div>
+<!-- Coffee Pin 1 -->
+<div class="absolute top-[45%] left-[65%] pointer-events-auto group cursor-pointer">
+<div class="flex flex-col items-center">
+<div class="bg-primary-fixed p-3 rounded-full shadow-lg group-hover:scale-110 transition-transform duration-300">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">coffee</span>
+</div>
+<div class="mt-2 bg-surface-container-lowest px-3 py-1 rounded-full shadow-md">
+<span class="text-xs font-bold text-on-surface font-plus-jakarta-sans tracking-tight">Matcha Mornings</span>
+</div>
+</div>
+</div>
+<!-- Cookie Pin 2 -->
+<div class="absolute top-[65%] left-[40%] pointer-events-auto group cursor-pointer">
+<div class="flex flex-col items-center">
+<div class="bg-tertiary-fixed p-3 rounded-full shadow-lg group-hover:scale-110 transition-transform duration-300">
+<span class="material-symbols-outlined text-tertiary" style="font-variation-settings: 'FILL' 1;">bakery_dining</span>
+</div>
+<div class="mt-2 bg-surface-container-lowest px-3 py-1 rounded-full shadow-md">
+<span class="text-xs font-bold text-on-surface font-plus-jakarta-sans tracking-tight">Artisan Crumb</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Floating UI Components -->
+<div class="absolute top-8 right-8 z-20 flex flex-col gap-4">
+<button class="w-14 h-14 bg-surface-container-lowest rounded-full shadow-xl flex items-center justify-center hover:bg-surface-container-low transition-colors group">
+<span class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform">my_location</span>
+</button>
+<button class="w-14 h-14 bg-surface-container-lowest rounded-full shadow-xl flex items-center justify-center hover:bg-surface-container-low transition-colors group">
+<span class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform">layers</span>
+</button>
+</div>
+<!-- Bottom Carousel Section -->
+<section class="absolute bottom-0 left-0 right-0 z-30 pb-12 pt-20 px-12 bg-gradient-to-t from-surface via-surface/90 to-transparent">
+<div class="max-w-7xl mx-auto">
+<div class="flex justify-between items-end mb-6 px-4">
+<div>
+<h2 class="text-3xl font-plus-jakarta-sans font-bold text-primary tracking-tight">Discover Nearby Experiences</h2>
+<p class="text-on-surface-variant font-body mt-1 italic">Curated artisan snack pop-ups within 2km</p>
+</div>
+<div class="flex gap-3">
+<button class="p-3 rounded-full bg-surface-container-high text-on-surface hover:bg-secondary-container transition-colors">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<button class="p-3 rounded-full bg-surface-container-high text-on-surface hover:bg-secondary-container transition-colors">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+<div class="flex gap-6 overflow-x-auto pb-4 scroll-smooth">
+<!-- Card 1 -->
+<div class="min-w-[400px] bg-surface-container-lowest rounded-lg overflow-hidden shadow-[0_12px_40px_rgba(55,96,44,0.06)] group">
+<div class="flex h-48">
+<div class="w-1/2">
+<img class="w-full h-full object-cover" data-alt="close up of ceramic bowl with bright green matcha and a wooden whisk" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCaZN-4WWPz68IO5galEggKHp4npqYWWQaCQuWND3wFUT5fh94ZDX7z3TkginTNzwxxOeXMuavXHhrAWM5VsQu6RJvMIdFr3WHY4voXMzPM6aV3BPE3iWs3O31YvpfD1qtZOaqPkULGeRZ4t9HIOA2YqiF7J1QhigpULIQwLPt1U_RaIv7PywUAyxgHNpPS68Ejqb4kdcPnI2xH7DKg-UeLeb0F9BjpwkVIGCsgJlCapg-vMNrAnHykfwCvPVBQg6Bo5J1gjoDnd-nQ"/>
+</div>
+<div class="w-1/2 p-6 flex flex-col justify-between">
+<div>
+<span class="text-[10px] uppercase tracking-widest font-bold text-primary mb-2 block">Brewing Now</span>
+<h3 class="text-xl font-plus-jakarta-sans font-bold text-on-surface leading-tight">Green Whisk Pop-up</h3>
+<p class="text-sm text-on-surface-variant mt-2">Experimental matcha tea &amp; mochi pairing.</p>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-sm">schedule</span>
+<span class="text-xs font-bold text-on-surface-variant">Until 5:00 PM</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="min-w-[400px] bg-surface-container-lowest rounded-lg overflow-hidden shadow-[0_12px_40px_rgba(55,96,44,0.06)] group">
+<div class="flex h-48">
+<div class="w-1/2">
+<img class="w-full h-full object-cover" data-alt="rustic wooden table with assorted homemade cookies and milk in soft sunlight" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAcfIrFi1NJc9q7EZYfYkdNPvegNehvF1qGbFbd0GikJTMGfmvxpqcCvsTGHpvPSeQE3C5QMHKP4WXHfaMzArXzRX0X3BD3y_Mtsq-A2xxDrOUgQ_aR8TfEJclXemAdJXufRTavx24yG0ZsU3KnXqmLZYHTQULfuKcLbQE4lYFieer8hQe556-lqIDOBQlVWW1Mt1A6vNgdk4Zny54Wx7sw-lq9uXnGrFl5RwlWbhvB03x0MK5uQI4ejQ0RfJROswGmi3XbN4FbYBGg"/>
+</div>
+<div class="w-1/2 p-6 flex flex-col justify-between">
+<div>
+<span class="text-[10px] uppercase tracking-widest font-bold text-tertiary mb-2 block">Baker's Choice</span>
+<h3 class="text-xl font-plus-jakarta-sans font-bold text-on-surface leading-tight">The Butter Nook</h3>
+<p class="text-sm text-on-surface-variant mt-2">Warm sea-salt chocolate chip cookies.</p>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-sm">location_on</span>
+<span class="text-xs font-bold text-on-surface-variant">0.4 km away</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="min-w-[400px] bg-surface-container-lowest rounded-lg overflow-hidden shadow-[0_12px_40px_rgba(55,96,44,0.06)] group">
+<div class="flex h-48">
+<div class="w-1/2">
+<img class="w-full h-full object-cover" data-alt="hand holding a small espresso cup with steam rising in a cozy cafe" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQYfnXmgpdvdDspGQWdRnFrIR8kzlxibwjuF6lk9osfcCD4c62DWPgGSUzg1ma8DRi_ywZl8MYgo614VJGGiULO3EOLRKGQ_l_lpqIIgplyUozICr5CCr87TWK5-AMwGks3_c-BUeiQSaBC95Kq8zIp4ETHvWc0KI4Gbb4Al0Kns671ctnMWx_eqp2AslEJkNh-ZfmAmdV9tyMqvL93LJDGiiUeO061ccNRPlRagB1PEuhP0IYt4_1dXMlhaKX3FvwgpEp8KJ8Ly1f"/>
+</div>
+<div class="w-1/2 p-6 flex flex-col justify-between">
+<div>
+<span class="text-[10px] uppercase tracking-widest font-bold text-secondary mb-2 block">Trending</span>
+<h3 class="text-xl font-plus-jakarta-sans font-bold text-on-surface leading-tight">Espresso &amp; Ego</h3>
+<p class="text-sm text-on-surface-variant mt-2">Single origin beans from local roasters.</p>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-sm">stars</span>
+<span class="text-xs font-bold text-on-surface-variant">Highly Rated</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+</body></html>

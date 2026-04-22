@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SnackShare - Login</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Be+Vietnam+Pro:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-surface": "#1c1c17",
+                        "primary": "#37602c",
+                        "surface": "#fcf9f0",
+                        "on-primary": "#ffffff",
+                        "surface-tint": "#3f6833",
+                        "on-tertiary-fixed": "#291805",
+                        "surface-dim": "#dddad1",
+                        "on-surface-variant": "#42493e",
+                        "background": "#fcf9f0",
+                        "inverse-on-surface": "#f4f1e8",
+                        "outline": "#73796d",
+                        "secondary-fixed": "#f5e0c0",
+                        "on-primary-fixed-variant": "#28501e",
+                        "on-secondary-container": "#706047",
+                        "surface-container-low": "#f6f3ea",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-fixed": "#ffdcbd",
+                        "primary-container": "#4f7942",
+                        "outline-variant": "#c2c9bb",
+                        "tertiary-container": "#846a50",
+                        "surface-container-high": "#ebe8df",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-fixed-variant": "#53452d",
+                        "on-error": "#ffffff",
+                        "tertiary": "#6a523a",
+                        "surface-variant": "#e5e2da",
+                        "on-secondary-fixed": "#241a06",
+                        "on-tertiary-fixed-variant": "#59422b",
+                        "secondary-container": "#f2ddbd",
+                        "on-primary-fixed": "#022100",
+                        "inverse-primary": "#a4d393",
+                        "primary-fixed-dim": "#a4d393",
+                        "surface-container-highest": "#e5e2da",
+                        "surface-bright": "#fcf9f0",
+                        "secondary": "#6c5c43",
+                        "error": "#ba1a1a",
+                        "primary-fixed": "#c0f0ad",
+                        "on-tertiary-container": "#fff0e5",
+                        "on-error-container": "#93000a",
+                        "on-secondary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "tertiary-fixed-dim": "#e1c1a2",
+                        "surface-container": "#f1eee5",
+                        "on-background": "#1c1c17",
+                        "secondary-fixed-dim": "#d8c4a5",
+                        "on-primary-container": "#d3ffc1",
+                        "inverse-surface": "#31312b"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Plus Jakarta Sans"],
+                        "body": ["Be Vietnam Pro"],
+                        "label": ["Be Vietnam Pro"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .bg-matcha-gradient {
+            background: linear-gradient(135deg, #37602c 0%, #4f7942 100%);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface font-body min-h-screen flex flex-col">
+<!-- Top Navigation Suppression (As per Shell Visibility Rules for Login) -->
+<main class="flex-grow flex flex-col px-8 pt-16 pb-32">
+<!-- Hero Branding Section -->
+<div class="mb-12 space-y-4">
+<div class="w-16 h-16 bg-secondary-container rounded-lg flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-primary text-4xl" data-icon="bakery_dining">bakery_dining</span>
+</div>
+<h1 class="font-headline text-display-lg text-4xl font-extrabold tracking-tight text-primary leading-tight">
+                Welcome back to SnackShare
+            </h1>
+<p class="text-on-surface-variant text-lg">
+                Your artisanal sanctuary for flavor and community.
+            </p>
+</div>
+<!-- Login Form Section -->
+<form class="space-y-6">
+<div class="space-y-2">
+<label class="block text-sm font-medium text-on-surface-variant ml-4" for="email">Email Address</label>
+<input class="w-full h-14 px-6 rounded-full bg-surface-container-highest border-none focus:ring-2 focus:ring-surface-tint focus:bg-primary-fixed transition-all duration-300 placeholder-on-surface-variant/50" id="email" name="email" placeholder="name@example.com" type="email"/>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between items-center px-4">
+<label class="block text-sm font-medium text-on-surface-variant" for="password">Password</label>
+<a class="text-xs font-semibold text-primary" href="#">Forgot?</a>
+</div>
+<input class="w-full h-14 px-6 rounded-full bg-surface-container-highest border-none focus:ring-2 focus:ring-surface-tint focus:bg-primary-fixed transition-all duration-300" id="password" name="password" placeholder="••••••••" type="password"/>
+</div>
+<div class="pt-4">
+<button class="w-full h-16 bg-matcha-gradient text-on-primary font-headline font-bold text-lg rounded-xl shadow-[0_12px_40px_rgba(55,96,44,0.12)] active:scale-95 transition-transform duration-200" type="submit">
+                    Login
+                </button>
+</div>
+</form>
+<!-- Aesthetic Divider -->
+<div class="relative py-10">
+<div aria-hidden="true" class="absolute inset-0 flex items-center">
+<div class="w-full border-t border-outline-variant/20"></div>
+</div>
+<div class="relative flex justify-center text-sm">
+<span class="px-4 bg-surface text-on-surface-variant italic">New here?</span>
+</div>
+</div>
+<!-- Sign Up Link -->
+<div class="text-center">
+<a class="inline-flex items-center justify-center px-8 py-4 bg-surface-container-low text-primary font-bold rounded-full transition-colors hover:bg-surface-container-high group" href="#">
+                Create an account
+                <span class="material-symbols-outlined ml-2 text-sm group-hover:translate-x-1 transition-transform" data-icon="arrow_forward">arrow_forward</span>
+</a>
+</div>
+<!-- Decor Image (Asymmetric Editorial Style) -->
+<div class="mt-12 -mx-8 flex justify-end">
+<div class="w-3/4 rounded-l-lg overflow-hidden">
+<img class="w-full h-48 object-cover opacity-80 mix-blend-multiply grayscale hover:grayscale-0 transition-all duration-700" data-alt="overhead view of a ceramic bowl filled with bright green matcha powder and an bamboo whisk on a textured cream linen background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCuyauppf4Dm-bTvaBxlufJBde8GWNWtxUZN_vI7auA-p8NTEmvklZdOFAhueCev_rAvopNvTyQg_iGOlQenFgyEq43ur4CwTNgBreLI7Zy6n31pKuRFNteQrmqGd_wnTRZJSIzWsDpm8zlLFsvXXn0gx34JiEY4iJ3nn1xd20UJxMGYUQsK7udr_EKb82NwOc8XetEkGxJjWDduC8Oe78rEaUjurGoahfp1aBEXGQlf5Sn_Q5DXy2BOImoUxrsVUcq0IfOzo36-8E"/>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation Bar (Mandatory inclusion from JSON) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-8 pt-4 bg-[#fcf9f0]/90 backdrop-blur-2xl shadow-[0_-8px_30px_rgba(55,96,44,0.04)] md:hidden">
+<a class="flex flex-col items-center justify-center text-[#42493e] hover:bg-[#f1eee5] transition-all duration-300 px-4 py-2 rounded-full" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="text-[11px] font-medium font-['Be_Vietnam_Pro']">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#42493e] hover:bg-[#f1eee5] transition-all duration-300 px-4 py-2 rounded-full" href="#">
+<span class="material-symbols-outlined" data-icon="search">search</span>
+<span class="text-[11px] font-medium font-['Be_Vietnam_Pro']">Search</span>
+</a>
+<a class="flex flex-col items-center justify-center text-[#42493e] hover:bg-[#f1eee5] transition-all duration-300 px-4 py-2 rounded-full" href="#">
+<span class="material-symbols-outlined" data-icon="add_box">add_box</span>
+<span class="text-[11px] font-medium font-['Be_Vietnam_Pro']">Post</span>
+</a>
+<!-- ACTIVE STATE: Mapping "Login" page intent to "Me" tab -->
+<a class="flex flex-col items-center justify-center bg-[#c0f0ad] text-[#022100] rounded-full px-5 py-1 scale-110 duration-300 ease-out" href="#">
+<span class="material-symbols-outlined" data-icon="account_circle" style="font-variation-settings: 'FILL' 1;">account_circle</span>
+<span class="text-[11px] font-bold font-['Be_Vietnam_Pro']">Me</span>
+</a>
+</nav>
+
+```</body></html>

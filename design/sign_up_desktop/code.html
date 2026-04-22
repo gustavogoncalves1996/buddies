@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Sign Up | SnackShare</title>
+<!-- Google Fonts: Plus Jakarta Sans & Be Vietnam Pro -->
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&amp;family=Be+Vietnam+Pro:ital,wght@0,100..900;1,100..900&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-surface": "#1c1c17",
+                    "primary": "#37602c",
+                    "surface": "#fcf9f0",
+                    "on-primary": "#ffffff",
+                    "surface-tint": "#3f6833",
+                    "on-tertiary-fixed": "#291805",
+                    "surface-dim": "#dddad1",
+                    "on-surface-variant": "#42493e",
+                    "background": "#fcf9f0",
+                    "inverse-on-surface": "#f4f1e8",
+                    "outline": "#73796d",
+                    "secondary-fixed": "#f5e0c0",
+                    "on-primary-fixed-variant": "#28501e",
+                    "on-secondary-container": "#706047",
+                    "surface-container-low": "#f6f3ea",
+                    "surface-container-lowest": "#ffffff",
+                    "tertiary-fixed": "#ffdcbd",
+                    "primary-container": "#4f7942",
+                    "outline-variant": "#c2c9bb",
+                    "tertiary-container": "#846a50",
+                    "surface-container-high": "#ebe8df",
+                    "on-tertiary": "#ffffff",
+                    "on-secondary-fixed-variant": "#53452d",
+                    "on-error": "#ffffff",
+                    "tertiary": "#6a523a",
+                    "surface-variant": "#e5e2da",
+                    "on-secondary-fixed": "#241a06",
+                    "on-tertiary-fixed-variant": "#59422b",
+                    "secondary-container": "#f2ddbd",
+                    "on-primary-fixed": "#022100",
+                    "inverse-primary": "#a4d393",
+                    "primary-fixed-dim": "#a4d393",
+                    "surface-container-highest": "#e5e2da",
+                    "surface-bright": "#fcf9f0",
+                    "secondary": "#6c5c43",
+                    "error": "#ba1a1a",
+                    "primary-fixed": "#c0f0ad",
+                    "on-tertiary-container": "#fff0e5",
+                    "on-error-container": "#93000a",
+                    "on-secondary": "#ffffff",
+                    "error-container": "#ffdad6",
+                    "tertiary-fixed-dim": "#e1c1a2",
+                    "surface-container": "#f1eee5",
+                    "on-background": "#1c1c17",
+                    "secondary-fixed-dim": "#d8c4a5",
+                    "on-primary-container": "#d3ffc1",
+                    "inverse-surface": "#31312b"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Plus Jakarta Sans"],
+                    "body": ["Be Vietnam Pro"],
+                    "label": ["Be Vietnam Pro"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .matcha-gradient {
+            background: linear-gradient(135deg, #37602c 0%, #4f7942 100%);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- Minimal Header (Derived from TopAppBar JSON instructions but suppressed for Transactional focus) -->
+<header class="fixed top-0 left-0 w-full z-50 px-8 py-6 flex justify-between items-center bg-surface/80 backdrop-blur-md">
+<span class="font-headline text-2xl font-bold tracking-tight text-primary">SnackShare</span>
+<a class="text-on-surface-variant font-medium text-sm hover:text-primary transition-colors" href="#">Help</a>
+</header>
+<main class="min-h-screen flex items-stretch pt-20">
+<!-- Editorial Side (The Visual Sanctuary) -->
+<div class="hidden lg:flex w-1/2 p-8 relative">
+<div class="w-full h-full rounded-lg overflow-hidden relative group">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="Close-up of a steaming cup of matcha green tea and a small plate of delicate artisanal biscuits on a warm wooden surface" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCqgtKb0C--oa1oxFkSN5gnYc0BKLOrOOX8Rsf1cCJ98LxI41V7Ayoh47kE-ckoDNPjegkcToZEzdv1Fu2TZFKReaChNmUL5HorRxyoIyFsOc_oqPrAVuUEl4B_7Uf_NTQV-w6crtXKjejxbalhKNN2I6_9jAFHojP0LfAz40cbRNuSaCDzvshzyq7cH7wfwndpbfV_lckXj0jysC7PrrslX40Tipag68k5JlgbNByAMQTvAhj1VnLZHU67uu-k0U7IMsSYTVn8LZ8"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/60 to-transparent opacity-40"></div>
+<div class="absolute bottom-12 left-12 max-w-md">
+<h2 class="font-headline text-4xl font-extrabold text-white tracking-tight mb-4">The Artisanal Sanctuary</h2>
+<p class="text-white/90 text-lg leading-relaxed">Join our community of mindful snackers. Share the warmth of a perfectly whisked matcha and the crunch of a hand-crafted biscuit.</p>
+</div>
+</div>
+</div>
+<!-- Sign Up Form Side -->
+<div class="w-full lg:w-1/2 flex items-center justify-center p-8 md:p-16">
+<div class="max-w-md w-full space-y-10">
+<div class="space-y-4">
+<h1 class="font-headline text-5xl font-extrabold tracking-tight text-on-surface">Begin your journey.</h1>
+<p class="text-on-surface-variant text-lg">Create your sanctuary and start sharing artisanal moments today.</p>
+</div>
+<form class="space-y-6">
+<!-- Name Field -->
+<div class="space-y-2">
+<label class="block text-sm font-bold text-on-surface-variant ml-4" for="name">Name</label>
+<input class="w-full px-6 py-4 rounded-full bg-surface-container-highest border-none focus:ring-2 focus:ring-surface-tint focus:bg-primary-fixed transition-all placeholder:text-on-surface-variant/50" id="name" name="name" placeholder="E.g. Whisk Master" type="text"/>
+</div>
+<!-- Email Field -->
+<div class="space-y-2">
+<label class="block text-sm font-bold text-on-surface-variant ml-4" for="email">Email</label>
+<input class="w-full px-6 py-4 rounded-full bg-surface-container-highest border-none focus:ring-2 focus:ring-surface-tint focus:bg-primary-fixed transition-all placeholder:text-on-surface-variant/50" id="email" name="email" placeholder="hello@matchalover.com" type="email"/>
+</div>
+<!-- Password Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="space-y-2">
+<label class="block text-sm font-bold text-on-surface-variant ml-4" for="password">Password</label>
+<input class="w-full px-6 py-4 rounded-full bg-surface-container-highest border-none focus:ring-2 focus:ring-surface-tint focus:bg-primary-fixed transition-all placeholder:text-on-surface-variant/50" id="password" name="password" placeholder="••••••••" type="password"/>
+</div>
+<div class="space-y-2">
+<label class="block text-sm font-bold text-on-surface-variant ml-4" for="confirm_password">Confirm</label>
+<input class="w-full px-6 py-4 rounded-full bg-surface-container-highest border-none focus:ring-2 focus:ring-surface-tint focus:bg-primary-fixed transition-all placeholder:text-on-surface-variant/50" id="confirm_password" name="confirm_password" placeholder="••••••••" type="password"/>
+</div>
+</div>
+<!-- Terms Checkbox (Subtle Design) -->
+<div class="flex items-center gap-3 ml-4">
+<input class="w-5 h-5 rounded-md border-none bg-surface-container-highest text-primary focus:ring-primary" id="terms" type="checkbox"/>
+<label class="text-sm text-on-surface-variant" for="terms">
+                            I agree to the <a class="text-primary font-bold hover:underline" href="#">Community Guidelines</a>
+</label>
+</div>
+<!-- Sign Up Button -->
+<button class="w-full matcha-gradient text-on-primary font-bold py-5 px-8 rounded-xl shadow-[0_12px_40px_rgba(55,96,44,0.15)] active:scale-95 transition-all duration-200 text-lg" type="submit">
+                        Sign Up
+                    </button>
+</form>
+<div class="text-center space-y-6">
+<div class="flex items-center gap-4 text-on-surface-variant/30">
+<div class="h-px w-full bg-current"></div>
+<span class="text-sm font-medium whitespace-nowrap">or</span>
+<div class="h-px w-full bg-current"></div>
+</div>
+<p class="text-on-surface-variant font-medium">
+                        Already have an account? 
+                        <a class="text-primary font-bold hover:underline ml-1" href="#">Login</a>
+</p>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer Decoration (No dividers, just tonal shift) -->
+<footer class="bg-surface-container-low py-12 px-8 flex flex-col md:flex-row justify-between items-center gap-6">
+<div class="flex items-center gap-8">
+<span class="text-on-surface-variant text-sm font-medium">© 2024 SnackShare</span>
+<a class="text-on-surface-variant text-sm hover:text-primary transition-colors" href="#">Privacy</a>
+<a class="text-on-surface-variant text-sm hover:text-primary transition-colors" href="#">Terms</a>
+</div>
+<div class="flex gap-4">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center text-primary-container hover:bg-primary-fixed transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-xl">spa</span>
+</div>
+<div class="w-10 h-10 rounded-full bg-surface-container-highest flex items-center justify-center text-primary-container hover:bg-primary-fixed transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-xl">favorite</span>
+</div>
+</div>
+</footer>
+</body></html>

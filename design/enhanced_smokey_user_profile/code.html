@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Julian Hearthstone | The Culinary Hearth</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Be+Vietnam+Pro:wght@300;400;500;600&amp;family=Cormorant+Garamond:ital,wght@0,600;0,700;1,500;1,600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-highest": "#e5e2da",
+                    "surface-tint": "#3f6833",
+                    "secondary": "#6c5c43",
+                    "on-background": "#1c1c17",
+                    "surface-container-low": "#f6f3ea",
+                    "outline": "#73796d",
+                    "on-tertiary-container": "#fff0e5",
+                    "tertiary-container": "#846a50",
+                    "on-secondary": "#ffffff",
+                    "surface-container-lowest": "#ffffff",
+                    "tertiary-fixed": "#ffdcbd",
+                    "tertiary-fixed-dim": "#e1c1a2",
+                    "on-secondary-fixed": "#241a06",
+                    "on-primary-fixed": "#022100",
+                    "inverse-on-surface": "#f4f1e8",
+                    "secondary-fixed-dim": "#d8c4a5",
+                    "tertiary": "#6a523a",
+                    "primary": "#37602c",
+                    "outline-variant": "#c2c9bb",
+                    "on-primary": "#ffffff",
+                    "background": "#fcf9f0",
+                    "primary-fixed-dim": "#a4d393",
+                    "on-secondary-container": "#706047",
+                    "error-container": "#ffdad6",
+                    "surface-container-high": "#ebe8df",
+                    "secondary-fixed": "#f5e0c0",
+                    "surface-container": "#f1eee5",
+                    "surface-dim": "#dddad1",
+                    "error": "#ba1a1a",
+                    "on-tertiary-fixed-variant": "#59422b",
+                    "on-tertiary": "#ffffff",
+                    "inverse-primary": "#a4d393",
+                    "primary-fixed": "#c0f0ad",
+                    "on-surface": "#1c1c17",
+                    "on-error": "#ffffff",
+                    "surface-bright": "#fcf9f0",
+                    "on-primary-fixed-variant": "#28501e",
+                    "surface-variant": "#e5e2da",
+                    "on-primary-container": "#d3ffc1",
+                    "on-surface-variant": "#42493e",
+                    "on-secondary-fixed-variant": "#53452d",
+                    "on-error-container": "#93000a",
+                    "secondary-container": "#f2ddbd",
+                    "surface": "#fcf9f0",
+                    "primary-container": "#4f7942",
+                    "on-tertiary-fixed": "#291805",
+                    "inverse-surface": "#31312b"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Plus Jakarta Sans"],
+                    "body": ["Be Vietnam Pro"],
+                    "label": ["Be Vietnam Pro"],
+                    "elegant": ["Cormorant Garamond", "serif"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24
+        }
+        .smokey-gradient {
+            background: linear-gradient(180deg, #0e1a0b 0%, #1c2e17 40%, #2a4d21 100%);
+            position: relative;
+            overflow: hidden
+        }
+        .smokey-gradient::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 50% 50%, rgba(164, 211, 147, 0.05) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .smokey-gradient::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuBzf03vAc_5yaiD6VBi20KoNP_TQ0-yTsyIG9B3cudRYZ_c8RAWWaCZffaqHUf2MlamzyTZwrsynWOxiVXYVmQT-eDqCYRNUkRMzskVg8PjqSU0me-Z_F6cojaChouXk-96877nhFwpzobeujzI3p0RF8KSODFuyI4f1mGmsus1i3nfsr-QlhSjuTbKnTMYlcpyciq2uKMnQPIsbUJ1EwKuye_MNoVJ1mktwuzAG4NTSVI0KWACm01bQ6WpBbVC86_Oic80nRXeLog);
+            opacity: 0.25;
+            mix-blend-mode: overlay;
+            pointer-events: none;
+            filter: contrast(120%) brightness(80%);
+        }
+        .mist-overlay {
+            position: absolute;
+            inset: 0;
+            background: url('https://www.transparenttextures.com/patterns/fog.png');
+            opacity: 0.4;
+            animation: drift 60s linear infinite;
+            pointer-events: none;
+        }
+        @keyframes drift {
+            from { background-position: 0 0; }
+            to { background-position: 1000px 1000px; }
+        }
+        .profile-halo {
+            box-shadow: 0 0 40px rgba(164, 211, 147, 0.15), inset 0 0 20px rgba(164, 211, 147, 0.1);
+            border: 1px solid rgba(164, 211, 147, 0.2);
+        }
+        .text-shadow-sm {
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+<body class="bg-background font-body text-on-surface selection:bg-primary-fixed selection:text-on-primary-fixed">
+<nav class="fixed top-0 w-full z-50 bg-[#ffffff]/80 dark:bg-[#1c1c17]/80 backdrop-blur-md shadow-[0_12px_40px_rgba(55,96,44,0.06)]">
+<div class="flex justify-between items-center px-12 py-4 max-w-[1920px] mx-auto">
+<div class="flex items-center gap-8">
+<span class="text-2xl font-bold tracking-tighter text-[#37602c] dark:text-[#c0f0ad] font-headline">The Culinary Hearth</span>
+<div class="hidden md:flex items-center gap-6 font-['Plus_Jakarta_Sans'] text-sm tracking-tight font-medium">
+<a class="text-[#42493e] dark:text-[#c2c9bb] hover:text-[#37602c] transition-colors" href="#">Map</a>
+<a class="text-[#42493e] dark:text-[#c2c9bb] hover:text-[#37602c] transition-colors" href="#">Create</a>
+<a class="text-[#42493e] dark:text-[#c2c9bb] hover:text-[#37602c] transition-colors" href="#">Manage</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-[#37602c] dark:text-[#c0f0ad] hover:bg-[#f1eee5] dark:hover:bg-[#32322c] rounded-full transition-all active:scale-95 duration-200 ease-out">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="flex items-center gap-2 p-1 pr-3 text-[#37602c] dark:text-[#c0f0ad] border-b-2 border-[#37602c] pb-1 transition-all active:scale-95 duration-200 ease-out">
+<span class="material-symbols-outlined" data-icon="account_circle" style="font-variation-settings: 'FILL' 1;">account_circle</span>
+<span class="font-headline text-sm font-medium">Profile</span>
+</button>
+</div>
+</div>
+</nav>
+<main class="pt-20">
+<!-- Enhanced Hero Section -->
+<section class="smokey-gradient min-h-[680px] flex flex-col items-center justify-center pt-16 pb-32 px-6 text-center">
+<div class="mist-overlay"></div>
+<div class="relative group z-10">
+<div class="w-48 h-48 md:w-56 md:h-56 rounded-full p-1.5 profile-halo mb-10 transition-all duration-700 group-hover:scale-105 group-hover:shadow-[0_0_60px_rgba(164,211,147,0.3)] bg-gradient-to-b from-primary-fixed/20 to-transparent">
+<img alt="Julian Hearthstone Profile" class="w-full h-full object-cover rounded-full filter brightness-95 contrast-105" data-alt="Portrait of a sophisticated middle-aged man with salt and pepper beard in a dark green wool sweater, moody cinematic lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDTDMsxzNJvcl1sUSbJ-JPqZun_GgLarqwepjbm8196TZQRINVn_WHCdU8uv9Kssfk_m35OlMQx8KmLfCn7a7ftRSKCB13TJCfBrB34ZdDKcxVrBrxaOEH3NToBlr0sGX_yAzpO0sdeRUYl6QdhMsBbqdcIfK9I7roHSNwk0W7y0CJ29vzCOxQwADXHnngcE9cifh5FtdBhnI-MwT5VSee31_tGPi9GPwd5AKp2Q7IeyjlL2gE6kwe5riFliDRA5fawnk8VdTzjfHc"/>
+</div>
+<div class="absolute -bottom-2 right-10 bg-primary-container text-on-primary-container p-2 rounded-full shadow-xl border border-primary-fixed/20">
+<span class="material-symbols-outlined text-sm" data-icon="verified" style="font-variation-settings: 'FILL' 1;">verified</span>
+</div>
+</div>
+<h1 class="font-elegant text-5xl md:text-7xl font-bold tracking-tight text-on-primary-container mb-6 text-shadow-sm z-10">
+                Julian Hearthstone
+            </h1>
+<p class="max-w-3xl font-elegant text-xl md:text-2xl text-primary-fixed/90 leading-relaxed italic z-10 px-4">
+                "Curating the intersection of atmospheric smoke and artisanal snacking. <br class="hidden md:block"/> A seeker of the perfect char and the quietest tea rooms."
+            </p>
+<!-- Awards Section -->
+<div class="mt-14 flex flex-wrap justify-center gap-6 z-10">
+<div class="bg-black/20 backdrop-blur-xl px-7 py-5 rounded-2xl border border-white/10 flex items-center gap-4 transition-all hover:bg-black/30">
+<div class="w-12 h-12 rounded-full bg-secondary-container/80 flex items-center justify-center shadow-lg">
+<span class="material-symbols-outlined text-on-secondary-container" data-icon="workspace_premium" style="font-variation-settings: 'FILL' 1;">workspace_premium</span>
+</div>
+<div class="text-left">
+<p class="text-[10px] uppercase tracking-[0.2em] text-primary-fixed font-bold opacity-80">Legendary Achievement</p>
+<p class="text-on-primary-container font-headline font-semibold text-lg">50cm Snack Mastery</p>
+</div>
+</div>
+<div class="bg-black/20 backdrop-blur-xl px-7 py-5 rounded-2xl border border-white/10 flex items-center gap-4 transition-all hover:bg-black/30">
+<div class="w-12 h-12 rounded-full bg-tertiary-fixed/80 flex items-center justify-center shadow-lg">
+<span class="material-symbols-outlined text-on-tertiary-fixed" data-icon="star" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+<div class="text-left">
+<p class="text-[10px] uppercase tracking-[0.2em] text-primary-fixed font-bold opacity-80">Community Pillar</p>
+<p class="text-on-primary-container font-headline font-semibold text-lg">100+ Shared Moments</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Content Canvas -->
+<section class="max-w-[1400px] mx-auto px-6 md:px-12 -mt-20 relative z-20 pb-32">
+<div class="flex items-center justify-between mb-12">
+<h2 class="font-headline text-3xl font-bold tracking-tight text-on-surface">Past Snack Explorations</h2>
+<div class="flex gap-2">
+<button class="bg-surface-container-high p-3 rounded-full hover:bg-primary-fixed transition-colors">
+<span class="material-symbols-outlined" data-icon="grid_view">grid_view</span>
+</button>
+<button class="bg-surface-container-low p-3 rounded-full hover:bg-primary-fixed transition-colors">
+<span class="material-symbols-outlined" data-icon="filter_list">filter_list</span>
+</button>
+</div>
+</div>
+<!-- Bento Masonry Grid -->
+<div class="grid grid-cols-1 md:grid-cols-4 auto-rows-[250px] gap-6">
+<!-- Card 1: Large Featured -->
+<div class="md:col-span-2 md:row-span-2 group relative overflow-hidden rounded-lg shadow-[0_12px_40px_rgba(55,96,44,0.06)]">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Close-up of premium Japanese wagyu beef skewers being grilled over binchotan charcoal with theatrical smoke" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCnXof_8InVM3DwD02u31Gid2Sz75dbHA-WCAwNUJQKrggGF2bceaRppRrlwXd3sxYY5YUPH4_EgCK1xpTkXJpYS8fk9rdqGuXXxCG2AWr8G-UZPENbuD-pdv9cHtLHIZ4OAir4gufkLAWXbb2ebDFEg4wP-kQ57QG7QJIG-HFBBpmxWFPBwk3x48pvh8EjtCg2FvZ78NiOwdjYdX6MpbVqMy1Tx66sZNyKx2loyBzo5-k5w_pXb1cx8RIGWmufefRXiVRRAB_w5mo"/>
+<div class="absolute inset-0 bg-gradient-to-t from-on-surface/90 via-on-surface/20 to-transparent p-8 flex flex-col justify-end opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+<span class="bg-primary-fixed text-on-primary-fixed text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full w-fit mb-3">Midnight Market</span>
+<h3 class="font-headline text-2xl font-bold text-white">The Charred Selection</h3>
+<p class="text-surface-variant text-sm mt-2 font-light">Kyoto, Japan • Oct 2023</p>
+</div>
+</div>
+<!-- Card 2: Vertical -->
+<div class="md:row-span-2 group relative overflow-hidden rounded-lg shadow-[0_12px_40px_rgba(55,96,44,0.06)]">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Artisanal sourdough crackers with aged cheese and honey on a dark slate platter, moody atmospheric lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCNO49MbcZopFIovg558OEa-29Pfm_DfXREQS-6YKd3vKV9_ZIVrwI15zop6tYfpJoQDGExf7hLphrNfbQ4Sgz5zVCABRolysE-sry9SFqQhPjpKUqx2oZOlD2c2kyXZTpkk1FSevULuldRabfMrfVeoaBTjuLpuV-NwVEYb0PH8YHWk27wCRJHoCZhBgOUZdpWs7Sr4JOi6S0ApIZwltfF1e9DEvdUZ9a-dxW4J8hbLXUWrFoVg9dFTwRWrip0nhjc2_K1R4Ut6tc"/>
+<div class="absolute inset-0 bg-gradient-to-t from-on-surface/90 to-transparent p-6 flex flex-col justify-end opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+<h3 class="font-headline text-xl font-bold text-white">Aged Comté Pairings</h3>
+</div>
+</div>
+<!-- Card 3: Horizontal -->
+<div class="md:col-span-1 group relative overflow-hidden rounded-lg shadow-[0_12px_40px_rgba(55,96,44,0.06)]">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Steaming cup of matcha tea on a wooden tray with a single small biscuit, soft morning light in a zen garden" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAHn5XEb5aejP3POZuRV25u4ZITDVpH4DsD_Xl_UKP_vZ1bXDQJ9Zz5O5vA9Vy8tIWj5osQleAWOlT0luji2GOKD4HpqHFomdb3dXTehmhWuQg3Prbo8qet1qIS9bKg_ZwDl_vtHNN7C9Ih9zfuYQON7_Qs4_zVHQUOdzQCPIFRIVMw2EVQpKe3a7v_EgLo4Tk7XWKPrub1LQ3o2fN2cjUuz61YWo7wAIGal9j21kOhn3t8lRb6wsVh44DEeHkBDJgg-AKyvpn43rc"/>
+<div class="absolute inset-0 bg-gradient-to-t from-on-surface/90 to-transparent p-6 flex flex-col justify-end opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+<h3 class="font-headline text-lg font-bold text-white">Zen Morning Whisk</h3>
+</div>
+</div>
+<!-- Card 4: Standard -->
+<div class="group relative overflow-hidden rounded-lg shadow-[0_12px_40px_rgba(55,96,44,0.06)]">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" data-alt="Handcrafted dark chocolate truffles dusted with matcha powder on a white ceramic plate, editorial style" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDrqY8HSkXlSZgE2rtFzYNKOGWAJQC4hKKmFSF8D95gQyAaiTnvCoqK8VkONK7qx8CUtF1MztWaXcS1qvH83pHl8SRyxP5i43FSDLDEYMBbei8sLiWLkV9j4ODH9TRtrsrsyF2npu4kK8iGa6pjL4tua-96Tw2xT9OxXU13Hj9_JUVITFKzLvjZ4R-JDt7YD3U8h59pfQ1NykpRWAevyXHgrYtQ3E1Bydxh6TKYvFmHib95dzJPMVTlsJvcMgbvSLV5N1awaKyz6I8"/>
+<div class="absolute inset-0 bg-gradient-to-t from-on-surface/90 to-transparent p-6 flex flex-col justify-end opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+<h3 class="font-headline text-lg font-bold text-white">Dust &amp; Cacao</h3>
+</div>
+</div>
+<!-- Card 5 was removed as per request -->
+</div>
+</section>
+</main>
+</body></html>

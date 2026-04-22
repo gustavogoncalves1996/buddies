@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Login | SnackShare</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&amp;family=Be+Vietnam+Pro:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-surface": "#1c1c17",
+                        "primary": "#37602c",
+                        "surface": "#fcf9f0",
+                        "on-primary": "#ffffff",
+                        "surface-tint": "#3f6833",
+                        "on-tertiary-fixed": "#291805",
+                        "surface-dim": "#dddad1",
+                        "on-surface-variant": "#42493e",
+                        "background": "#fcf9f0",
+                        "inverse-on-surface": "#f4f1e8",
+                        "outline": "#73796d",
+                        "secondary-fixed": "#f5e0c0",
+                        "on-primary-fixed-variant": "#28501e",
+                        "on-secondary-container": "#706047",
+                        "surface-container-low": "#f6f3ea",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-fixed": "#ffdcbd",
+                        "primary-container": "#4f7942",
+                        "outline-variant": "#c2c9bb",
+                        "tertiary-container": "#846a50",
+                        "surface-container-high": "#ebe8df",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-fixed-variant": "#53452d",
+                        "on-error": "#ffffff",
+                        "tertiary": "#6a523a",
+                        "surface-variant": "#e5e2da",
+                        "on-secondary-fixed": "#241a06",
+                        "on-tertiary-fixed-variant": "#59422b",
+                        "secondary-container": "#f2ddbd",
+                        "on-primary-fixed": "#022100",
+                        "inverse-primary": "#a4d393",
+                        "primary-fixed-dim": "#a4d393",
+                        "surface-container-highest": "#e5e2da",
+                        "surface-bright": "#fcf9f0",
+                        "secondary": "#6c5c43",
+                        "error": "#ba1a1a",
+                        "primary-fixed": "#c0f0ad",
+                        "on-tertiary-container": "#fff0e5",
+                        "on-error-container": "#93000a",
+                        "on-secondary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "tertiary-fixed-dim": "#e1c1a2",
+                        "surface-container": "#f1eee5",
+                        "on-background": "#1c1c17",
+                        "secondary-fixed-dim": "#d8c4a5",
+                        "on-primary-container": "#d3ffc1",
+                        "inverse-surface": "#31312b"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Plus Jakarta Sans"],
+                        "body": ["Be Vietnam Pro"],
+                        "label": ["Be Vietnam Pro"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Be Vietnam Pro', sans-serif;
+            background-color: #fcf9f0;
+        }
+        h1, h2, h3 {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .matcha-gradient {
+            background: linear-gradient(135deg, #37602c 0%, #4f7942 100%);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface selection:bg-primary-fixed">
+<main class="min-h-screen flex items-center justify-center p-6 md:p-12 lg:p-24">
+<!-- Editorial Layout Container -->
+<div class="relative w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-0 overflow-hidden rounded-xl bg-surface-container-low shadow-[0_12px_40px_rgba(55,96,44,0.06)]">
+<!-- Left Side: Visual/Editorial Column -->
+<div class="hidden lg:flex lg:col-span-7 relative overflow-hidden bg-surface-container-highest min-h-[700px] flex-col justify-between p-16">
+<div class="relative z-10">
+<span class="inline-block px-4 py-1.5 mb-8 rounded-full bg-secondary-container text-on-secondary-container text-xs font-bold tracking-widest uppercase">
+                        The Artisanal Sanctuary
+                    </span>
+<h1 class="text-6xl font-extrabold text-primary leading-none tracking-tight mb-6">
+                        SnackShare
+                    </h1>
+<p class="text-xl text-on-surface-variant max-w-md leading-relaxed font-body">
+                        Revisit your favorite crumbs. A quiet corner for artisanal snack enthusiasts to discover and delight.
+                    </p>
+</div>
+<!-- Decorative Image Component -->
+<div class="absolute bottom-0 right-0 w-3/4 h-3/4 opacity-90 mix-blend-multiply">
+<img alt="Top-down view of matcha tea and artisanal biscuits on a rustic wooden table with soft morning light" class="w-full h-full object-cover rounded-tl-lg" data-alt="Top-down view of matcha tea and artisanal biscuits on a rustic wooden table with soft morning light and organic shadows" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDC1ME9B1sUWd1IXpycNPGJDqQ3TnvSnVdlF1x14pp6QMkcoTQUwsPQ06HwAraejbxH6htGacVbYn3m_FJbhfWeyt2i3S4HaQXeAyMUrJv_xFDzLIzEEuDTn3OwuS2ONnbibkd0vtXyyHKoZM_fCEpzhfECi81eFNbwRvLavGQ0lgnv0DU6Pf3o-GVVl50X-pod_oevcPWyAfsTSGWQkyCyusKxmGyQiiaJ2zYiGWyyGJPGEBQ8DVaAyO_-5yUB4Ch45SEzKYN4a-M"/>
+</div>
+<div class="relative z-10 text-on-surface-variant/60 text-sm italic">
+                    "Every snack tells a story of craftsmanship."
+                </div>
+</div>
+<!-- Right Side: Login Form Column -->
+<div class="lg:col-span-5 bg-surface-container-lowest flex flex-col justify-center px-8 py-16 md:px-16 lg:px-20">
+<div class="mb-12 lg:hidden">
+<h2 class="text-3xl font-black text-primary tracking-tight">SnackShare</h2>
+</div>
+<div class="mb-10">
+<h2 class="text-4xl font-bold text-on-surface mb-3 tracking-tight">Welcome Back</h2>
+<p class="text-on-surface-variant">Sign in to your artisanal sanctuary.</p>
+</div>
+<form class="space-y-6">
+<!-- Email Field -->
+<div class="space-y-2">
+<label class="block text-sm font-semibold text-on-surface-variant ml-2" for="email">Email Address</label>
+<div class="relative">
+<input class="w-full px-6 py-4 bg-surface-container-highest border-none rounded-full focus:ring-2 focus:ring-surface-tint focus:bg-primary-fixed transition-all duration-300 placeholder:text-outline/50" id="email" name="email" placeholder="hello@snackshare.com" type="email"/>
+</div>
+</div>
+<!-- Password Field -->
+<div class="space-y-2">
+<div class="flex justify-between items-center px-2">
+<label class="block text-sm font-semibold text-on-surface-variant" for="password">Password</label>
+<a class="text-xs font-semibold text-primary hover:text-primary-container transition-colors" href="#">Forgot password?</a>
+</div>
+<div class="relative">
+<input class="w-full px-6 py-4 bg-surface-container-highest border-none rounded-full focus:ring-2 focus:ring-surface-tint focus:bg-primary-fixed transition-all duration-300 placeholder:text-outline/50" id="password" name="password" placeholder="••••••••" type="password"/>
+</div>
+</div>
+<!-- Actions -->
+<div class="pt-4">
+<button class="w-full matcha-gradient text-on-primary font-bold py-4 px-8 rounded-full shadow-lg hover:shadow-[0_12px_40px_rgba(55,96,44,0.15)] transform active:scale-95 transition-all duration-200" type="submit">
+                            Login
+                        </button>
+</div>
+<!-- Social or Alternative Divider (Subtle) -->
+<div class="relative py-4">
+<div class="absolute inset-0 flex items-center">
+<div class="w-full bg-surface-container-high h-[1px]"></div>
+</div>
+<div class="relative flex justify-center text-xs uppercase">
+<span class="bg-surface-container-lowest px-4 text-on-surface-variant/40 font-bold tracking-widest">Or continue with</span>
+</div>
+</div>
+<!-- Secondary Login Options -->
+<div class="flex gap-4">
+<button class="flex-1 flex items-center justify-center gap-2 bg-surface-container-low hover:bg-surface-container-high text-on-surface-variant py-3 rounded-full transition-colors duration-200" type="button">
+<img alt="Google Logo" class="w-5 h-5" data-alt="Official Google logo with multi-colored G symbol" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC5g1voUpdJ2quhuLWSEpZ51LkEhz9Bhva1JjECjkag64vJRxY-10kqB5Pu5P82dx1ol6x3cCNcGbvVnGyLgZbS66519Cd8xKIw98tDpzkY6EVikM_EEj14L4bzUY0u16PoEPMbxgv9VQ3O_Ct4YeApAt89RSEX6SDYg_0iyisD-231PpgAhACkidKEy0Fmwv5XW9Jho_jWlvpvnARvPpb637SCMSaM9x2nf9iHyuSVfHiymhwfl6WVOYr_FI_sgNu4_4XhjnNJxw8"/>
+<span class="text-sm font-semibold">Google</span>
+</button>
+</div>
+</form>
+<!-- Footer Link -->
+<div class="mt-12 text-center">
+<p class="text-on-surface-variant text-sm">
+                        Don't have an account? 
+                        <a class="text-primary font-bold ml-1 hover:underline decoration-primary-fixed decoration-4 underline-offset-4 transition-all" href="#">Create an account</a>
+</p>
+</div>
+</div>
+</div>
+<!-- Floating Decorative Element (Bottom Left) -->
+<div class="fixed bottom-12 left-12 hidden xl:block opacity-20 hover:opacity-40 transition-opacity">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary scale-150" data-icon="bakery_dining">bakery_dining</span>
+<span class="text-primary font-headline font-bold text-sm tracking-widest uppercase">Est. 2024</span>
+</div>
+</div>
+</main>
+</body></html>
