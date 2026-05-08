@@ -12,7 +12,7 @@ export default defineConfig({
       // Hand-written SW (push + custom routing) with Workbox precache injected.
       strategies: 'injectManifest',
       srcDir: 'src',
-      filename: 'sw.js',
+      filename: 'sw.ts',
       registerType: 'autoUpdate',
       injectRegister: false, // we register manually in main.jsx
       devOptions: { enabled: false },
