@@ -18,8 +18,8 @@ export default defineConfig({
       devOptions: { enabled: false },
       includeAssets: ['favicon.ico', 'loading.png', 'robots.txt'],
       manifest: {
-        name: 'Buddies — cozy snack gatherings',
-        short_name: 'Buddies',
+        name: 'Buddies Club',
+        short_name: 'Buddies Club',
         description: 'Find and host cozy snack meetups near you.',
         theme_color: '#37602c',          // Matcha primary
         background_color: '#fdf7e8',     // Biscuit surface

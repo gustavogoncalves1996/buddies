@@ -41,8 +41,8 @@ export default function EventDetail() {
 
   const intensityLabel = useMemo(() => {
     const v = Number(event.snackSize);
-    if (v <= 1) return t("createEvent.snackSizeMildBlend");
-    if (v >= 3) return t("createEvent.snackSizeDeepBlend");
+    if (v <= 18) return t("createEvent.snackSizeMildBlend");
+    if (v >= 36) return t("createEvent.snackSizeDeepBlend");
     return t("createEvent.snackSizeBalanced");
   }, [event.snackSize, t]);
 

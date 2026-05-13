@@ -25,27 +25,6 @@ import sessionJointImg from "../assets/session-joint.png";
 const DEFAULT_EVENT_IMAGE =
   "https://lh3.googleusercontent.com/aida-public/AB6AXuCaZN-4WWPz68IO5galEggKHp4npqYWWQaCQuWND3wFUT5fh94ZDX7z3TkginTNzwxxOeXMuavXHhrAWM5VsQu6RJvMIdFr3WHY4voXMzPM6aV3BPE3iWs3O31YvpfD1qtZOaqPkULGeRZ4t9HIOA2YqiF7J1QhigpULIQwLPt1U_RaIv7PywUAyxgHNpPS68Ejqb4kdcPnI2xH7DKg-UeLeb0F9BjpwkVIGCsgJlCapg-vMNrAnHykfwCvPVBQg6Bo5J1gjoDnd-nQ";
 
-/* ── Puffy cloud icon used in the intensity scale (image 2 style) ── */
-function CloudIcon({ size = 28, fill = "#3d6b30", stroke = "#3d6b30", filled = true, strokeWidth = 2 }) {
-  // Multi-bump puffy cloud, similar to the reference design.
-  return (
-    <svg
-      viewBox="0 0 80 56"
-      width={size}
-      height={(size * 56) / 80}
-      aria-hidden
-    >
-      <path
-        d="M22 50c-9 0-16-6.7-16-15 0-7.5 5.7-13.7 13.1-14.8C20.5 13 27 7 35 7c6.5 0 12.1 4 14.4 9.7 1.6-.6 3.4-.9 5.2-.9 7.5 0 13.6 5.6 14.3 12.8 5.7 1.3 9.9 6.1 9.9 11.9 0 6.7-5.6 12-12.5 12H22z"
-        fill={filled ? fill : "#ffffff"}
-        stroke={stroke}
-        strokeWidth={strokeWidth}
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
 /* ── Joint with smoke illustration (image asset) ── */
 function SessionJointIllustration({ size = 180 }) {
   return (
@@ -55,77 +34,57 @@ function SessionJointIllustration({ size = 180 }) {
       aria-hidden
       width={size}
       height={size}
-      className="object-contain select-none pointer-events-none"
+      className="object-contain select-none pointer-events-none transition-[width,height] duration-200"
       draggable={false}
       style={{ width: size, height: size }}
     />
   );
 }
 
-/* ── Cloud-stop slider used both on mobile + desktop ── */
-function IntensityCloudSlider({ value, onChange, items, sizeStep = [22, 32, 44] }) {
-  // Active = item with value <= current. Color deepens with intensity.
-  const colors = ["#a3c79a", "#5e9a4a", "#2e5723"];
+/* ── Centimeter slider for session intensity ── */
+const INTENSITY_CM_MIN = 5;
+const INTENSITY_CM_MAX = 50;
+
+function IntensityCmSlider({ value, onChange, min = INTENSITY_CM_MIN, max = INTENSITY_CM_MAX }) {
+  const pct = ((value - min) / (max - min)) * 100;
+  const ticks = [min, Math.round((min + max) / 2), max];
   return (
     <div className="w-full select-none">
-      <div className="relative h-14 w-full">
+      <div className="relative h-10 w-full">
         {/* track */}
-        <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-0.75 bg-outline-variant/40 rounded-full" />
-        {/* filled track up to current */}
+        <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-1 bg-outline-variant/40 rounded-full" />
+        {/* filled */}
         <div
-          className="absolute left-0 top-1/2 -translate-y-1/2 h-0.75 bg-primary/70 rounded-full transition-[width] duration-200"
-          style={{ width: `${((value - 1) / (items.length - 1)) * 100}%` }}
+          className="absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-primary rounded-full transition-[width] duration-150"
+          style={{ width: `${pct}%` }}
         />
-        {/* cloud stops */}
-        {items.map((item, i) => {
-          const pct = (i / (items.length - 1)) * 100;
-          const active = value === item.value;
-          const reached = value >= item.value;
-          return (
-            <button
-              type="button"
-              key={item.value}
-              onClick={() => onChange(item.value)}
-              className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 flex items-center justify-center focus:outline-none transition-transform duration-200"
-              style={{ left: `${pct}%`, transform: `translate(-50%, -50%) scale(${active ? 1.1 : 1})` }}
-              aria-label={item.label}
-            >
-              <CloudIcon
-                size={sizeStep[i]}
-                fill={colors[i]}
-                stroke={reached ? colors[i] : "#b8c8b3"}
-                filled={reached}
-                strokeWidth={i === 0 && !reached ? 2.5 : 2}
-              />
-            </button>
-          );
-        })}
-        {/* hidden range for keyboard / drag accessibility */}
+        {/* thumb */}
+        <div
+          className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-6 h-6 rounded-full bg-primary shadow-md ring-4 ring-primary/15 pointer-events-none transition-[left] duration-150"
+          style={{ left: `${pct}%` }}
+        />
         <input
           type="range"
-          min="1"
-          max={items.length}
+          min={min}
+          max={max}
           step="1"
           value={value}
           onChange={(e) => onChange(Number(e.target.value))}
           className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-          aria-label="Session intensity"
+          aria-label="Session intensity in centimeters"
         />
       </div>
-      {/* labels */}
+      {/* tick labels */}
       <div className="relative h-5 w-full mt-1">
-        {items.map((item, i) => {
-          const pct = (i / (items.length - 1)) * 100;
-          const active = value === item.value;
+        {ticks.map((tick) => {
+          const tickPct = ((tick - min) / (max - min)) * 100;
           return (
             <span
-              key={item.value}
-              className={`absolute top-0 -translate-x-1/2 text-[10px] font-bold tracking-wider whitespace-nowrap ${
-                active ? "text-primary" : "text-on-surface-variant/60"
-              }`}
-              style={{ left: `${pct}%` }}
+              key={tick}
+              className="absolute top-0 -translate-x-1/2 text-[10px] font-bold tracking-wider text-on-surface-variant/60"
+              style={{ left: `${tickPct}%` }}
             >
-              {item.short}
+              {tick} cm
             </span>
           );
         })}
@@ -155,7 +114,7 @@ export default function CreateEvent() {
   const currentUser = session
     ? users.find((u) => u.authId === session.user.id)
     : null;
-  const [snackSize, setSnackSize] = useState(2);
+  const [snackSize, setSnackSize] = useState(20); // session intensity, in cm
   const [maxSnackers, setMaxSnackers] = useState(8);
   const [geocoded, setGeocoded] = useState(null); // { label, lat, lng }
   const [imageFile, setImageFile] = useState(null);
@@ -355,24 +314,11 @@ export default function CreateEvent() {
   }, [register]);
 
   const intensityMeta = useMemo(() => {
-    const items = [
-      {
-        value: 1,
-        label: t("createEvent.snackSizeMildBlend"),
-        short: t("createEvent.snackSizeMild"),
-      },
-      {
-        value: 2,
-        label: t("createEvent.snackSizeBalanced"),
-        short: t("createEvent.snackSizeBalancedShort"),
-      },
-      {
-        value: 3,
-        label: t("createEvent.snackSizeDeepBlend"),
-        short: t("createEvent.snackSizeDeep"),
-      },
-    ];
-    return { items, current: items[Math.min(2, Math.max(0, snackSize - 1))] };
+    let label;
+    if (snackSize <= 18) label = t("createEvent.snackSizeMildBlend");
+    else if (snackSize <= 35) label = t("createEvent.snackSizeBalanced");
+    else label = t("createEvent.snackSizeDeepBlend");
+    return { label, cm: snackSize };
   }, [snackSize, t]);
 
   const onSubmit = async (data) => {
@@ -545,18 +491,18 @@ export default function CreateEvent() {
                 <h2 className="text-base font-bold tracking-tight">{t("createEvent.snackSize")}</h2>
               </div>
               <div className="flex flex-col items-center justify-center pt-2">
-                <SessionJointIllustration size={150} />
-                <p className="mt-2 text-base font-bold text-primary">
-                  {intensityMeta.current.label}
+                <SessionJointIllustration
+                  size={70 + ((snackSize - INTENSITY_CM_MIN) / (INTENSITY_CM_MAX - INTENSITY_CM_MIN)) * 140}
+                />
+                <p className="mt-2 text-2xl font-extrabold text-primary tabular-nums">
+                  {intensityMeta.cm} cm
+                </p>
+                <p className="text-sm font-semibold text-on-surface-variant">
+                  {intensityMeta.label}
                 </p>
               </div>
               <div className="px-2 pt-1">
-                <IntensityCloudSlider
-                  value={snackSize}
-                  onChange={setSnackSize}
-                  items={intensityMeta.items}
-                  sizeStep={[20, 28, 38]}
-                />
+                <IntensityCmSlider value={snackSize} onChange={setSnackSize} />
               </div>
             </section>
 
@@ -689,67 +635,72 @@ export default function CreateEvent() {
                 <h2 className="font-display text-3xl font-semibold">{t("createEvent.lightAndShadows")}</h2>
               </div>
 
-              <div
-                ref={arcRef}
-                onPointerDown={onArcPointerDown}
-                onPointerMove={onArcPointerMove}
-                onPointerUp={onArcPointerUp}
-                onPointerCancel={onArcPointerUp}
-                role="slider"
-                aria-label={t("createEvent.chooseTimeByDragging")}
-                aria-valuemin={0}
-                aria-valuemax={1435}
-                aria-valuenow={Math.round(timeMeta.ratio * 1435)}
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  const [hStr, mStr] = (timeValue || "16:30").split(":");
-                  let total = Number(hStr) * 60 + Number(mStr);
-                  if (e.key === "ArrowRight" || e.key === "ArrowUp") {
-                    e.preventDefault();
-                    total = Math.min(24 * 60 - 5, total + 5);
-                  } else if (e.key === "ArrowLeft" || e.key === "ArrowDown") {
-                    e.preventDefault();
-                    total = Math.max(0, total - 5);
-                  } else {
-                    return;
-                  }
-                  const h = Math.floor(total / 60);
-                  const m = total % 60;
-                  setValue(
-                    "time",
-                    `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`,
-                    { shouldValidate: true }
-                  );
-                }}
-                className="relative pt-20 pb-12 px-8 bg-surface-container-low rounded-xl cursor-grab active:cursor-grabbing select-none touch-none"
-              >
-                <div className="absolute top-10 left-12 right-12 h-0.5 bg-outline-variant/30" />
-                <div className="w-full h-40 border-t-2 border-dashed border-primary-fixed/40 rounded-[100%] flex items-center justify-center relative">
-                  {/* Selected time marker — slides along the arc with the chosen time */}
-                  <div
-                    className="absolute -top-10 flex flex-col items-center transition-[left] duration-500"
-                    style={{
-                      left: `calc(${timeMeta.ratio * 100}% - 32px)`,
-                    }}
-                  >
-                    <div className="w-16 h-16 bg-linear-to-tr from-primary to-primary-container rounded-full flex items-center justify-center text-white shadow-xl shadow-primary/20">
-                      {timeMeta.isNight ? <Moon size={28} fill="currentColor" /> : <Sun size={28} fill="currentColor" />}
+              <div className="relative group">
+                <div
+                  className="absolute inset-0 bg-surface-container-high group-hover:bg-primary-fixed/20 transition-all duration-500 -rotate-1"
+                  style={{ borderRadius: "58% 42% 33% 67% / 50% 60% 40% 50%" }}
+                />
+                <div
+                  ref={arcRef}
+                  onPointerDown={onArcPointerDown}
+                  onPointerMove={onArcPointerMove}
+                  onPointerUp={onArcPointerUp}
+                  onPointerCancel={onArcPointerUp}
+                  role="slider"
+                  aria-label={t("createEvent.chooseTimeByDragging")}
+                  aria-valuemin={0}
+                  aria-valuemax={1435}
+                  aria-valuenow={Math.round(timeMeta.ratio * 1435)}
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    const [hStr, mStr] = (timeValue || "16:30").split(":");
+                    let total = Number(hStr) * 60 + Number(mStr);
+                    if (e.key === "ArrowRight" || e.key === "ArrowUp") {
+                      e.preventDefault();
+                      total = Math.min(24 * 60 - 5, total + 5);
+                    } else if (e.key === "ArrowLeft" || e.key === "ArrowDown") {
+                      e.preventDefault();
+                      total = Math.max(0, total - 5);
+                    } else {
+                      return;
+                    }
+                    const h = Math.floor(total / 60);
+                    const m = total % 60;
+                    setValue(
+                      "time",
+                      `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`,
+                      { shouldValidate: true }
+                    );
+                  }}
+                  className="relative pt-20 pb-12 px-8 cursor-grab active:cursor-grabbing select-none touch-none"
+                >
+                  <div className="w-full h-40 border-t-2 border-dashed border-primary-fixed/40 rounded-[100%] flex items-center justify-center relative">
+                    {/* Selected time marker — slides along the arc with the chosen time */}
+                    <div
+                      className="absolute -top-10 flex flex-col items-center transition-[left] duration-500"
+                      style={{
+                        left: `calc(${timeMeta.ratio * 100}% - 32px)`,
+                      }}
+                    >
+                      <div className="w-16 h-16 bg-linear-to-tr from-primary to-primary-container rounded-full flex items-center justify-center text-white shadow-xl shadow-primary/20">
+                        {timeMeta.isNight ? <Moon size={28} fill="currentColor" /> : <Sun size={28} fill="currentColor" />}
+                      </div>
+                      <span className="mt-4 font-display text-3xl font-bold text-primary tabular-nums">
+                        {timeMeta.display}
+                      </span>
+                      <span className="text-xs uppercase tracking-widest font-bold text-on-surface-variant whitespace-nowrap">
+                        {timeMeta.label}
+                      </span>
                     </div>
-                    <span className="mt-4 font-display text-3xl font-bold text-primary tabular-nums">
-                      {timeMeta.display}
-                    </span>
-                    <span className="text-xs uppercase tracking-widest font-bold text-on-surface-variant whitespace-nowrap">
-                      {timeMeta.label}
-                    </span>
-                  </div>
 
-                  <div className="absolute bottom-0 left-0 flex flex-col items-center">
-                    <Sun size={20} className="text-outline-variant" />
-                    <span className="text-[10px] mt-2 font-bold opacity-40">{t("createEvent.sunrise")}</span>
-                  </div>
-                  <div className="absolute bottom-0 right-0 flex flex-col items-center">
-                    <Moon size={20} className="text-outline-variant" />
-                    <span className="text-[10px] mt-2 font-bold opacity-40">{t("createEvent.moonrise")}</span>
+                    <div className="absolute bottom-0 left-4 flex flex-col items-center">
+                      <Sun size={20} className="text-outline-variant" />
+                      <span className="text-[10px] mt-2 font-bold opacity-40">{t("createEvent.sunrise")}</span>
+                    </div>
+                    <div className="absolute bottom-0 right-4 flex flex-col items-center">
+                      <Moon size={20} className="text-outline-variant" />
+                      <span className="text-[10px] mt-2 font-bold opacity-40">{t("createEvent.moonrise")}</span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -840,7 +791,7 @@ export default function CreateEvent() {
             </section>
 
             {/* 03. Session Intensity */}
-            <section className="bg-surface-container-low p-10 rounded-xl relative overflow-hidden">
+            <section>
               <div className="flex items-baseline gap-4 mb-8">
                 <span className="font-display text-2xl font-bold text-primary">03.</span>
                 <h2 className="font-display text-3xl font-semibold flex items-center gap-3">
@@ -848,19 +799,24 @@ export default function CreateEvent() {
                   {t("createEvent.snackSize")}
                 </h2>
               </div>
-              <div className="flex flex-col items-center justify-center pt-2">
-                <SessionJointIllustration size={220} />
-                <p className="mt-2 text-xl font-bold text-primary">
-                  {intensityMeta.current.label}
-                </p>
-              </div>
-              <div className="w-full px-2 mt-8">
-                <IntensityCloudSlider
-                  value={snackSize}
-                  onChange={setSnackSize}
-                  items={intensityMeta.items}
-                  sizeStep={[26, 38, 52]}
+              <div className="relative group">
+                <div
+                  className="absolute inset-0 bg-surface-container-high group-hover:bg-primary-fixed/20 transition-all duration-500 rotate-2"
+                  style={{ borderRadius: "45% 55% 62% 38% / 58% 42% 58% 42%" }}
                 />
+                <div className="relative p-10">
+                  <div className="flex flex-col items-center justify-center pt-2">
+                    <SessionJointIllustration
+                      size={110 + ((snackSize - INTENSITY_CM_MIN) / (INTENSITY_CM_MAX - INTENSITY_CM_MIN)) * 200}
+                    />
+                    <p className="mt-2 text-base font-semibold text-on-surface-variant">
+                      {intensityMeta.label}
+                    </p>
+                  </div>
+                  <div className="w-3/4 mx-auto mt-6">
+                    <IntensityCmSlider value={snackSize} onChange={setSnackSize} />
+                  </div>
+                </div>
               </div>
             </section>
 
