@@ -39,13 +39,30 @@ function haversineKm(lat1, lng1, lat2, lng2) {
 const RADIUS_KM = 10;
 const DEFAULT_CENTER = [41.1579, -8.6291]; // Porto fallback
 
-function createPinIcon(emoji) {
+/* Cannabis-leaf SVG used inside the map markers */
+const CANNABIS_SVG =
+  '<svg viewBox="0 0 24 24" width="22" height="22" fill="#37602c" xmlns="http://www.w3.org/2000/svg"><path d="M12 22c-.3-1.6-.6-3.1-.9-4.6-1.4.6-2.9.9-4.5.9 1-1.3 1.7-2.7 2.1-4.3-1.6.2-3.2 0-4.7-.6 1.4-1 2.5-2.2 3.3-3.6-1.5-.4-2.9-1.1-4.1-2.1 1.6-.2 3.2-.7 4.5-1.6C6.3 5 5.3 3.5 4.7 1.9c1.5.6 2.9 1.5 4.1 2.7.6-1.5 1.5-2.9 2.7-4 .3 1.6.3 3.3 0 4.9 1.2-1.2 2.6-2.1 4.1-2.7-.6 1.6-1.6 3.1-2.9 4.2 1.3.9 2.9 1.4 4.5 1.6-1.2 1-2.6 1.7-4.1 2.1.8 1.4 1.9 2.6 3.3 3.6-1.5.6-3.1.8-4.7.6.4 1.6 1.1 3 2.1 4.3-1.6 0-3.1-.3-4.5-.9-.3 1.5-.6 3-.9 4.6Z"/></svg>';
+
+function createEventMarker(title) {
+  const safe = String(title || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
   return L.divIcon({
-    className: "custom-pin",
-    html: '<div style="background:#f2ddbd;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;box-shadow:0 4px 12px rgba(0,0,0,0.12);border:3px solid #fff;">' + emoji + '</div>',
-    iconSize: [40, 40],
-    iconAnchor: [20, 40],
-    popupAnchor: [0, -42],
+    className: "cozy-event-pin",
+    html:
+      '<div style="display:flex;flex-direction:column;align-items:center;pointer-events:auto;">' +
+        '<div style="position:relative;width:64px;height:64px;display:flex;align-items:center;justify-content:center;">' +
+          '<div style="position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle, rgba(79,121,66,0.55) 0%, rgba(79,121,66,0.18) 55%, transparent 75%);"></div>' +
+          '<div style="position:relative;width:40px;height:40px;border-radius:50%;background:#ffffff;border:2px solid rgba(79,121,66,0.25);box-shadow:0 6px 18px rgba(55,96,44,0.25);display:flex;align-items:center;justify-content:center;">' +
+            CANNABIS_SVG +
+          '</div>' +
+        '</div>' +
+        '<div style="margin-top:-6px;background:#ffffff;padding:3px 10px;border-radius:9999px;box-shadow:0 4px 12px rgba(0,0,0,0.12);font-family:Plus Jakarta Sans, sans-serif;font-size:11px;font-weight:700;color:#1c1c17;white-space:nowrap;max-width:160px;overflow:hidden;text-overflow:ellipsis;">' + safe + '</div>' +
+      '</div>',
+    iconSize: [160, 88],
+    iconAnchor: [80, 80],
+    popupAnchor: [0, -82],
   });
 }
 
@@ -55,8 +72,6 @@ const userIcon = L.divIcon({
   iconSize: [56, 56],
   iconAnchor: [28, 28],
 });
-
-const pinEmojis = ["🍪", "🍵", "☕", "🥐"];
 
 /** Automatically re-center map once user location is obtained */
 function RecenterMap() {
@@ -169,11 +184,11 @@ export default function Home() {
           attribution='&copy; <a href="https://carto.com/">CARTO</a>'
         />
         <Marker position={center} icon={userIcon} />
-        {nearbyEvents.map((ev, i) => (
+        {nearbyEvents.map((ev) => (
           <Marker
             key={ev.id}
             position={[ev.lat, ev.lng]}
-            icon={createPinIcon(pinEmojis[i % pinEmojis.length])}
+            icon={createEventMarker(ev.title)}
           >
             <Popup className="cozy-popup">
               <div className="font-headline font-bold text-sm text-on-surface">{ev.title}</div>

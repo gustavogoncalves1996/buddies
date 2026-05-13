@@ -1,25 +1,41 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useRef } from "react";
 import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
-import { CalendarDays, MapPin, Users, ChevronDown, ChevronUp, Check, X } from "lucide-react";
+import { CalendarDays, MapPin, Users, ChevronDown, ChevronUp, Check, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import L from "leaflet";
 import useStore from "../store/useStore";
 import LoadingScreen from "../components/LoadingScreen";
 
-const markerIcon = L.divIcon({
-  className: "",
-  html: '<div style="width:16px;height:16px;background:#37602c;border:3px solid #c0f0ad;border-radius:50%;box-shadow:0 2px 8px rgba(55,96,44,.35)"></div>',
-  iconSize: [16, 16],
-  iconAnchor: [8, 8],
-});
+const CANNABIS_SVG =
+  '<svg viewBox="0 0 24 24" width="22" height="22" fill="#37602c" xmlns="http://www.w3.org/2000/svg"><path d="M12 22c-.3-1.6-.6-3.1-.9-4.6-1.4.6-2.9.9-4.5.9 1-1.3 1.7-2.7 2.1-4.3-1.6.2-3.2 0-4.7-.6 1.4-1 2.5-2.2 3.3-3.6-1.5-.4-2.9-1.1-4.1-2.1 1.6-.2 3.2-.7 4.5-1.6C6.3 5 5.3 3.5 4.7 1.9c1.5.6 2.9 1.5 4.1 2.7.6-1.5 1.5-2.9 2.7-4 .3 1.6.3 3.3 0 4.9 1.2-1.2 2.6-2.1 4.1-2.7-.6 1.6-1.6 3.1-2.9 4.2 1.3.9 2.9 1.4 4.5 1.6-1.2 1-2.6 1.7-4.1 2.1.8 1.4 1.9 2.6 3.3 3.6-1.5.6-3.1.8-4.7.6.4 1.6 1.1 3 2.1 4.3-1.6 0-3.1-.3-4.5-.9-.3 1.5-.6 3-.9 4.6Z"/></svg>';
 
-const activeMarkerIcon = L.divIcon({
-  className: "",
-  html: '<div style="width:22px;height:22px;background:#37602c;border:4px solid #c0f0ad;border-radius:50%;box-shadow:0 4px 16px rgba(55,96,44,.5)"></div>',
-  iconSize: [22, 22],
-  iconAnchor: [11, 11],
-});
+function makeEventMarker(title, active) {
+  const safe = String(title || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+  const ringColor = active
+    ? "radial-gradient(circle, rgba(79,121,66,0.85) 0%, rgba(79,121,66,0.3) 55%, transparent 75%)"
+    : "radial-gradient(circle, rgba(79,121,66,0.55) 0%, rgba(79,121,66,0.18) 55%, transparent 75%)";
+  const border = active ? "3px solid #37602c" : "2px solid rgba(79,121,66,0.25)";
+  const scale = active ? 1.1 : 1;
+  return L.divIcon({
+    className: "cozy-event-pin",
+    html:
+      '<div style="display:flex;flex-direction:column;align-items:center;pointer-events:auto;transform:scale(' + scale + ');transform-origin:center bottom;">' +
+        '<div style="position:relative;width:64px;height:64px;display:flex;align-items:center;justify-content:center;">' +
+          '<div style="position:absolute;inset:0;border-radius:50%;background:' + ringColor + ';"></div>' +
+          '<div style="position:relative;width:40px;height:40px;border-radius:50%;background:#ffffff;border:' + border + ';box-shadow:0 6px 18px rgba(55,96,44,0.25);display:flex;align-items:center;justify-content:center;">' +
+            CANNABIS_SVG +
+          '</div>' +
+        '</div>' +
+        '<div style="margin-top:-6px;background:#ffffff;padding:3px 10px;border-radius:9999px;box-shadow:0 4px 12px rgba(0,0,0,0.12);font-family:Plus Jakarta Sans, sans-serif;font-size:11px;font-weight:700;color:#1c1c17;white-space:nowrap;max-width:160px;overflow:hidden;text-overflow:ellipsis;">' + safe + '</div>' +
+      '</div>',
+    iconSize: [160, 88],
+    iconAnchor: [80, 80],
+  });
+}
 
 /** Re-center the map once the user's geolocation arrives */
 function RecenterOnUser() {
@@ -96,8 +112,18 @@ export default function MyHostedSnacks() {
   const userLocation = useStore((s) => s.userLocation);
   const locationStatus = useStore((s) => s.locationStatus);
 
+  const carouselRef = useRef(null);
+  const mobileCarouselRef = useRef(null);
+
   const handleMarkerClick = useCallback((eventId) => {
     setSelectedEventId((prev) => (prev === eventId ? null : eventId));
+  }, []);
+
+  const scrollCarousel = useCallback((direction) => {
+    const el = carouselRef.current;
+    if (!el) return;
+    const cardWidth = el.querySelector("div")?.offsetWidth || 380;
+    el.scrollBy({ left: direction * (cardWidth + 20), behavior: "smooth" });
   }, []);
   const center = userLocation
     ? [userLocation.lat, userLocation.lng]
@@ -126,7 +152,7 @@ export default function MyHostedSnacks() {
               <Marker
                 key={e.id}
                 position={[e.lat, e.lng]}
-                icon={selectedEventId === e.id ? activeMarkerIcon : markerIcon}
+                icon={makeEventMarker(e.title, selectedEventId === e.id)}
                 eventHandlers={{ click: () => handleMarkerClick(e.id) }}
               />
             ))}
@@ -164,100 +190,154 @@ export default function MyHostedSnacks() {
           </button>
         </div>
 
-        {/* Selected event card — only visible when a marker is clicked */}
-        {selectedEvent && (() => {
-          const apps = getApplicants(selectedEvent.id);
-          return (
-            <div className="absolute bottom-0 left-0 right-0 z-10 px-12 pb-10">
-              <div className="max-w-xl">
-                <div className="bg-surface-container-lowest/95 backdrop-blur-xl rounded-2xl shadow-[0_24px_80px_rgba(0,0,0,0.12)] overflow-hidden flex flex-col">
-                  <div className="flex h-56">
-                    <div className="w-2/5 h-full">
-                      <img
-                        src={selectedEvent.image}
-                        alt={selectedEvent.title}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div className="w-3/5 p-6 flex flex-col justify-between">
-                      <div>
-                        <span className="bg-secondary-container text-on-secondary-container px-3 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider mb-3 inline-block">
-                          {selectedEvent.tag}
-                        </span>
-                        <h3 className="text-lg font-extrabold text-on-surface leading-tight mb-3">
-                          {selectedEvent.title}
-                        </h3>
-                      </div>
-                      <div className="space-y-1.5 text-xs text-on-surface-variant">
-                        <div className="flex items-center gap-2">
-                          <CalendarDays size={14} className="text-primary" />
-                          {new Date(selectedEvent.date).toLocaleDateString("en-US", {
-                            month: "short",
-                            day: "numeric",
-                          })}{" "}
-                          &bull; {selectedEvent.time}
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <MapPin size={14} className="text-primary" />
-                          {selectedEvent.location}
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Users size={14} className="text-primary" />
-                          {selectedEvent.currentSnackers}/{selectedEvent.maxSnackers} {t("manage.spots")} &bull;{" "}
-                          <span className="text-primary font-bold">{apps.filter((a) => a.status === "pending").length} {t("manage.pending")}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Applicants row */}
-                  {apps.length > 0 && (
-                    <div className="border-t border-outline-variant px-6 py-4">
-                      <div className="flex gap-3 overflow-x-auto scrollbar-hide">
-                        {apps.map((a) => (
-                          <div key={a.id} className="shrink-0 flex items-center gap-2 bg-surface-container-high rounded-full px-3 py-1.5">
-                            <img src={a.avatar} alt={a.name} className="w-7 h-7 rounded-full object-cover" />
-                            <span className="text-xs font-bold text-on-surface whitespace-nowrap">{a.name}</span>
-                            {a.status === "pending" && (
-                              <div className="flex gap-1 ml-1">
-                                <button
-                                  onClick={() => updateStatus(a.id, "accepted")}
-                                  className="w-6 h-6 rounded-full bg-primary text-on-primary flex items-center justify-center"
-                                >
-                                  <Check size={12} />
-                                </button>
-                                <button
-                                  onClick={() => updateStatus(a.id, "rejected")}
-                                  className="w-6 h-6 rounded-full bg-error text-on-error flex items-center justify-center"
-                                >
-                                  <X size={12} />
-                                </button>
-                              </div>
-                            )}
-                            {a.status === "accepted" && (
-                              <span className="text-[10px] font-bold text-primary">{t("common.accepted")}</span>
-                            )}
-                            {a.status === "rejected" && (
-                              <span className="text-[10px] font-bold text-error">{t("common.declined")}</span>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Close button */}
-                  <button
-                    onClick={() => setSelectedEventId(null)}
-                    className="absolute top-3 right-3 w-8 h-8 rounded-full bg-surface-container-high/80 backdrop-blur flex items-center justify-center text-on-surface-variant hover:bg-surface-container-highest transition-colors"
-                  >
-                    <X size={14} />
-                  </button>
-                </div>
+        {/* Bottom carousel — all events for the current tab */}
+        <section className="absolute bottom-0 left-0 right-0 z-10 pb-8 pt-16 px-12 bg-linear-to-t from-surface via-surface/85 to-transparent pointer-events-none">
+          <div className="max-w-7xl mx-auto pointer-events-auto">
+            <div className="flex justify-between items-end mb-4 px-1">
+              <div>
+                <h2 className="text-xl font-headline font-bold text-primary tracking-tight">
+                  {tab === "upcoming" ? t("manage.upcomingEvents") : t("manage.pastEvents")}
+                </h2>
+                <p className="text-on-surface-variant text-sm font-body italic">
+                  {events.length} {events.length === 1 ? t("manage.eventLabel") : t("manage.eventsLabel")}
+                </p>
+              </div>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => scrollCarousel(-1)}
+                  className="p-3 rounded-full bg-surface-container-high text-on-surface hover:bg-secondary-container transition-colors"
+                >
+                  <ChevronLeft size={20} />
+                </button>
+                <button
+                  onClick={() => scrollCarousel(1)}
+                  className="p-3 rounded-full bg-surface-container-high text-on-surface hover:bg-secondary-container transition-colors"
+                >
+                  <ChevronRight size={20} />
+                </button>
               </div>
             </div>
-          );
-        })()}
+
+            <div
+              ref={carouselRef}
+              className="flex gap-5 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-hide"
+            >
+              {events.length === 0 && (
+                <div className="w-full text-center py-8 bg-surface-container-lowest/80 backdrop-blur rounded-2xl">
+                  <p className="text-on-surface-variant text-sm font-body">
+                    {tab === "upcoming" ? t("manage.noUpcoming") : t("manage.noPast")}
+                  </p>
+                </div>
+              )}
+              {events.map((ev) => {
+                const apps = getApplicants(ev.id);
+                const pending = apps.filter((a) => a.status === "pending").length;
+                const isActive = selectedEventId === ev.id;
+                return (
+                  <div
+                    key={ev.id}
+                    onClick={() => handleMarkerClick(ev.id)}
+                    className={`relative flex-none w-96 snap-start bg-surface-container-lowest/95 backdrop-blur-xl rounded-2xl overflow-hidden shadow-cozy cursor-pointer transition-all hover:shadow-[0_24px_60px_rgba(0,0,0,0.12)] ${
+                      isActive ? "ring-2 ring-primary scale-[1.02]" : ""
+                    }`}
+                  >
+                    <div className="flex h-40">
+                      <div className="w-2/5 h-full shrink-0">
+                        <img
+                          src={ev.image}
+                          alt={ev.title}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div className="w-3/5 p-4 flex flex-col justify-between min-w-0">
+                        <div>
+                          <span className="bg-secondary-container text-on-secondary-container px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider mb-2 inline-block">
+                            {ev.tag}
+                          </span>
+                          <h3 className="text-base font-extrabold text-on-surface leading-tight line-clamp-2">
+                            {ev.title}
+                          </h3>
+                        </div>
+                        <div className="space-y-1 text-[11px] text-on-surface-variant">
+                          <div className="flex items-center gap-1.5">
+                            <CalendarDays size={12} className="text-primary" />
+                            {new Date(ev.date).toLocaleDateString("en-US", {
+                              month: "short",
+                              day: "numeric",
+                            })}{" "}
+                            &bull; {ev.time}
+                          </div>
+                          <div className="flex items-center gap-1.5 truncate">
+                            <MapPin size={12} className="text-primary shrink-0" />
+                            <span className="truncate">{ev.location}</span>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <Users size={12} className="text-primary" />
+                            {ev.currentSnackers}/{ev.maxSnackers}
+                            {pending > 0 && (
+                              <span className="ml-auto text-primary font-bold">
+                                {pending} {t("manage.pending")}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {isActive && apps.length > 0 && (
+                      <div className="border-t border-outline-variant px-4 py-3">
+                        <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+                          {apps.map((a) => (
+                            <div
+                              key={a.id}
+                              className="shrink-0 flex items-center gap-2 bg-surface-container-high rounded-full px-2.5 py-1"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <img
+                                src={a.avatar}
+                                alt={a.name}
+                                className="w-6 h-6 rounded-full object-cover"
+                              />
+                              <span className="text-[11px] font-bold text-on-surface whitespace-nowrap">
+                                {a.name}
+                              </span>
+                              {a.status === "pending" && (
+                                <div className="flex gap-1 ml-1">
+                                  <button
+                                    onClick={() => updateStatus(a.id, "accepted")}
+                                    className="w-5 h-5 rounded-full bg-primary text-on-primary flex items-center justify-center"
+                                  >
+                                    <Check size={10} />
+                                  </button>
+                                  <button
+                                    onClick={() => updateStatus(a.id, "rejected")}
+                                    className="w-5 h-5 rounded-full bg-error text-on-error flex items-center justify-center"
+                                  >
+                                    <X size={10} />
+                                  </button>
+                                </div>
+                              )}
+                              {a.status === "accepted" && (
+                                <span className="text-[9px] font-bold text-primary">
+                                  {t("common.accepted")}
+                                </span>
+                              )}
+                              {a.status === "rejected" && (
+                                <span className="text-[9px] font-bold text-error">
+                                  {t("common.declined")}
+                                </span>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
       </div>
 
       {/* ======= MOBILE ======= */}
@@ -271,7 +351,7 @@ export default function MyHostedSnacks() {
               <Marker
                 key={e.id}
                 position={[e.lat, e.lng]}
-                icon={selectedEventId === e.id ? activeMarkerIcon : markerIcon}
+                icon={makeEventMarker(e.title, selectedEventId === e.id)}
                 eventHandlers={{ click: () => handleMarkerClick(e.id) }}
               />
             ))}
@@ -304,87 +384,106 @@ export default function MyHostedSnacks() {
             </div>
           </div>
 
-          {/* Selected event card overlay at bottom */}
-          {selectedEvent && (() => {
-            const apps = getApplicants(selectedEvent.id);
-            const isExpanded = expandedId === selectedEvent.id;
-            return (
-              <div className="absolute bottom-0 left-0 right-0 z-1000 px-4 pb-4">
-                <div className="bg-surface-container-lowest/95 backdrop-blur-xl rounded-2xl shadow-cozy overflow-hidden relative">
-                  <div className="flex h-32">
+          {/* Bottom carousel — all events for the current tab */}
+          <div
+            ref={mobileCarouselRef}
+            className="absolute bottom-0 left-0 right-0 z-1000 px-4 pb-4 flex gap-3 overflow-x-auto snap-x snap-mandatory scrollbar-hide"
+          >
+            {events.length === 0 && (
+              <div className="w-full text-center py-6 bg-surface-container-lowest/95 backdrop-blur rounded-2xl">
+                <p className="text-on-surface-variant text-xs font-body">
+                  {tab === "upcoming" ? t("manage.noUpcoming") : t("manage.noPast")}
+                </p>
+              </div>
+            )}
+            {events.map((ev) => {
+              const apps = getApplicants(ev.id);
+              const pending = apps.filter((a) => a.status === "pending").length;
+              const isActive = selectedEventId === ev.id;
+              const isExpanded = expandedId === ev.id;
+              return (
+                <div
+                  key={ev.id}
+                  onClick={() => handleMarkerClick(ev.id)}
+                  className={`shrink-0 w-[85%] snap-center bg-surface-container-lowest/95 backdrop-blur-xl rounded-2xl shadow-cozy overflow-hidden relative cursor-pointer transition-all ${
+                    isActive ? "ring-2 ring-primary" : ""
+                  }`}
+                >
+                  <div className="flex h-28">
                     <img
-                      src={selectedEvent.image}
-                      alt={selectedEvent.title}
-                      className="w-28 h-full object-cover"
+                      src={ev.image}
+                      alt={ev.title}
+                      className="w-24 h-full object-cover shrink-0"
                     />
-                    <div className="flex-1 p-4 flex flex-col justify-between">
-                      <div>
+                    <div className="flex-1 p-3 flex flex-col justify-between min-w-0">
+                      <div className="min-w-0">
                         <span className="bg-secondary-container text-on-secondary-container px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider">
-                          {selectedEvent.tag}
+                          {ev.tag}
                         </span>
-                        <h3 className="text-sm font-extrabold text-on-surface mt-1 leading-tight">
-                          {selectedEvent.title}
+                        <h3 className="text-sm font-extrabold text-on-surface mt-1 leading-tight line-clamp-1">
+                          {ev.title}
                         </h3>
                       </div>
-                      <div className="flex items-center gap-3 text-[11px] text-on-surface-variant">
+                      <div className="flex items-center gap-3 text-[10px] text-on-surface-variant">
                         <span className="flex items-center gap-1">
-                          <CalendarDays size={12} className="text-primary" />
-                          {new Date(selectedEvent.date).toLocaleDateString("en-US", {
+                          <CalendarDays size={11} className="text-primary" />
+                          {new Date(ev.date).toLocaleDateString("en-US", {
                             month: "short",
                             day: "numeric",
                           })}
                         </span>
                         <span className="flex items-center gap-1">
-                          <Users size={12} className="text-primary" />
-                          {selectedEvent.currentSnackers}/{selectedEvent.maxSnackers}
+                          <Users size={11} className="text-primary" />
+                          {ev.currentSnackers}/{ev.maxSnackers}
                         </span>
+                        {pending > 0 && (
+                          <span className="ml-auto text-primary font-bold">{pending}!</span>
+                        )}
                       </div>
                     </div>
                   </div>
 
                   {/* Expandable applicants */}
-                  {apps.length > 0 && (
-                    <div className="border-t border-outline-variant">
+                  {isActive && apps.length > 0 && (
+                    <div className="border-t border-outline-variant" onClick={(e) => e.stopPropagation()}>
                       <button
-                        onClick={() => setExpandedId(isExpanded ? null : selectedEvent.id)}
-                        className="w-full flex items-center justify-between px-4 py-3 text-xs font-bold text-on-surface-variant"
+                        onClick={() => setExpandedId(isExpanded ? null : ev.id)}
+                        className="w-full flex items-center justify-between px-4 py-2.5 text-xs font-bold text-on-surface-variant"
                       >
                         <span>
-                          {t("manage.pendingApplicants", {
-                            count: apps.filter((a) => a.status === "pending").length,
-                          })}
+                          {t("manage.pendingApplicants", { count: pending })}
                         </span>
                         {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                       </button>
                       {isExpanded && (
-                        <div className="px-4 pb-4 space-y-3">
+                        <div className="px-4 pb-4 space-y-2 max-h-48 overflow-y-auto">
                           {apps.map((a) => (
                             <div
                               key={a.id}
-                              className="flex items-center gap-3 bg-surface-container-high rounded-xl p-3"
+                              className="flex items-center gap-3 bg-surface-container-high rounded-xl p-2.5"
                             >
                               <img
                                 src={a.avatar}
                                 alt={a.name}
-                                className="w-10 h-10 rounded-full object-cover"
+                                className="w-9 h-9 rounded-full object-cover"
                               />
                               <div className="flex-1 min-w-0">
-                                <p className="text-sm font-bold text-on-surface truncate">{a.name}</p>
-                                <p className="text-xs text-on-surface-variant truncate">{a.message}</p>
+                                <p className="text-xs font-bold text-on-surface truncate">{a.name}</p>
+                                <p className="text-[10px] text-on-surface-variant truncate">{a.message}</p>
                               </div>
                               {a.status === "pending" && (
-                                <div className="flex gap-2 shrink-0">
+                                <div className="flex gap-1.5 shrink-0">
                                   <button
                                     onClick={() => updateStatus(a.id, "accepted")}
-                                    className="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center"
+                                    className="w-7 h-7 rounded-full bg-primary text-on-primary flex items-center justify-center"
                                   >
-                                    <Check size={14} />
+                                    <Check size={12} />
                                   </button>
                                   <button
                                     onClick={() => updateStatus(a.id, "rejected")}
-                                    className="w-8 h-8 rounded-full bg-error text-on-error flex items-center justify-center"
+                                    className="w-7 h-7 rounded-full bg-error text-on-error flex items-center justify-center"
                                   >
-                                    <X size={14} />
+                                    <X size={12} />
                                   </button>
                                 </div>
                               )}
@@ -403,18 +502,10 @@ export default function MyHostedSnacks() {
                       )}
                     </div>
                   )}
-
-                  {/* Close button */}
-                  <button
-                    onClick={() => setSelectedEventId(null)}
-                    className="absolute top-2 right-2 w-7 h-7 rounded-full bg-surface-container-high/80 backdrop-blur flex items-center justify-center text-on-surface-variant"
-                  >
-                    <X size={12} />
-                  </button>
                 </div>
-              </div>
-            );
-          })()}
+              );
+            })}
+          </div>
         </div>
       </div>
     </div>

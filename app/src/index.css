@@ -61,6 +61,7 @@
 
   --font-headline: "Plus Jakarta Sans", sans-serif;
   --font-body: "Be Vietnam Pro", sans-serif;
+  --font-serif: "Fraunces", "Cormorant Garamond", Georgia, serif;
 
   --shadow-cozy: 0 12px 40px rgba(55, 96, 44, 0.06);
   --shadow-float: 0 4px 12px rgba(0, 0, 0, 0.03);

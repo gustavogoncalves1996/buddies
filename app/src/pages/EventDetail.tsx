@@ -39,6 +39,13 @@ export default function EventDetail() {
   const spotsLeft = event.maxSnackers - event.currentSnackers;
   const fillPercent = (event.currentSnackers / event.maxSnackers) * 100;
 
+  const intensityLabel = useMemo(() => {
+    const v = Number(event.snackSize);
+    if (v <= 1) return t("createEvent.snackSizeMildBlend");
+    if (v >= 3) return t("createEvent.snackSizeDeepBlend");
+    return t("createEvent.snackSizeBalanced");
+  }, [event.snackSize, t]);
+
   const handleApply = async () => {
     if (!currentUser) {
       pushToast(t("eventDetail.loginRequired"), "error");
@@ -184,10 +191,10 @@ export default function EventDetail() {
                   {t("eventDetail.snackSize")}
                 </p>
                 <h4 className="text-2xl md:text-3xl font-bold text-on-secondary-container">
-                  {event.snackSize}cm
+                  {intensityLabel}
                 </h4>
                 <p className="hidden md:block text-on-secondary-fixed-variant mt-2">{t("eventDetail.snackSizeHint")}</p>
-                <span className="absolute -bottom-2 -right-2 text-5xl md:text-9xl opacity-10">&#127850;</span>
+                <span className="absolute -bottom-2 -right-2 text-5xl md:text-9xl opacity-10">&#127807;</span>
               </div>
 
               <div className="bg-surface-container-high p-5 md:p-8 rounded-2xl md:rounded-lg relative overflow-hidden group">

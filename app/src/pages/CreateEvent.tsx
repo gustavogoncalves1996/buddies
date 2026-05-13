@@ -6,7 +6,7 @@ import {
   MapPin,
   CalendarDays,
   Users,
-  Cookie,
+  Leaf,
   Sparkles,
   ChevronLeft,
   Image as ImageIcon,
@@ -20,9 +20,119 @@ import { useTranslation } from "react-i18next";
 import useStore from "../store/useStore";
 import AddressAutocomplete from "../components/AddressAutocomplete";
 import ImageUpload from "../components/ImageUpload";
+import sessionJointImg from "../assets/session-joint.png";
 
 const DEFAULT_EVENT_IMAGE =
   "https://lh3.googleusercontent.com/aida-public/AB6AXuCaZN-4WWPz68IO5galEggKHp4npqYWWQaCQuWND3wFUT5fh94ZDX7z3TkginTNzwxxOeXMuavXHhrAWM5VsQu6RJvMIdFr3WHY4voXMzPM6aV3BPE3iWs3O31YvpfD1qtZOaqPkULGeRZ4t9HIOA2YqiF7J1QhigpULIQwLPt1U_RaIv7PywUAyxgHNpPS68Ejqb4kdcPnI2xH7DKg-UeLeb0F9BjpwkVIGCsgJlCapg-vMNrAnHykfwCvPVBQg6Bo5J1gjoDnd-nQ";
+
+/* ── Puffy cloud icon used in the intensity scale (image 2 style) ── */
+function CloudIcon({ size = 28, fill = "#3d6b30", stroke = "#3d6b30", filled = true, strokeWidth = 2 }) {
+  // Multi-bump puffy cloud, similar to the reference design.
+  return (
+    <svg
+      viewBox="0 0 80 56"
+      width={size}
+      height={(size * 56) / 80}
+      aria-hidden
+    >
+      <path
+        d="M22 50c-9 0-16-6.7-16-15 0-7.5 5.7-13.7 13.1-14.8C20.5 13 27 7 35 7c6.5 0 12.1 4 14.4 9.7 1.6-.6 3.4-.9 5.2-.9 7.5 0 13.6 5.6 14.3 12.8 5.7 1.3 9.9 6.1 9.9 11.9 0 6.7-5.6 12-12.5 12H22z"
+        fill={filled ? fill : "#ffffff"}
+        stroke={stroke}
+        strokeWidth={strokeWidth}
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+/* ── Joint with smoke illustration (image asset) ── */
+function SessionJointIllustration({ size = 180 }) {
+  return (
+    <img
+      src={sessionJointImg}
+      alt=""
+      aria-hidden
+      width={size}
+      height={size}
+      className="object-contain select-none pointer-events-none"
+      draggable={false}
+      style={{ width: size, height: size }}
+    />
+  );
+}
+
+/* ── Cloud-stop slider used both on mobile + desktop ── */
+function IntensityCloudSlider({ value, onChange, items, sizeStep = [22, 32, 44] }) {
+  // Active = item with value <= current. Color deepens with intensity.
+  const colors = ["#a3c79a", "#5e9a4a", "#2e5723"];
+  return (
+    <div className="w-full select-none">
+      <div className="relative h-14 w-full">
+        {/* track */}
+        <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-0.75 bg-outline-variant/40 rounded-full" />
+        {/* filled track up to current */}
+        <div
+          className="absolute left-0 top-1/2 -translate-y-1/2 h-0.75 bg-primary/70 rounded-full transition-[width] duration-200"
+          style={{ width: `${((value - 1) / (items.length - 1)) * 100}%` }}
+        />
+        {/* cloud stops */}
+        {items.map((item, i) => {
+          const pct = (i / (items.length - 1)) * 100;
+          const active = value === item.value;
+          const reached = value >= item.value;
+          return (
+            <button
+              type="button"
+              key={item.value}
+              onClick={() => onChange(item.value)}
+              className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 flex items-center justify-center focus:outline-none transition-transform duration-200"
+              style={{ left: `${pct}%`, transform: `translate(-50%, -50%) scale(${active ? 1.1 : 1})` }}
+              aria-label={item.label}
+            >
+              <CloudIcon
+                size={sizeStep[i]}
+                fill={colors[i]}
+                stroke={reached ? colors[i] : "#b8c8b3"}
+                filled={reached}
+                strokeWidth={i === 0 && !reached ? 2.5 : 2}
+              />
+            </button>
+          );
+        })}
+        {/* hidden range for keyboard / drag accessibility */}
+        <input
+          type="range"
+          min="1"
+          max={items.length}
+          step="1"
+          value={value}
+          onChange={(e) => onChange(Number(e.target.value))}
+          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+          aria-label="Session intensity"
+        />
+      </div>
+      {/* labels */}
+      <div className="relative h-5 w-full mt-1">
+        {items.map((item, i) => {
+          const pct = (i / (items.length - 1)) * 100;
+          const active = value === item.value;
+          return (
+            <span
+              key={item.value}
+              className={`absolute top-0 -translate-x-1/2 text-[10px] font-bold tracking-wider whitespace-nowrap ${
+                active ? "text-primary" : "text-on-surface-variant/60"
+              }`}
+              style={{ left: `${pct}%` }}
+            >
+              {item.short}
+            </span>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
 export default function CreateEvent() {
   const { t } = useTranslation();
@@ -45,9 +155,8 @@ export default function CreateEvent() {
   const currentUser = session
     ? users.find((u) => u.authId === session.user.id)
     : null;
-  const [snackSize, setSnackSize] = useState(12);
+  const [snackSize, setSnackSize] = useState(2);
   const [maxSnackers, setMaxSnackers] = useState(8);
-  const [emojiSize, setEmojiSize] = useState(24);
   const [geocoded, setGeocoded] = useState(null); // { label, lat, lng }
   const [imageFile, setImageFile] = useState(null);
 
@@ -245,16 +354,26 @@ export default function CreateEvent() {
     register("location");
   }, [register]);
 
-  useEffect(() => {
-    setEmojiSize(16 + (snackSize / 50) * 48);
-  }, [snackSize]);
-
-  const getEmoji = () => {
-    if (snackSize <= 10) return "🍪";
-    if (snackSize <= 20) return "🧁";
-    if (snackSize <= 35) return "🥐";
-    return "🎂";
-  };
+  const intensityMeta = useMemo(() => {
+    const items = [
+      {
+        value: 1,
+        label: t("createEvent.snackSizeMildBlend"),
+        short: t("createEvent.snackSizeMild"),
+      },
+      {
+        value: 2,
+        label: t("createEvent.snackSizeBalanced"),
+        short: t("createEvent.snackSizeBalancedShort"),
+      },
+      {
+        value: 3,
+        label: t("createEvent.snackSizeDeepBlend"),
+        short: t("createEvent.snackSizeDeep"),
+      },
+    ];
+    return { items, current: items[Math.min(2, Math.max(0, snackSize - 1))] };
+  }, [snackSize, t]);
 
   const onSubmit = async (data) => {
     if (!currentUser) {
@@ -419,35 +538,25 @@ export default function CreateEvent() {
               </div>
             </section>
 
-            {/* Snack Size */}
-            <section className="space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2.5">
-                  <Cookie size={18} className="text-primary" />
-                  <h2 className="text-base font-bold tracking-tight">{t("createEvent.snackSize")}</h2>
-                </div>
-                <span className="bg-secondary-container text-on-secondary-container px-3 py-1 rounded-2xl text-sm font-bold">
-                  {snackSize} cm
-                </span>
+            {/* Session Intensity */}
+            <section className="space-y-4 bg-surface-container-low rounded-3xl p-5">
+              <div className="flex items-center gap-2.5">
+                <Leaf size={18} className="text-primary" />
+                <h2 className="text-base font-bold tracking-tight">{t("createEvent.snackSize")}</h2>
               </div>
-              <div className="flex justify-center items-center h-20 bg-surface-container-low rounded-2xl">
-                <span className="transition-all duration-200" style={{ fontSize: emojiSize + "px" }}>
-                  {getEmoji()}
-                </span>
+              <div className="flex flex-col items-center justify-center pt-2">
+                <SessionJointIllustration size={150} />
+                <p className="mt-2 text-base font-bold text-primary">
+                  {intensityMeta.current.label}
+                </p>
               </div>
-              <div className="relative pt-2">
-                <input
-                  type="range"
-                  min="1"
-                  max="50"
+              <div className="px-2 pt-1">
+                <IntensityCloudSlider
                   value={snackSize}
-                  onChange={(e) => setSnackSize(Number(e.target.value))}
-                  className="w-full h-2 bg-surface-container-highest rounded-full appearance-none cursor-pointer accent-primary"
+                  onChange={setSnackSize}
+                  items={intensityMeta.items}
+                  sizeStep={[20, 28, 38]}
                 />
-              </div>
-              <div className="flex justify-between text-[10px] text-on-surface-variant font-medium px-1">
-                <span>1 cm 🍪</span>
-                <span>50 cm 🎂</span>
               </div>
             </section>
 
@@ -730,52 +839,28 @@ export default function CreateEvent() {
               </div>
             </section>
 
-            {/* 03. Serving Size */}
+            {/* 03. Session Intensity */}
             <section className="bg-surface-container-low p-10 rounded-xl relative overflow-hidden">
-              <div className="flex items-baseline gap-4 mb-10">
+              <div className="flex items-baseline gap-4 mb-8">
                 <span className="font-display text-2xl font-bold text-primary">03.</span>
-                <h2 className="font-display text-3xl font-semibold">{t("createEvent.servingSize")}</h2>
+                <h2 className="font-display text-3xl font-semibold flex items-center gap-3">
+                  <Leaf size={22} className="text-primary" />
+                  {t("createEvent.snackSize")}
+                </h2>
               </div>
-              <div className="flex flex-col items-center justify-center py-6">
-                <div className="relative mb-12 flex items-center justify-center">
-                  <div
-                    className="w-32 h-32 bg-secondary-container rounded-full flex items-center justify-center shadow-inner overflow-hidden transition-transform duration-300"
-                    style={{ transform: `scale(${1 + (snackSize / 50) * 0.4})` }}
-                  >
-                    <span style={{ fontSize: 16 + (snackSize / 50) * 56 + "px" }}>
-                      {getEmoji()}
-                    </span>
-                  </div>
-                  <div className="absolute -bottom-4 right-0 bg-primary px-4 py-1 rounded-full text-white font-bold text-sm shadow-lg tabular-nums">
-                    {snackSize}cm
-                  </div>
-                </div>
-                <div className="w-full px-4">
-                  <div className="relative h-8 w-full mb-6 flex items-center">
-                    <div className="absolute left-0 right-0 top-1/2 -translate-y-1/2 h-1 bg-outline-variant/30 rounded-full" />
-                    <div
-                      className="absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-primary rounded-full transition-[width] duration-150 pointer-events-none"
-                      style={{ width: `${((snackSize - 1) / 49) * 100}%` }}
-                    />
-                    <div
-                      className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-8 h-8 bg-white border-4 border-primary rounded-full shadow-lg pointer-events-none transition-[left] duration-150"
-                      style={{ left: `${((snackSize - 1) / 49) * 100}%` }}
-                    />
-                    <input
-                      type="range"
-                      min="1"
-                      max="50"
-                      value={snackSize}
-                      onChange={(e) => setSnackSize(Number(e.target.value))}
-                      className="relative z-10 w-full h-8 opacity-0 cursor-pointer"
-                    />
-                  </div>
-                  <div className="flex justify-between text-[10px] font-black text-on-surface-variant/40 tracking-tighter">
-                    <span>1 CM</span>
-                    <span className="text-primary/60">{t("createEvent.sweetSpot")}</span>
-                    <span>50 CM</span>
-                  </div>
-                </div>
+              <div className="flex flex-col items-center justify-center pt-2">
+                <SessionJointIllustration size={220} />
+                <p className="mt-2 text-xl font-bold text-primary">
+                  {intensityMeta.current.label}
+                </p>
+              </div>
+              <div className="w-full px-2 mt-8">
+                <IntensityCloudSlider
+                  value={snackSize}
+                  onChange={setSnackSize}
+                  items={intensityMeta.items}
+                  sizeStep={[26, 38, 52]}
+                />
               </div>
             </section>
 

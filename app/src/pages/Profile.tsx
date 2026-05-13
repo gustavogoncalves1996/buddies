@@ -1,7 +1,10 @@
 import { useMemo } from "react";
-import { Star, MapPin, CalendarDays, Settings, LogOut, Sparkles } from "lucide-react";
+import { Star, MapPin, CalendarDays, Settings, LogOut, Sparkles, Crown, Cloud } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import useStore from "../store/useStore";
+
+const SMOKE_TEXTURE =
+  "https://images.unsplash.com/photo-1554188248-986adbb73be4?auto=format&fit=crop&w=1600&q=80";
 
 export default function Profile() {
   const { t } = useTranslation();
@@ -19,9 +22,22 @@ export default function Profile() {
   const hasRating = !!user && user.eventsAttended > 0;
   const ratingDisplay = hasRating ? user.rating : "—";
 
+  const featuredBadges = [
+    {
+      tag: t("profile.legendaryAchievement"),
+      label: t("profile.cookieMaster"),
+      Icon: Crown,
+    },
+    {
+      tag: t("profile.communityPillarTag"),
+      label: t("profile.topHost"),
+      Icon: Cloud,
+    },
+  ];
+
   const awards = [
-    { emoji: "🍪", label: t("profile.cookieMaster") },
-    { emoji: "⭐", label: t("profile.topHost") },
+    { emoji: "🌿", label: t("profile.cookieMaster") },
+    { emoji: "✨", label: t("profile.topHost") },
     { emoji: "🔥", label: t("profile.streak10") },
     { emoji: "🤝", label: t("profile.communityHero") },
   ];
@@ -30,42 +46,88 @@ export default function Profile() {
     <div className="min-h-screen bg-surface pb-24 md:pb-12">
       {/* ======= DESKTOP HERO ======= */}
       <section className="hidden md:block relative min-h-170 overflow-hidden">
-        <div className="absolute inset-0 bg-linear-to-br from-[#1a3a14] via-[#2d5a22] to-[#1a3a14]" />
-        <div className="absolute inset-0 opacity-30 bg-[radial-gradient(ellipse_at_top,rgba(192,240,173,0.3),transparent_60%)]" />
-        <div className="relative z-10 flex flex-col items-center justify-center min-h-170 text-center px-8">
-          <div className="w-48 lg:w-56 h-48 lg:h-56 rounded-full overflow-hidden border-[6px] border-primary-fixed/40 shadow-[0_24px_80px_rgba(0,0,0,0.4)] mb-8">
-            <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-linear-to-br from-[#0d1f08] via-[#1f3a16] to-[#0d1f08]" />
+        {/* Smokey atmospheric layers */}
+        <img
+          src={SMOKE_TEXTURE}
+          alt=""
+          aria-hidden
+          className="absolute inset-0 w-full h-full object-cover opacity-25 mix-blend-screen pointer-events-none"
+        />
+        <div
+          className="absolute inset-0 opacity-50 pointer-events-none"
+          style={{
+            background:
+              "radial-gradient(ellipse at top, rgba(192,240,173,0.25), transparent 60%), radial-gradient(circle at 20% 80%, rgba(255,255,255,0.10), transparent 50%), radial-gradient(circle at 80% 30%, rgba(192,240,173,0.18), transparent 55%)",
+          }}
+        />
+        <div
+          className="absolute inset-0 opacity-40 pointer-events-none"
+          style={{
+            background:
+              "linear-gradient(180deg, transparent 0%, transparent 60%, #0d1f08 100%)",
+          }}
+        />
+        <div className="relative z-10 flex flex-col items-center justify-center min-h-170 text-center px-8 py-16">
+          {/* Avatar with golden/green glow */}
+          <div className="relative mb-10">
+            <div className="absolute -inset-6 rounded-full bg-linear-to-br from-[#c0f0ad]/40 via-[#FFD700]/20 to-transparent blur-2xl" />
+            <div className="relative w-48 lg:w-56 h-48 lg:h-56 rounded-full overflow-hidden border-[6px] border-[#c0f0ad]/40 shadow-[0_24px_80px_rgba(0,0,0,0.5)] ring-4 ring-[#FFD700]/15">
+              <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+            </div>
           </div>
-          <h1 className="text-5xl lg:text-7xl font-extrabold text-white tracking-tight mb-3" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+
+          <h1
+            className="text-5xl lg:text-7xl text-[#f3ead4] tracking-tight mb-4 drop-shadow-sm"
+            style={{ fontFamily: "var(--font-serif)", fontWeight: 600 }}
+          >
             {user.name}
           </h1>
-          <p className="text-xl text-primary-fixed/80 font-medium mb-6">{user.bio}</p>
+          <p
+            className="italic text-lg text-[#e8f5d8]/85 max-w-2xl leading-relaxed mb-10"
+            style={{ fontFamily: "var(--font-serif)" }}
+          >
+            {user.bio || t("profile.bioFallback")}
+          </p>
           <div className="flex gap-12 mb-10">
             <div className="text-center">
               <span className="text-4xl font-extrabold text-white">{user.eventsHosted}</span>
-              <p className="text-sm text-primary-fixed/60 mt-1">{t("profile.eventsHosted")}</p>
+              <p className="text-sm text-primary-fixed/70 mt-1">{t("profile.eventsHosted")}</p>
             </div>
             <div className="text-center">
               <span className="text-4xl font-extrabold text-white">{user.eventsAttended}</span>
-              <p className="text-sm text-primary-fixed/60 mt-1">{t("profile.attended")}</p>
+              <p className="text-sm text-primary-fixed/70 mt-1">{t("profile.attended")}</p>
             </div>
             <div className="text-center">
               <div className="flex items-center justify-center gap-1">
                 <Star size={20} fill={hasRating ? "#FFD700" : "none"} color={hasRating ? "#FFD700" : "#c0f0ad"} />
                 <span className="text-4xl font-extrabold text-white">{ratingDisplay}</span>
               </div>
-              <p className="text-sm text-primary-fixed/60 mt-1">{t("profile.rating")}</p>
+              <p className="text-sm text-primary-fixed/70 mt-1">{t("profile.rating")}</p>
             </div>
           </div>
-          {/* Awards */}
-          <div className="flex gap-6">
-            {awards.map((a, i) => (
+
+          {/* Featured achievement cards */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 w-full max-w-3xl">
+            {featuredBadges.map(({ tag, label, Icon }) => (
               <div
-                key={i}
-                className="bg-white/10 backdrop-blur-sm rounded-2xl px-6 py-4 text-center hover:bg-white/15 transition-colors"
+                key={label}
+                className="relative bg-white/8 backdrop-blur-sm rounded-2xl px-6 py-5 border border-white/15 hover:bg-white/12 transition-colors flex items-center gap-5 text-left"
               >
-                <span className="text-3xl mb-2 block">{a.emoji}</span>
-                <span className="text-xs text-primary-fixed/80 font-bold">{a.label}</span>
+                <div className="w-14 h-14 rounded-full bg-linear-to-br from-[#c0f0ad]/30 to-[#FFD700]/10 flex items-center justify-center border border-[#c0f0ad]/30 shrink-0">
+                  <Icon size={26} className="text-[#c0f0ad]" />
+                </div>
+                <div>
+                  <span className="block text-[10px] font-bold uppercase tracking-[0.2em] text-[#c0f0ad]/80 mb-1">
+                    {tag}
+                  </span>
+                  <span
+                    className="block text-xl text-[#f3ead4]"
+                    style={{ fontFamily: "var(--font-serif)", fontWeight: 600 }}
+                  >
+                    {label}
+                  </span>
+                </div>
               </div>
             ))}
           </div>
@@ -73,28 +135,47 @@ export default function Profile() {
       </section>
 
       {/* ======= MOBILE HERO ======= */}
-      <section className="md:hidden relative bg-linear-to-br from-primary to-primary-container py-10">
-        <div className="flex flex-col items-center text-center px-6">
-          <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-primary-fixed/40 shadow-lg mb-4">
-            <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+      <section className="md:hidden relative bg-linear-to-br from-[#0d1f08] via-[#1f3a16] to-[#0d1f08] py-10 overflow-hidden">
+        <img
+          src={SMOKE_TEXTURE}
+          alt=""
+          aria-hidden
+          className="absolute inset-0 w-full h-full object-cover opacity-25 mix-blend-screen pointer-events-none"
+        />
+        <div className="relative flex flex-col items-center text-center px-6">
+          <div className="relative mb-4">
+            <div className="absolute -inset-3 rounded-full bg-linear-to-br from-[#c0f0ad]/40 to-[#FFD700]/15 blur-xl" />
+            <div className="relative w-24 h-24 rounded-full overflow-hidden border-4 border-[#c0f0ad]/50 shadow-lg">
+              <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+            </div>
           </div>
-          <h1 className="text-2xl font-extrabold text-white tracking-tight mb-1">{user.name}</h1>
-          <p className="text-sm text-primary-fixed/80 mb-4">{user.bio}</p>
+          <h1
+            className="text-3xl text-[#f3ead4] tracking-tight mb-1"
+            style={{ fontFamily: "var(--font-serif)", fontWeight: 600 }}
+          >
+            {user.name}
+          </h1>
+          <p
+            className="italic text-sm text-[#e8f5d8]/85 mb-4 px-2"
+            style={{ fontFamily: "var(--font-serif)" }}
+          >
+            {user.bio || t("profile.bioFallback")}
+          </p>
           <div className="flex gap-8">
             <div className="text-center">
               <span className="text-xl font-extrabold text-white">{user.eventsHosted}</span>
-              <p className="text-[10px] text-primary-fixed/60 mt-0.5">{t("profile.hostedShort")}</p>
+              <p className="text-[10px] text-primary-fixed/70 mt-0.5">{t("profile.hostedShort")}</p>
             </div>
             <div className="text-center">
               <span className="text-xl font-extrabold text-white">{user.eventsAttended}</span>
-              <p className="text-[10px] text-primary-fixed/60 mt-0.5">{t("profile.attendedShort")}</p>
+              <p className="text-[10px] text-primary-fixed/70 mt-0.5">{t("profile.attendedShort")}</p>
             </div>
             <div className="text-center">
               <div className="flex items-center gap-0.5 justify-center">
                 <Star size={14} fill={hasRating ? "#FFD700" : "none"} color={hasRating ? "#FFD700" : "#c0f0ad"} />
                 <span className="text-xl font-extrabold text-white">{ratingDisplay}</span>
               </div>
-              <p className="text-[10px] text-primary-fixed/60 mt-0.5">{t("profile.rating")}</p>
+              <p className="text-[10px] text-primary-fixed/70 mt-0.5">{t("profile.rating")}</p>
             </div>
           </div>
         </div>
@@ -116,7 +197,10 @@ export default function Profile() {
         </div>
 
         {/* Section title */}
-        <h2 className="text-lg md:text-3xl font-extrabold text-on-surface mb-4 md:mb-8">
+        <h2
+          className="text-lg md:text-3xl text-on-surface mb-4 md:mb-8"
+          style={{ fontFamily: "var(--font-serif)", fontWeight: 600 }}
+        >
           {t("profile.memoriesTitle")}
         </h2>
 
