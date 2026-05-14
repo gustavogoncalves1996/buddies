@@ -1,11 +1,15 @@
 import { useState, useMemo, useCallback, useRef } from "react";
 import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
-import { CalendarDays, MapPin, Users, ChevronDown, ChevronUp, Check, X, ChevronLeft, ChevronRight } from "lucide-react";
+import { CalendarDays, MapPin, Users, ChevronDown, ChevronUp, Check, X, ChevronLeft, ChevronRight, Pencil, Ban } from "lucide-react";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 import L from "leaflet";
 import useStore from "../store/useStore";
 import LoadingScreen from "../components/LoadingScreen";
+import ConfirmDialog from "../components/ConfirmDialog";
+import { ManageSkeleton } from "../components/PageSkeletons";
+import { getErrorMessage } from "../utils/errors";
 
 const CANNABIS_SVG =
   '<svg viewBox="0 0 24 24" width="22" height="22" fill="#37602c" xmlns="http://www.w3.org/2000/svg"><path d="M12 22c-.3-1.6-.6-3.1-.9-4.6-1.4.6-2.9.9-4.5.9 1-1.3 1.7-2.7 2.1-4.3-1.6.2-3.2 0-4.7-.6 1.4-1 2.5-2.2 3.3-3.6-1.5-.4-2.9-1.1-4.1-2.1 1.6-.2 3.2-.7 4.5-1.6C6.3 5 5.3 3.5 4.7 1.9c1.5.6 2.9 1.5 4.1 2.7.6-1.5 1.5-2.9 2.7-4 .3 1.6.3 3.3 0 4.9 1.2-1.2 2.6-2.1 4.1-2.7-.6 1.6-1.6 3.1-2.9 4.2 1.3.9 2.9 1.4 4.5 1.6-1.2 1-2.6 1.7-4.1 2.1.8 1.4 1.9 2.6 3.3 3.6-1.5.6-3.1.8-4.7.6.4 1.6 1.1 3 2.1 4.3-1.6 0-3.1-.3-4.5-.9-.3 1.5-.6 3-.9 4.6Z"/></svg>';
@@ -49,9 +53,12 @@ function RecenterOnUser() {
 
 export default function MyHostedSnacks() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [tab, setTab] = useState("upcoming");
   const [expandedId, setExpandedId] = useState(null);
   const [selectedEventId, setSelectedEventId] = useState(null);
+  const [confirmAction, setConfirmAction] = useState(null);
+  const [confirmBusy, setConfirmBusy] = useState(false);
 
   const allEvents = useStore((s) => s.events);
   const session = useStore((s) => s.session);
@@ -59,11 +66,17 @@ export default function MyHostedSnacks() {
   const pastEvents = useStore((s) => s.pastEvents);
   const applicants = useStore((s) => s.applicants);
   const updateApplicantStatus = useStore((s) => s.updateApplicantStatus);
+  const cancelEvent = useStore((s) => s.cancelEvent);
   const pushToast = useStore((s) => s.pushToast);
+  const dataReady = useStore((s) => s.dataReady);
 
   const updateStatus = useCallback(
     async (applicantId, status) => {
       const applicant = applicants.find((a) => a.id === applicantId);
+      if (status === "rejected") {
+        setConfirmAction({ type: "reject", applicantId, applicantName: applicant?.name || t("manage.fallbackSnacker") });
+        return;
+      }
       try {
         await updateApplicantStatus(applicantId, status);
         pushToast(
@@ -79,7 +92,7 @@ export default function MyHostedSnacks() {
       } catch (err) {
         pushToast(
           t("manage.updateFail", {
-            error: err.message || t("common.unknownError"),
+            error: getErrorMessage(err, t("common.unknownError")),
           }),
           "error"
         );
@@ -87,6 +100,43 @@ export default function MyHostedSnacks() {
     },
     [applicants, updateApplicantStatus, pushToast, t]
   );
+
+  const handleCancelEvent = useCallback(
+    (eventId) => {
+      const event = allEvents.find((item) => item.id === eventId);
+      setConfirmAction({ type: "cancel", eventId, eventTitle: event?.title || t("manage.eventFallback") });
+    },
+    [allEvents, t]
+  );
+
+  const runConfirmedAction = useCallback(async () => {
+    if (!confirmAction) return;
+    setConfirmBusy(true);
+    try {
+      if (confirmAction.type === "reject") {
+        const applicant = applicants.find((a) => a.id === confirmAction.applicantId);
+        await updateApplicantStatus(confirmAction.applicantId, "rejected");
+        pushToast(
+          t("manage.updateRejected", { name: applicant?.name || t("manage.fallbackSnacker") }),
+          "info"
+        );
+      }
+      if (confirmAction.type === "cancel") {
+        await cancelEvent(confirmAction.eventId);
+        pushToast(t("manage.cancelledToast"), "info");
+      }
+      setConfirmAction(null);
+    } catch (err) {
+      pushToast(
+        confirmAction.type === "cancel"
+          ? t("manage.cancelFail", { error: getErrorMessage(err, t("common.unknownError")) })
+          : t("manage.updateFail", { error: getErrorMessage(err, t("common.unknownError")) }),
+        "error"
+      );
+    } finally {
+      setConfirmBusy(false);
+    }
+  }, [applicants, cancelEvent, confirmAction, pushToast, t, updateApplicantStatus]);
 
   const currentUser = useMemo(
     () => (session ? users.find((u) => u.authId === session.user.id) : null),
@@ -135,12 +185,31 @@ export default function MyHostedSnacks() {
       : [41.1579, -8.6291];
 
   /* Hold the cozy loader until we know the user's location (or it fails) */
+  if (!dataReady) {
+    return <ManageSkeleton />;
+  }
+
   if (!userLocation && locationStatus === "pending") {
     return <LoadingScreen message={t("manage.loadingMessage")} />;
   }
 
   return (
     <div className="min-h-screen bg-surface pb-24 md:pb-0">
+      <ConfirmDialog
+        open={!!confirmAction}
+        title={confirmAction?.type === "cancel" ? t("manage.cancelConfirmTitle") : t("manage.rejectConfirmTitle")}
+        description={
+          confirmAction?.type === "cancel"
+            ? t("manage.cancelConfirmBody", { title: confirmAction?.eventTitle })
+            : t("manage.rejectConfirmBody", { name: confirmAction?.applicantName })
+        }
+        confirmLabel={confirmAction?.type === "cancel" ? t("manage.cancelEvent") : t("manage.rejectApplicant")}
+        cancelLabel={t("common.close")}
+        tone="danger"
+        busy={confirmBusy}
+        onConfirm={runConfirmedAction}
+        onCancel={() => (confirmBusy ? null : setConfirmAction(null))}
+      />
       {/* ======= DESKTOP ======= */}
       <div className="hidden md:block relative w-full h-[calc(100vh-73px)] overflow-hidden">
         {/* Full-screen map background */}
@@ -252,7 +321,7 @@ export default function MyHostedSnacks() {
                       <div className="w-3/5 p-4 flex flex-col justify-between min-w-0">
                         <div>
                           <span className="bg-secondary-container text-on-secondary-container px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider mb-2 inline-block">
-                            {ev.tag}
+                            {ev.status === "cancelled" ? t("manage.cancelled") : ev.tag}
                           </span>
                           <h3 className="text-base font-extrabold text-on-surface leading-tight line-clamp-2">
                             {ev.title}
@@ -283,6 +352,29 @@ export default function MyHostedSnacks() {
                         </div>
                       </div>
                     </div>
+
+                    {tab === "upcoming" && (
+                      <div className="border-t border-outline-variant px-4 py-3 flex gap-2" onClick={(e) => e.stopPropagation()}>
+                        <button
+                          type="button"
+                          onClick={() => navigate(`/create/${ev.id}`)}
+                          className="flex items-center gap-1.5 rounded-full bg-primary-fixed text-on-surface px-3 py-1.5 text-[11px] font-bold hover:bg-secondary-container transition-colors"
+                        >
+                          <Pencil size={12} />
+                          {t("manage.editEvent")}
+                        </button>
+                        {ev.status !== "cancelled" && (
+                          <button
+                            type="button"
+                            onClick={() => handleCancelEvent(ev.id)}
+                            className="flex items-center gap-1.5 rounded-full bg-error/10 text-error px-3 py-1.5 text-[11px] font-bold hover:bg-error hover:text-on-error transition-colors"
+                          >
+                            <Ban size={12} />
+                            {t("manage.cancelEvent")}
+                          </button>
+                        )}
+                      </div>
+                    )}
 
                     {isActive && apps.length > 0 && (
                       <div className="border-t border-outline-variant px-4 py-3">
@@ -418,7 +510,7 @@ export default function MyHostedSnacks() {
                     <div className="flex-1 p-3 flex flex-col justify-between min-w-0">
                       <div className="min-w-0">
                         <span className="bg-secondary-container text-on-secondary-container px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider">
-                          {ev.tag}
+                          {ev.status === "cancelled" ? t("manage.cancelled") : ev.tag}
                         </span>
                         <h3 className="text-sm font-extrabold text-on-surface mt-1 leading-tight line-clamp-1">
                           {ev.title}
@@ -442,6 +534,29 @@ export default function MyHostedSnacks() {
                       </div>
                     </div>
                   </div>
+
+                  {tab === "upcoming" && (
+                    <div className="border-t border-outline-variant px-3 py-2 flex gap-2" onClick={(e) => e.stopPropagation()}>
+                      <button
+                        type="button"
+                        onClick={() => navigate(`/create/${ev.id}`)}
+                        className="flex-1 flex items-center justify-center gap-1.5 rounded-full bg-primary-fixed text-on-surface px-3 py-2 text-[11px] font-bold"
+                      >
+                        <Pencil size={12} />
+                        {t("manage.editEvent")}
+                      </button>
+                      {ev.status !== "cancelled" && (
+                        <button
+                          type="button"
+                          onClick={() => handleCancelEvent(ev.id)}
+                          className="flex-1 flex items-center justify-center gap-1.5 rounded-full bg-error/10 text-error px-3 py-2 text-[11px] font-bold"
+                        >
+                          <Ban size={12} />
+                          {t("manage.cancelEvent")}
+                        </button>
+                      )}
+                    </div>
+                  )}
 
                   {/* Expandable applicants */}
                   {isActive && apps.length > 0 && (

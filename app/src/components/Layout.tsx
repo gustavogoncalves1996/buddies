@@ -1,5 +1,5 @@
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { Map, PlusCircle, CalendarDays, User, Search, Bell, LogOut, Sparkles } from "lucide-react";
+import { Map, PlusCircle, CalendarDays, User, Search, Bell, LogOut, Sparkles, Settings } from "lucide-react";
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import useStore from "../store/useStore";
@@ -54,6 +54,7 @@ function TopNav() {
     { to: "/", label: t("nav.map") },
     { to: "/create", label: t("nav.create") },
     { to: "/manage", label: t("nav.manage") },
+    { to: "/settings", label: t("nav.settings") },
   ];
 
   return (
@@ -138,6 +139,7 @@ function BottomNav() {
     { to: "/create", icon: PlusCircle, label: t("nav.create") },
     { to: "/manage", icon: CalendarDays, label: t("nav.manage") },
     { to: "/profile", icon: User, label: t("nav.profile") },
+    { to: "/settings", icon: Settings, label: t("nav.settings") },
   ];
 
   return (

@@ -1,7 +1,56 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ImagePlus, X, Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import useStore from "../store/useStore";
+import { getErrorMessage } from "../utils/errors";
+
+const COVER_RATIO = 16 / 9;
+const MAX_COVER_WIDTH = 1600;
+
+function cropToCover(file) {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    const url = URL.createObjectURL(file);
+    image.onload = () => {
+      const sourceRatio = image.width / image.height;
+      const sourceWidth = sourceRatio > COVER_RATIO ? image.height * COVER_RATIO : image.width;
+      const sourceHeight = sourceRatio > COVER_RATIO ? image.height : image.width / COVER_RATIO;
+      const sourceX = (image.width - sourceWidth) / 2;
+      const sourceY = (image.height - sourceHeight) / 2;
+      const targetWidth = Math.min(MAX_COVER_WIDTH, Math.round(sourceWidth));
+      const targetHeight = Math.round(targetWidth / COVER_RATIO);
+      const canvas = document.createElement("canvas");
+      canvas.width = targetWidth;
+      canvas.height = targetHeight;
+      const context = canvas.getContext("2d");
+      if (!context) {
+        URL.revokeObjectURL(url);
+        reject(new Error("Canvas is not available."));
+        return;
+      }
+      context.drawImage(image, sourceX, sourceY, sourceWidth, sourceHeight, 0, 0, targetWidth, targetHeight);
+      canvas.toBlob(
+        (blob) => {
+          URL.revokeObjectURL(url);
+          if (!blob) {
+            reject(new Error("Couldn't crop image."));
+            return;
+          }
+          const extension = file.type === "image/png" ? "png" : "jpg";
+          const name = file.name.replace(/[.][^.]+$/, `-cover.${extension}`);
+          resolve(new File([blob], name, { type: blob.type || "image/jpeg" }));
+        },
+        file.type === "image/png" ? "image/png" : "image/jpeg",
+        0.9
+      );
+    };
+    image.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error("Couldn't read image."));
+    };
+    image.src = url;
+  });
+}
 
 /**
  * Cozy drag-and-drop image picker. Shows a preview immediately and
@@ -14,24 +63,45 @@ export default function ImageUpload({ value, onChange, disabled }) {
   const [dragOver, setDragOver] = useState(false);
   const pushToast = useStore((s) => s.pushToast);
 
-  const handleFile = (file) => {
+  useEffect(() => {
+    if (typeof value === "string" && value !== "uploading") setPreview(value);
+    if (!value) setPreview(null);
+  }, [value]);
+
+  useEffect(() => {
+    return () => {
+      if (preview?.startsWith("blob:")) URL.revokeObjectURL(preview);
+    };
+  }, [preview]);
+
+  const handleFile = async (file) => {
     if (!file) return;
     if (!file.type?.startsWith("image/")) {
       pushToast(t("imageUpload.notImage"), "error");
+      return;
+    }
+    if (!/[.](jpe?g|png|webp|gif|avif)$/i.test(file.name || "")) {
+      pushToast(t("imageUpload.badExtension"), "error");
       return;
     }
     if (file.size > 5 * 1024 * 1024) {
       pushToast(t("imageUpload.tooBig"), "error");
       return;
     }
-    const url = URL.createObjectURL(file);
-    setPreview(url);
-    onChange?.(file);
+    try {
+      const croppedFile = await cropToCover(file);
+      if (preview?.startsWith("blob:")) URL.revokeObjectURL(preview);
+      const url = URL.createObjectURL(croppedFile);
+      setPreview(url);
+      onChange?.(croppedFile);
+    } catch (err) {
+      pushToast(t("imageUpload.cropFailed", { error: getErrorMessage(err, t("common.unknownError")) }), "error");
+    }
   };
 
   const clear = (e) => {
     e?.stopPropagation();
-    if (preview) URL.revokeObjectURL(preview);
+    if (preview?.startsWith("blob:")) URL.revokeObjectURL(preview);
     setPreview(null);
     onChange?.(null);
     if (inputRef.current) inputRef.current.value = "";

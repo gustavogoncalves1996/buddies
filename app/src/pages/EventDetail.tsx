@@ -3,6 +3,8 @@ import { ChevronLeft, CalendarDays, MapPin, Users, Star, MessageCircle } from "l
 import { useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import useStore from "../store/useStore";
+import { EventDetailSkeleton } from "../components/PageSkeletons";
+import { getErrorMessage } from "../utils/errors";
 
 export default function EventDetail() {
   const { t } = useTranslation();
@@ -17,9 +19,10 @@ export default function EventDetail() {
   const session = useStore((s) => s.session);
   const applyToEvent = useStore((s) => s.applyToEvent);
   const pushToast = useStore((s) => s.pushToast);
+  const dataReady = useStore((s) => s.dataReady);
 
-  const event = useMemo(() => events.find((e) => e.id === Number(id)) || events[0], [events, id]);
-  const host = useMemo(() => users.find((u) => u.id === event.hostId), [users, event.hostId]);
+  const event = useMemo(() => events.find((e) => e.id === Number(id)) || null, [events, id]);
+  const host = useMemo(() => (event ? users.find((u) => u.id === event.hostId) : null), [users, event]);
   const currentUser = useMemo(
     () => (session ? users.find((u) => u.authId === session.user.id) : null),
     [users, session]
@@ -29,22 +32,39 @@ export default function EventDetail() {
     () =>
       currentUser
         ? applicants.find(
-            (a) => a.eventId === event.id && a.userId === currentUser.id
+            (a) => event && a.eventId === event.id && a.userId === currentUser.id
           )
         : null,
-    [applicants, currentUser, event.id]
+    [applicants, currentUser, event]
   );
 
-  const isHost = currentUser?.id === event.hostId;
-  const spotsLeft = event.maxSnackers - event.currentSnackers;
-  const fillPercent = (event.currentSnackers / event.maxSnackers) * 100;
+  const isHost = !!event && currentUser?.id === event.hostId;
+  const spotsLeft = event ? Math.max(0, event.maxSnackers - event.currentSnackers) : 0;
+  const fillPercent = event ? Math.min(100, (event.currentSnackers / event.maxSnackers) * 100) : 0;
+  const isFull = spotsLeft <= 0;
 
   const intensityLabel = useMemo(() => {
-    const v = Number(event.snackSize);
+    const v = Number(event?.snackSize || 0);
     if (v <= 18) return t("createEvent.snackSizeMildBlend");
     if (v >= 36) return t("createEvent.snackSizeDeepBlend");
     return t("createEvent.snackSizeBalanced");
-  }, [event.snackSize, t]);
+  }, [event?.snackSize, t]);
+
+  if (!dataReady) {
+    return <EventDetailSkeleton />;
+  }
+
+  if (!event) {
+    return (
+      <div className="min-h-screen bg-surface px-6 py-16 text-center">
+        <h1 className="text-2xl font-extrabold text-on-surface mb-3">{t("eventDetail.notFoundTitle")}</h1>
+        <p className="text-on-surface-variant mb-6">{t("eventDetail.notFoundBody")}</p>
+        <button onClick={() => navigate("/")} className="bg-primary text-on-primary px-6 py-3 rounded-full font-bold">
+          {t("common.back")}
+        </button>
+      </div>
+    );
+  }
 
   const handleApply = async () => {
     if (!currentUser) {
@@ -57,6 +77,10 @@ export default function EventDetail() {
     }
     if (myApplication) {
       pushToast(t("eventDetail.alreadyApplied"), "info");
+      return;
+    }
+    if (event.status === "cancelled") {
+      pushToast(t("manage.cancelled"), "info");
       return;
     }
     if (spotsLeft <= 0) {
@@ -73,7 +97,7 @@ export default function EventDetail() {
         err?.code === "DUPLICATE_APPLICATION"
           ? t("eventDetail.alreadyApplied")
           : t("eventDetail.applyFail", {
-              error: err.message || t("common.unknownError"),
+              error: getErrorMessage(err, t("common.unknownError")),
             }),
         "error"
       );
@@ -88,12 +112,13 @@ export default function EventDetail() {
     if (myApplication?.status === "accepted") return t("eventDetail.youreIn");
     if (myApplication?.status === "rejected") return t("eventDetail.appDeclined");
     if (myApplication?.status === "pending") return t("eventDetail.appPending");
+    if (event.status === "cancelled") return t("manage.cancelled");
     if (spotsLeft <= 0) return t("eventDetail.fullyBooked");
     return t("eventDetail.applyToJoin");
   })();
 
   const applyDisabled =
-    submitting || isHost || !!myApplication || spotsLeft <= 0;
+    submitting || isHost || !!myApplication || spotsLeft <= 0 || event.status === "cancelled";
 
   return (
     <div className="min-h-screen bg-surface pb-24 md:pb-12">
@@ -120,6 +145,16 @@ export default function EventDetail() {
             <span className="bg-secondary-container text-on-secondary-container px-3 md:px-4 py-1 md:py-1.5 rounded-full text-[10px] md:text-xs font-bold tracking-widest uppercase mb-2 md:mb-4 inline-block">
               {event.tag}
             </span>
+            {isFull && (
+              <span className="ml-2 bg-error text-on-error px-3 md:px-4 py-1 md:py-1.5 rounded-full text-[10px] md:text-xs font-bold tracking-widest uppercase mb-2 md:mb-4 inline-block">
+                {t("home.fullBadge")}
+              </span>
+            )}
+            {event.status === "cancelled" && (
+              <span className="ml-2 bg-surface-container-lowest text-error px-3 md:px-4 py-1 md:py-1.5 rounded-full text-[10px] md:text-xs font-bold tracking-widest uppercase mb-2 md:mb-4 inline-block">
+                {t("manage.cancelled")}
+              </span>
+            )}
             <h1 className="hidden md:block text-white text-5xl lg:text-7xl font-extrabold tracking-tight mb-4 leading-[1.1]">
               {event.title}
             </h1>

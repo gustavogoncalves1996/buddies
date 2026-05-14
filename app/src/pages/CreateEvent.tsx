@@ -15,11 +15,12 @@ import {
   Plus,
   Minus,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import useStore from "../store/useStore";
 import AddressAutocomplete from "../components/AddressAutocomplete";
 import ImageUpload from "../components/ImageUpload";
+import { getErrorMessage } from "../utils/errors";
 import sessionJointImg from "../assets/session-joint.png";
 
 const DEFAULT_EVENT_IMAGE =
@@ -98,6 +99,8 @@ export default function CreateEvent() {
   const schema = useMemo(
     () =>
       z.object({
+        title: z.string().min(3, t("createEvent.schemaTitle")),
+        description: z.string().optional(),
         location: z.string().min(3, t("createEvent.schemaLocation")),
         date: z.string().min(1, t("createEvent.schemaDate")),
         time: z.string().min(1, t("createEvent.schemaTime")),
@@ -105,12 +108,16 @@ export default function CreateEvent() {
     [t]
   );
   const navigate = useNavigate();
+  const { eventId } = useParams();
+  const [searchParams] = useSearchParams();
   const addEvent = useStore((s) => s.addEvent);
+  const updateEvent = useStore((s) => s.updateEvent);
   const uploadEventImage = useStore((s) => s.uploadEventImage);
   const setLoading = useStore((s) => s.setLoading);
   const pushToast = useStore((s) => s.pushToast);
   const session = useStore((s) => s.session);
   const users = useStore((s) => s.users);
+  const events = useStore((s) => s.events);
   const currentUser = session
     ? users.find((u) => u.authId === session.user.id)
     : null;
@@ -118,6 +125,12 @@ export default function CreateEvent() {
   const [maxSnackers, setMaxSnackers] = useState(8);
   const [geocoded, setGeocoded] = useState(null); // { label, lat, lng }
   const [imageFile, setImageFile] = useState(null);
+
+  const editingEvent = useMemo(
+    () => (eventId ? events.find((event) => event.id === Number(eventId)) : null),
+    [eventId, events]
+  );
+  const isEditing = !!editingEvent;
 
   const {
     register,
@@ -128,6 +141,8 @@ export default function CreateEvent() {
   } = useForm({ resolver: zodResolver(schema) });
 
   const locationValue = watch("location") || "";
+  const titleValue = watch("title") || "";
+  const descriptionValue = watch("description") || "";
   const dateValue = watch("date") || "";
   const timeValue = watch("time") || "";
 
@@ -140,10 +155,41 @@ export default function CreateEvent() {
   }, []);
 
   useEffect(() => {
+    if (!titleValue) setValue("title", t("createEvent.defaultTitle"), { shouldValidate: true });
     if (!dateValue) setValue("date", todayISO, { shouldValidate: true });
     if (!timeValue) setValue("time", "16:30", { shouldValidate: true });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (!editingEvent) return;
+    setValue("title", editingEvent.title || t("createEvent.defaultTitle"), { shouldValidate: true });
+    setValue("description", editingEvent.description || "", { shouldValidate: false });
+    setValue("location", editingEvent.location || "", { shouldValidate: true });
+    setValue("date", editingEvent.date || todayISO, { shouldValidate: true });
+    setValue("time", editingEvent.time || "16:30", { shouldValidate: true });
+    setSnackSize(editingEvent.snackSize || 20);
+    setMaxSnackers(editingEvent.maxSnackers || 8);
+    if (editingEvent.lat != null && editingEvent.lng != null) {
+      setGeocoded({
+        label: editingEvent.location,
+        short: editingEvent.location,
+        lat: editingEvent.lat,
+        lng: editingEvent.lng,
+      });
+    }
+  }, [editingEvent, setValue, t, todayISO]);
+
+  useEffect(() => {
+    if (editingEvent) return;
+    const lat = Number(searchParams.get("lat"));
+    const lng = Number(searchParams.get("lng"));
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
+    const label = searchParams.get("label") || t("createEvent.mapPinnedLocation");
+    const item = { label, short: label, lat, lng };
+    setGeocoded(item);
+    setValue("location", label, { shouldValidate: true });
+  }, [editingEvent, searchParams, setValue, t]);
 
   // ---------- Date wheel drag (angular) ----------
   const MAX_DAY_OFFSET = 180; // up to ~6 months ahead
@@ -244,10 +290,14 @@ export default function CreateEvent() {
   };
 
   const onInvalid = (formErrors) => {
+    console.warn("CreateEvent form invalid:", formErrors);
     const first =
+      formErrors.title?.message ||
       formErrors.location?.message ||
       formErrors.date?.message ||
       formErrors.time?.message ||
+      formErrors.description?.message ||
+      Object.values(formErrors)[0]?.message ||
       t("createEvent.invalidForm");
     pushToast(first, "error");
   };
@@ -311,6 +361,8 @@ export default function CreateEvent() {
   // Register location manually so the autocomplete drives it via setValue
   useEffect(() => {
     register("location");
+    register("title");
+    register("description");
   }, [register]);
 
   const intensityMeta = useMemo(() => {
@@ -322,6 +374,7 @@ export default function CreateEvent() {
   }, [snackSize, t]);
 
   const onSubmit = async (data) => {
+    console.log("CreateEvent onSubmit fired", { data, currentUser, geocoded, snackSize, maxSnackers });
     if (!currentUser) {
       pushToast(t("createEvent.loginRequired"), "error");
       return;
@@ -332,37 +385,43 @@ export default function CreateEvent() {
     }
     setLoading(true);
     try {
-      let imageUrl = DEFAULT_EVENT_IMAGE;
+      let imageUrl = editingEvent?.image || DEFAULT_EVENT_IMAGE;
       if (imageFile) {
         try {
           imageUrl = await uploadEventImage(imageFile);
         } catch (err) {
           setLoading(false);
-          pushToast(t("createEvent.uploadFail", { error: err.message || t("common.unknownError") }), "error");
+          pushToast(t("createEvent.uploadFail", { error: getErrorMessage(err, t("common.unknownError")) }), "error");
           return;
         }
       }
-      await addEvent({
+
+      const payload = {
         ...data,
         snackSize,
         maxSnackers,
         hostId: currentUser.id,
-        currentSnackers: 0,
+        currentSnackers: editingEvent?.currentSnackers ?? 0,
         lat: geocoded.lat,
         lng: geocoded.lng,
         image: imageUrl,
-        status: "planning",
-        tag: "New",
+        status: editingEvent?.status || "planning",
+        tag: editingEvent?.tag || "New",
         walkTime: t("createEvent.defaultWalkTime"),
-        title: t("createEvent.defaultTitle"),
-        description: t("createEvent.defaultDescription", { location: data.location }),
-      });
-      pushToast(t("createEvent.created"), "success");
+        title: data.title || t("createEvent.defaultTitle"),
+        description:
+          data.description || t("createEvent.defaultDescription", { location: data.location }),
+      };
+
+      if (isEditing) await updateEvent(editingEvent.id, payload);
+      else await addEvent(payload);
+
+      pushToast(isEditing ? t("createEvent.updated") : t("createEvent.created"), "success");
       navigate("/manage");
       setTimeout(() => setLoading(false), 400);
     } catch (err) {
       setLoading(false);
-      pushToast(t("createEvent.createFail", { error: err.message || t("common.unknownError") }), "error");
+      pushToast(t(isEditing ? "createEvent.updateFail" : "createEvent.createFail", { error: getErrorMessage(err, t("common.unknownError")) }), "error");
     }
   };
 
@@ -388,6 +447,34 @@ export default function CreateEvent() {
           </p>
 
           <form onSubmit={handleSubmit(onSubmit, onInvalid)} className="space-y-10">
+            <section className="space-y-3">
+              <div>
+                <label className="block text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-1.5 ml-4">
+                  {t("createEvent.titleLabel")}
+                </label>
+                <input
+                  type="text"
+                  value={titleValue}
+                  onChange={(e) => setValue("title", e.target.value, { shouldValidate: true })}
+                  placeholder={t("createEvent.titlePlaceholder")}
+                  className="w-full bg-surface-container-highest border-none rounded-full px-5 py-3.5 text-sm text-on-surface placeholder:text-on-surface-variant/60 focus:outline-none focus:ring-2 focus:ring-primary-fixed"
+                />
+                {errors.title && <p className="text-error text-xs ml-4 mt-1">{errors.title.message}</p>}
+              </div>
+              <div>
+                <label className="block text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-1.5 ml-4">
+                  {t("createEvent.descriptionLabel")}
+                </label>
+                <textarea
+                  value={descriptionValue}
+                  onChange={(e) => setValue("description", e.target.value, { shouldValidate: false })}
+                  placeholder={t("createEvent.descriptionPlaceholder")}
+                  rows={3}
+                  className="w-full bg-surface-container-highest border-none rounded-2xl px-5 py-3.5 text-sm text-on-surface placeholder:text-on-surface-variant/60 focus:outline-none focus:ring-2 focus:ring-primary-fixed resize-none"
+                />
+              </div>
+            </section>
+
             {/* Location */}
             <section className="space-y-3">
               <div className="flex items-center gap-2.5">
@@ -428,7 +515,7 @@ export default function CreateEvent() {
                 <h2 className="text-base font-bold tracking-tight">{t("createEvent.coverImage")}</h2>
                 <span className="text-xs text-on-surface-variant font-medium">· {t("common.optional")}</span>
               </div>
-              <ImageUpload value={imageFile} onChange={setImageFile} />
+              <ImageUpload value={imageFile || editingEvent?.image} onChange={setImageFile} />
             </section>
 
             {/* Date & Time */}
@@ -712,6 +799,34 @@ export default function CreateEvent() {
 
           {/* ── Right column: organic inputs + serving size + CTA ── */}
           <div className="lg:col-span-5 flex flex-col gap-12">
+            <section className="space-y-4">
+              <div>
+                <label className="block text-[10px] font-bold tracking-widest text-on-surface-variant uppercase mb-2">
+                  {t("createEvent.titleLabel")}
+                </label>
+                <input
+                  type="text"
+                  value={titleValue}
+                  onChange={(e) => setValue("title", e.target.value, { shouldValidate: true })}
+                  placeholder={t("createEvent.titlePlaceholder")}
+                  className="w-full bg-surface-container-highest rounded-full px-6 py-4 text-xl font-headline font-bold text-on-surface placeholder:text-outline-variant focus:outline-none focus:ring-2 focus:ring-primary-fixed"
+                />
+                {errors.title && <p className="text-error text-xs mt-2 ml-4">{errors.title.message}</p>}
+              </div>
+              <div>
+                <label className="block text-[10px] font-bold tracking-widest text-on-surface-variant uppercase mb-2">
+                  {t("createEvent.descriptionLabel")}
+                </label>
+                <textarea
+                  value={descriptionValue}
+                  onChange={(e) => setValue("description", e.target.value, { shouldValidate: false })}
+                  placeholder={t("createEvent.descriptionPlaceholder")}
+                  rows={3}
+                  className="w-full bg-surface-container-highest rounded-3xl px-6 py-4 text-sm text-on-surface placeholder:text-outline-variant focus:outline-none focus:ring-2 focus:ring-primary-fixed resize-none"
+                />
+              </div>
+            </section>
+
             {/* Location organic shape */}
             <section className="flex flex-col gap-8">
               <div className="relative group">
@@ -827,7 +942,7 @@ export default function CreateEvent() {
                 <h2 className="font-display text-lg font-semibold">{t("createEvent.coverImage")}</h2>
                 <span className="text-xs text-on-surface-variant font-medium">· {t("common.optional")}</span>
               </div>
-              <ImageUpload value={imageFile} onChange={setImageFile} />
+              <ImageUpload value={imageFile || editingEvent?.image} onChange={setImageFile} />
             </section>
 
             {/* CTA */}

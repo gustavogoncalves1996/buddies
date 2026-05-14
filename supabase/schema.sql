@@ -23,6 +23,7 @@ create table if not exists public.profiles (
   events_hosted int default 0,
   events_attended int default 0,
   badge text,
+  push_subscription jsonb,
   created_at timestamptz default now()
 );
 
@@ -47,6 +48,18 @@ create table if not exists public.events (
   created_at timestamptz default now()
 );
 
+do $$
+begin
+  if not exists (
+    select 1 from pg_constraint where conname = 'events_status_check'
+  ) then
+    alter table public.events
+      add constraint events_status_check
+      check (status in ('planning', 'confirmed', 'cancelled'));
+  end if;
+end;
+$$;
+
 -- Past events (history showcase on profile)
 create table if not exists public.past_events (
   id bigserial primary key,
@@ -69,6 +82,26 @@ create table if not exists public.applicants (
   status text default 'pending', -- pending | accepted | rejected
   created_at timestamptz default now()
 );
+
+do $$
+begin
+  if not exists (
+    select 1 from pg_constraint where conname = 'applicants_status_check'
+  ) then
+    alter table public.applicants
+      add constraint applicants_status_check
+      check (status in ('pending', 'accepted', 'rejected'));
+  end if;
+
+  if not exists (
+    select 1 from pg_constraint where conname = 'applicants_event_user_unique'
+  ) then
+    alter table public.applicants
+      add constraint applicants_event_user_unique
+      unique (event_id, user_id);
+  end if;
+end;
+$$;
 
 -- =============================================================
 -- 2. ROW-LEVEL SECURITY (RLS)
@@ -148,6 +181,20 @@ drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute function public.handle_new_user();
+
+
+-- Apaga todos os dados de exemplo, mas mantém as tabelas e políticas.
+-- ATENÇÃO: Isto elimina dados reais se já os tiveres. Usa apenas em ambiente de desenvolvimento.
+TRUNCATE TABLE public.applicants CASCADE;
+TRUNCATE TABLE public.past_events CASCADE;
+TRUNCATE TABLE public.events CASCADE;
+TRUNCATE TABLE public.profiles CASCADE;
+
+-- Reinicia as sequências para que os IDs voltem a 1
+ALTER SEQUENCE public.events_id_seq RESTART WITH 1;
+ALTER SEQUENCE public.applicants_id_seq RESTART WITH 1;
+ALTER SEQUENCE public.past_events_id_seq RESTART WITH 1;
+
 
 -- =============================================================
 -- 4. SEED DATA

@@ -1,7 +1,9 @@
 import { useMemo } from "react";
 import { Star, MapPin, CalendarDays, Settings, LogOut, Sparkles, Crown, Cloud } from "lucide-react";
+import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import useStore from "../store/useStore";
+import { ProfileSkeleton } from "../components/PageSkeletons";
 
 const SMOKE_TEXTURE =
   "https://images.unsplash.com/photo-1554188248-986adbb73be4?auto=format&fit=crop&w=1600&q=80";
@@ -11,6 +13,9 @@ export default function Profile() {
   const users = useStore((s) => s.users);
   const session = useStore((s) => s.session);
   const allPastEvents = useStore((s) => s.pastEvents);
+  const dataReady = useStore((s) => s.dataReady);
+  const fetchAll = useStore((s) => s.fetchAll);
+  const signOut = useStore((s) => s.signOut);
   const user = useMemo(
     () => (session ? users.find((u) => u.authId === session.user.id) : null),
     [users, session]
@@ -41,6 +46,32 @@ export default function Profile() {
     { emoji: "🔥", label: t("profile.streak10") },
     { emoji: "🤝", label: t("profile.communityHero") },
   ];
+
+  if (!dataReady || !user) {
+    if (!dataReady) return <ProfileSkeleton />;
+    return (
+      <div className="min-h-screen bg-surface px-6 py-16 text-center">
+        <h1 className="text-2xl font-extrabold text-on-surface mb-3">{t("profile.notReadyTitle")}</h1>
+        <p className="text-on-surface-variant mb-6 max-w-xl mx-auto">{t("profile.notReadyBody")}</p>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+          <button
+            type="button"
+            onClick={() => fetchAll()}
+            className="rounded-full bg-primary text-on-primary px-5 py-3 font-bold"
+          >
+            {t("profile.retrySync")}
+          </button>
+          <button
+            type="button"
+            onClick={() => signOut()}
+            className="rounded-full bg-surface-container-high text-on-surface px-5 py-3 font-bold"
+          >
+            {t("profile.logOut")}
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-surface pb-24 md:pb-12">
@@ -316,10 +347,10 @@ export default function Profile() {
 
         {/* Settings section (mobile) */}
         <div className="md:hidden mt-8 space-y-3">
-          <button className="w-full flex items-center gap-4 px-5 py-4 bg-surface-container-lowest rounded-2xl shadow-cozy text-on-surface font-bold text-sm">
+          <Link to="/settings" className="w-full flex items-center gap-4 px-5 py-4 bg-surface-container-lowest rounded-2xl shadow-cozy text-on-surface font-bold text-sm">
             <Settings size={18} className="text-on-surface-variant" />
             {t("profile.accountSettings")}
-          </button>
+          </Link>
           <button className="w-full flex items-center gap-4 px-5 py-4 bg-surface-container-lowest rounded-2xl shadow-cozy text-error font-bold text-sm">
             <LogOut size={18} className="text-error" />
             {t("profile.logOut")}

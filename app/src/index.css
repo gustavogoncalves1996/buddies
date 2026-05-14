@@ -107,3 +107,18 @@
 .leaflet-control-zoom { border: none !important; box-shadow: var(--shadow-cozy) !important; border-radius: 1rem !important; overflow: hidden; }
 .leaflet-control-zoom a { background: var(--color-surface-container-lowest) !important; color: var(--color-primary) !important; border: none !important; }
 .leaflet-control-attribution { background: rgba(255,255,255,0.7) !important; backdrop-filter: blur(8px); font-size: 10px !important; }
+
+/* Custom div icons must not inherit Leaflet's default white box / border */
+.leaflet-div-icon.cozy-event-pin,
+.leaflet-div-icon.user-center-pin {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+}
+.cozy-event-pin > div,
+.user-center-pin > div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

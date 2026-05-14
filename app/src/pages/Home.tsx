@@ -1,12 +1,13 @@
 import { useState, useRef, useCallback, useMemo, useEffect } from "react";
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents } from "react-leaflet";
 import L from "leaflet";
 import { Search, Locate, ChevronLeft, ChevronRight, Car, Footprints } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import useStore from "../store/useStore";
 import LoadingScreen from "../components/LoadingScreen";
 import LocaleExampleCard from "../components/LocaleExampleCard";
+import { HomeSkeleton } from "../components/PageSkeletons";
 import "leaflet/dist/leaflet.css";
 
 /* ── Travel helpers ── */
@@ -36,8 +37,8 @@ function haversineKm(lat1, lng1, lat2, lng2) {
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
-const RADIUS_KM = 10;
 const DEFAULT_CENTER = [41.1579, -8.6291]; // Porto fallback
+const DISTANCE_OPTIONS = [5, 10, 25, 50];
 
 /* Cannabis-leaf SVG used inside the map markers */
 const CANNABIS_SVG =
@@ -108,15 +109,71 @@ function LocateButton() {
   );
 }
 
+function MapCreateOnDoubleClick() {
+  const navigate = useNavigate();
+  const { t } = useTranslation();
+  const pushToast = useStore((s) => s.pushToast);
+
+  useMapEvents({
+    dblclick: async (event) => {
+      const lat = Number(event.latlng.lat.toFixed(6));
+      const lng = Number(event.latlng.lng.toFixed(6));
+      let label = t("createEvent.mapPinnedLocation");
+      try {
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`,
+          { headers: { Accept: "application/json" } }
+        );
+        if (response.ok) {
+          const data = await response.json();
+          label = data.display_name || label;
+        }
+      } catch {
+        label = `${label} (${lat}, ${lng})`;
+      }
+      pushToast(t("home.mapCreateHint"), "success");
+      navigate(`/create?lat=${lat}&lng=${lng}&label=${encodeURIComponent(label)}`);
+    },
+  });
+
+  return null;
+}
+
+function matchesDateFilter(event, filter) {
+  if (!event.date) return true;
+  const eventDate = new Date(`${event.date}T${event.time || "23:59"}`);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const end = new Date(today);
+
+  if (filter === "today") {
+    end.setDate(today.getDate() + 1);
+    return eventDate >= today && eventDate < end;
+  }
+  if (filter === "weekend") {
+    const day = eventDate.getDay();
+    return eventDate >= today && (day === 0 || day === 6);
+  }
+  if (filter === "week") {
+    end.setDate(today.getDate() + 7);
+    return eventDate >= today && eventDate <= end;
+  }
+  return eventDate >= today;
+}
+
 export default function Home() {
   const { t } = useTranslation();
   const [search, setSearch] = useState("");
+  const [distanceKm, setDistanceKm] = useState(10);
+  const [dateFilter, setDateFilter] = useState("all");
   const events = useStore((s) => s.events);
   const users = useStore((s) => s.users);
+  const searchQuery = useStore((s) => s.searchQuery);
   const userLocation = useStore((s) => s.userLocation);
   const locationStatus = useStore((s) => s.locationStatus);
   const requestLocation = useStore((s) => s.requestLocation);
   const pushToast = useStore((s) => s.pushToast);
+  const dataReady = useStore((s) => s.dataReady);
   const carouselRef = useRef(null);
 
   const center = userLocation
@@ -140,23 +197,31 @@ export default function Home() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [locationStatus, t]);
 
-  /* Filter events: future only, within 10 km of user (show all if location unknown) */
+  const effectiveSearch = (search || searchQuery || "").trim().toLowerCase();
+
+  /* Filter events: future only, searchable, date-scoped and within selected radius. */
   const nearbyEvents = useMemo(() => {
-    const todayStart = new Date();
-    todayStart.setHours(0, 0, 0, 0);
-    const futureOnly = events.filter((e) => {
-      if (!e.date) return true;
-      // Combine date + time so events later today still show
-      const when = new Date(`${e.date}T${e.time || "23:59"}`);
-      return when.getTime() >= todayStart.getTime();
+    return events.filter((event) => {
+      if (event.status === "cancelled") return false;
+      if (!matchesDateFilter(event, dateFilter)) return false;
+
+      if (effectiveSearch) {
+        const haystack = [event.title, event.location, event.tag, event.description]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase();
+        if (!haystack.includes(effectiveSearch)) return false;
+      }
+
+      if (!userLocation) return true;
+      if (event.lat == null || event.lng == null) return false;
+      return haversineKm(userLocation.lat, userLocation.lng, event.lat, event.lng) <= distanceKm;
     });
-    if (!userLocation) return futureOnly;
-    return futureOnly.filter(
-      (e) =>
-        e.lat != null &&
-        haversineKm(userLocation.lat, userLocation.lng, e.lat, e.lng) <= RADIUS_KM
-    );
-  }, [events, userLocation]);
+  }, [dateFilter, distanceKm, effectiveSearch, events, userLocation]);
+
+  const emptyMessage = effectiveSearch
+    ? t("home.emptySearch")
+    : t("home.emptyNearby", { radius: distanceKm });
 
   const scrollCarousel = useCallback((direction) => {
     const el = carouselRef.current;
@@ -166,6 +231,10 @@ export default function Home() {
   }, []);
 
   /* Hold the cozy loader until we know the user's location (or it fails) */
+  if (!dataReady) {
+    return <HomeSkeleton />;
+  }
+
   if (!userLocation && locationStatus === "pending") {
     return <LoadingScreen message={t("home.loadingMessage")} />;
   }
@@ -198,6 +267,7 @@ export default function Home() {
         ))}
         <LocateButton />
         <RecenterMap />
+        <MapCreateOnDoubleClick />
       </MapContainer>
 
       {/* Mobile search */}
@@ -214,6 +284,38 @@ export default function Home() {
         </div>
       </div>
 
+      <div className="absolute top-20 left-4 right-4 md:top-5 md:left-5 md:right-auto z-1000 flex flex-wrap items-center gap-2 max-w-[calc(100vw-2rem)] md:max-w-3xl">
+        <select
+          value={distanceKm}
+          onChange={(e) => setDistanceKm(Number(e.target.value))}
+          className="h-10 rounded-full bg-surface-container-lowest/90 backdrop-blur-xl px-4 text-xs font-bold text-on-surface shadow-cozy focus:outline-none focus:ring-2 focus:ring-primary-fixed"
+          aria-label={t("home.distanceFilter")}
+        >
+          {DISTANCE_OPTIONS.map((distance) => (
+            <option key={distance} value={distance}>{t("home.distanceKm", { distance })}</option>
+          ))}
+        </select>
+        {[
+          ["all", t("home.dateAll")],
+          ["today", t("home.dateToday")],
+          ["weekend", t("home.dateWeekend")],
+          ["week", t("home.dateWeek")],
+        ].map(([value, label]) => (
+          <button
+            key={value}
+            type="button"
+            onClick={() => setDateFilter(value)}
+            className={`h-10 rounded-full px-4 text-xs font-bold shadow-cozy transition-colors ${
+              dateFilter === value
+                ? "bg-primary text-on-primary"
+                : "bg-surface-container-lowest/90 text-on-surface hover:bg-secondary-container"
+            }`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
       {/* Bottom carousel */}
       <section className="absolute bottom-0 left-0 right-0 z-30 pb-20 md:pb-12 pt-20 px-4 md:px-12 bg-linear-to-t from-surface via-surface/90 to-transparent">
         <div className="max-w-7xl mx-auto">
@@ -225,7 +327,7 @@ export default function Home() {
                 {t("home.discoverTitle")}
               </h2>
               <p className="hidden md:block text-on-surface-variant font-body mt-1 italic">
-                {t("home.discoverSubtitle", { radius: RADIUS_KM })}
+                {t("home.discoverSubtitle", { radius: distanceKm })}
               </p>
             </div>
             <div className="hidden md:flex gap-3">
@@ -251,7 +353,7 @@ export default function Home() {
             {nearbyEvents.length === 0 && (
               <div className="w-full text-center py-8">
                 <p className="text-on-surface-variant text-sm font-body">
-                  {t("home.emptyNearby", { radius: RADIUS_KM })}
+                  {emptyMessage}
                 </p>
               </div>
             )}
@@ -265,36 +367,48 @@ export default function Home() {
                 distanceKm != null ? (distanceKm / AVG_DRIVE_KMH) * 60 : null;
               const walkMin =
                 distanceKm != null ? (distanceKm / AVG_WALK_KMH) * 60 : null;
+              const spotsLeft = Math.max(0, (ev.maxSnackers || 0) - (ev.currentSnackers || 0));
+              const isFull = spotsLeft <= 0;
               return (
                 <Link
                   key={ev.id}
                   to={"/event/" + ev.id}
                   className="flex-none w-80 md:w-110 snap-center bg-surface-container-lowest/95 md:bg-surface-container-lowest backdrop-blur-md md:backdrop-blur-none rounded-2xl md:rounded-lg overflow-hidden shadow-cozy group"
                 >
-                  <div className="flex h-36 md:h-52">
-                    <div className="w-2/5 md:w-1/2 shrink-0 overflow-hidden bg-surface-container-high">
+                  <div className="flex h-40 md:h-56">
+                    <div className="relative w-2/5 md:w-1/2 shrink-0 overflow-hidden bg-surface-container-high">
                       <img
                         src={ev.image}
                         alt={ev.title}
                         loading="lazy"
                         className="w-full h-full object-cover block"
                       />
+                      <div className="absolute top-3 left-3 flex gap-2">
+                        {isFull && (
+                          <span className="rounded-full bg-error text-on-error px-2.5 py-1 text-[10px] font-bold shadow-cozy">
+                            {t("home.fullBadge")}
+                          </span>
+                        )}
+                      </div>
                     </div>
-                    <div className="w-3/5 md:w-1/2 p-3 md:p-5 flex flex-col justify-between gap-2 min-w-0">
-                      <div>
+                    <div className="w-3/5 md:w-1/2 p-3 md:p-4 flex flex-col justify-between gap-2 min-w-0 overflow-hidden">
+                      <div className="min-w-0">
                         <span className="text-[9px] md:text-[10px] uppercase tracking-widest font-bold text-primary">
                           {ev.tag}
                         </span>
-                        <h3 className="font-headline text-sm md:text-lg font-bold text-on-surface leading-tight mt-0.5">
+                        <h3 className="font-headline text-sm md:text-lg font-bold text-on-surface leading-tight mt-0.5 line-clamp-1">
                           {ev.title}
                         </h3>
-                        <p className="hidden md:block text-xs text-on-surface-variant mt-1 line-clamp-2">
+                        <p className="hidden md:block text-xs text-on-surface-variant mt-1 line-clamp-2 break-words">
                           {ev.description}
+                        </p>
+                        <p className="text-[10px] md:text-xs font-bold text-primary mt-2">
+                          {t("home.spotsLeft", { count: spotsLeft })}
                         </p>
                       </div>
 
                       {/* Distance + directions */}
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-wrap">
                         {host && (
                           <img
                             src={host.avatar}

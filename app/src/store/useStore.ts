@@ -67,6 +67,46 @@ const mapPastEvent = (p) => ({
   tag: p.tag,
 });
 
+const VALID_EVENT_STATUSES = new Set(["planning", "confirmed", "cancelled"]);
+const VALID_APPLICANT_STATUSES = new Set(["pending", "accepted", "rejected"]);
+
+function requireEventPayload(event) {
+  if (!String(event.title || "").trim()) throw new Error("Event title is required.");
+  if (!String(event.location || "").trim()) throw new Error("Event location is required.");
+  if (!event.date) throw new Error("Event date is required.");
+  if (!event.time) throw new Error("Event time is required.");
+  if (!Number.isFinite(Number(event.maxSnackers)) || Number(event.maxSnackers) < 1) {
+    throw new Error("Event capacity must be at least 1.");
+  }
+  if (!Number.isFinite(Number(event.snackSize)) || Number(event.snackSize) < 1) {
+    throw new Error("Session intensity must be at least 1.");
+  }
+  if (event.status && !VALID_EVENT_STATUSES.has(event.status)) {
+    throw new Error("Invalid event status.");
+  }
+}
+
+function eventPayloadFrom(event, hostId) {
+  requireEventPayload(event);
+  return {
+    title: String(event.title).trim(),
+    description: String(event.description || "").trim(),
+    host_id: hostId,
+    date: event.date,
+    time: event.time,
+    location: String(event.location).trim(),
+    lat: event.lat,
+    lng: event.lng,
+    max_snackers: Number(event.maxSnackers),
+    current_snackers: Number(event.currentSnackers ?? 0),
+    snack_size: Number(event.snackSize),
+    image: event.image,
+    status: event.status ?? "planning",
+    tag: event.tag,
+    walk_time: event.walkTime,
+  };
+}
+
 /* ── Zustand Store ── */
 const useStore = create<any>((set, get) => ({
   /* ── Auth ── */
@@ -83,6 +123,7 @@ const useStore = create<any>((set, get) => ({
   searchQuery: "",
   userLocation: null,          // { lat, lng } or null
   locationStatus: "pending",
+  dataReady: false,
   isLoading: false,
   toasts: [],                  // [{ id, message, type, duration }]
 
@@ -168,6 +209,48 @@ const useStore = create<any>((set, get) => ({
     if (data.session) await get().fetchAll();
   },
 
+  ensureCurrentProfile: async () => {
+    const session = get().session;
+    if (!session) return null;
+
+    const authUser = session.user;
+    const fallbackName =
+      authUser.user_metadata?.name || authUser.email?.split("@")[0] || "Snack friend";
+    const fallbackAvatar =
+      authUser.user_metadata?.avatar ||
+      `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(authUser.id)}`;
+
+    const { data: existing, error: existingError } = await supabase
+      .from("profiles")
+      .select("id")
+      .eq("auth_id", authUser.id)
+      .maybeSingle();
+
+    if (existingError) {
+      console.error("ensureCurrentProfile(select)", existingError);
+      return null;
+    }
+
+    if (existing) return existing;
+
+    const { data: inserted, error: insertError } = await supabase
+      .from("profiles")
+      .insert({
+        auth_id: authUser.id,
+        name: fallbackName,
+        avatar: fallbackAvatar,
+      })
+      .select("id")
+      .single();
+
+    if (insertError) {
+      console.error("ensureCurrentProfile(insert)", insertError);
+      return null;
+    }
+
+    return inserted;
+  },
+
   signIn: async (email, password) => {
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
@@ -202,17 +285,24 @@ const useStore = create<any>((set, get) => ({
       events: [],
       pastEvents: [],
       applicants: [],
+      dataReady: false,
     });
   },
 
   /* ─────────────────── DATA FETCHING ─────────────────── */
   fetchAll: async () => {
-    await Promise.all([
-      get().fetchProfiles(),
-      get().fetchEvents(),
-      get().fetchPastEvents(),
-      get().fetchApplicants(),
-    ]);
+    set({ dataReady: false });
+    try {
+      await get().ensureCurrentProfile();
+      await Promise.all([
+        get().fetchProfiles(),
+        get().fetchEvents(),
+        get().fetchPastEvents(),
+        get().fetchApplicants(),
+      ]);
+    } finally {
+      set({ dataReady: true });
+    }
   },
 
   fetchProfiles: async () => {
@@ -292,23 +382,7 @@ const useStore = create<any>((set, get) => ({
     const me = get().getCurrentUser();
     if (!me) throw new Error("Not signed in");
 
-    const payload = {
-      title: event.title,
-      description: event.description,
-      host_id: me.id,
-      date: event.date,
-      time: event.time,
-      location: event.location,
-      lat: event.lat,
-      lng: event.lng,
-      max_snackers: event.maxSnackers,
-      current_snackers: event.currentSnackers ?? 0,
-      snack_size: event.snackSize,
-      image: event.image,
-      status: event.status ?? "planning",
-      tag: event.tag,
-      walk_time: event.walkTime,
-    };
+    const payload = eventPayloadFrom(event, me.id);
 
     const { data, error } = await supabase
       .from("events")
@@ -326,7 +400,42 @@ const useStore = create<any>((set, get) => ({
     return mapEvent(data);
   },
 
+  updateEvent: async (eventId, updates) => {
+    const me = get().getCurrentUser();
+    if (!me) throw new Error("Not signed in");
+
+    const existing = get().events.find((e) => e.id === Number(eventId));
+    if (!existing) throw new Error("Event not found");
+    if (existing.hostId !== me.id) throw new Error("Only the host can edit this event.");
+
+    const nextEvent = { ...existing, ...updates, hostId: me.id };
+    const payload = eventPayloadFrom(nextEvent, me.id);
+
+    const { data, error } = await supabase
+      .from("events")
+      .update(payload)
+      .eq("id", existing.id)
+      .select()
+      .single();
+    if (error) {
+      console.error("updateEvent failed", error);
+      throw error;
+    }
+
+    const mapped = mapEvent(data);
+    set((s) => ({
+      events: s.events.map((event) => (event.id === mapped.id ? mapped : event)),
+    }));
+    await get().fetchEvents();
+    return mapped;
+  },
+
+  cancelEvent: async (eventId) => {
+    return get().updateEvent(eventId, { status: "cancelled", tag: "Cancelled" });
+  },
+
   updateApplicantStatus: async (applicantId, status) => {
+    if (!VALID_APPLICANT_STATUSES.has(status)) throw new Error("Invalid applicant status.");
     const applicant = get().applicants.find((a) => a.id === applicantId);
     if (!applicant) throw new Error("Applicant not found");
 
@@ -380,6 +489,14 @@ const useStore = create<any>((set, get) => ({
   applyToEvent: async (eventId, message) => {
     const me = get().getCurrentUser();
     if (!me) throw new Error("Not signed in");
+
+    const event = get().events.find((e) => e.id === Number(eventId));
+    if (!event) throw new Error("Event not found");
+    if (event.hostId === me.id) {
+      const err = new Error("You cannot apply to your own event.");
+      err.code = "HOST_APPLICATION";
+      throw err;
+    }
 
     // Prevent duplicate applications
     const existing = get().applicants.find(
