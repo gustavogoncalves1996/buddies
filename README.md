@@ -28,7 +28,7 @@ O projeto ja contem uma aplicacao React funcional com autenticacao Supabase, rot
 Estado resumido:
 
 - Implementado: frontend React/Vite, rotas principais, store Zustand, Supabase client, schema SQL base, RLS, constraints principais de status/candidatura unica, upload de imagens, geolocalizacao, mapas Leaflet, i18n, PWA, service worker, cache offline e helpers de push no browser.
-- Parcial: documentacao de push existe em [PWA_AND_PUSH.md](PWA_AND_PUSH.md), mas a pasta [supabase/functions/notify-host-on-application](../supabase/functions/notify-host-on-application) esta vazia neste workspace.
+- Parcial: documentacao de push existe em [app/PWA_AND_PUSH.md](app/PWA_AND_PUSH.md), mas a pasta [supabase/functions/notify-host-on-application](supabase/functions/notify-host-on-application) esta vazia neste workspace.
 - Pendente: testes automatizados, tipagem forte do store, robustez de erros, Edge Function real de push, fluxo completo de notificacoes, moderacao, chat, ratings reais, admin/ops e funcionalidades sociais avancadas.
 
 ## Objetivos do produto
@@ -73,7 +73,7 @@ Backend e infraestrutura:
 - vite-plugin-pwa com Workbox `injectManifest`
 - Capacitor 8 para shell mobile Android/iOS
 
-Scripts disponiveis em [package.json](package.json):
+Scripts disponiveis em [app/package.json](app/package.json):
 
 ```bash
 npm run dev
@@ -86,36 +86,36 @@ npm run preview
 
 Raiz principal da app:
 
-- [app](.) contem o frontend, configuracao Vite, PWA, Capacitor e documentacao tecnica.
-- [src/App.tsx](src/App.tsx) define rotas, wrappers globais e protecao de paginas.
-- [src/main.tsx](src/main.tsx) inicializa React, providers, query persistence e registo PWA.
-- [src/store/useStore.ts](src/store/useStore.ts) concentra estado global, mapeamento de dados e mutations Supabase.
-- [src/utils/supabase.ts](src/utils/supabase.ts) inicializa o cliente Supabase.
-- [src/i18n.ts](src/i18n.ts) contem as traducoes.
-- [src/contexts/LocaleContext.tsx](src/contexts/LocaleContext.tsx) gere idioma, pais, moeda, timezone e formatadores `Intl`.
-- [src/lib/queryClient.ts](src/lib/queryClient.ts) configura React Query e persistencia offline.
-- [src/lib/push.ts](src/lib/push.ts) contem helpers de subscricao e remocao de Web Push.
-- [src/sw.ts](src/sw.ts) contem o service worker customizado.
-- [src/pages](src/pages) contem as paginas de rota.
-- [src/components](src/components) contem componentes reutilizaveis.
-- [public](public) contem assets estaticos e referencias de design.
-- [vite.config.js](vite.config.js) configura React, Tailwind e PWA.
-- [PWA_AND_PUSH.md](PWA_AND_PUSH.md) documenta o plano operacional de PWA/push.
+- [app](app) contem o frontend, configuracao Vite, PWA, Capacitor e documentacao tecnica.
+- [app/src/App.tsx](app/src/App.tsx) define rotas, wrappers globais e protecao de paginas.
+- [app/src/main.tsx](app/src/main.tsx) inicializa React, providers, query persistence e registo PWA.
+- [app/src/store/useStore.ts](app/src/store/useStore.ts) concentra estado global, mapeamento de dados e mutations Supabase.
+- [app/src/utils/supabase.ts](app/src/utils/supabase.ts) inicializa o cliente Supabase.
+- [app/src/i18n.ts](app/src/i18n.ts) contem as traducoes.
+- [app/src/contexts/LocaleContext.tsx](app/src/contexts/LocaleContext.tsx) gere idioma, pais, moeda, timezone e formatadores `Intl`.
+- [app/src/lib/queryClient.ts](app/src/lib/queryClient.ts) configura React Query e persistencia offline.
+- [app/src/lib/push.ts](app/src/lib/push.ts) contem helpers de subscricao e remocao de Web Push.
+- [app/src/sw.ts](app/src/sw.ts) contem o service worker customizado.
+- [app/src/pages](app/src/pages) contem as paginas de rota.
+- [app/src/components](app/src/components) contem componentes reutilizaveis.
+- [app/public](app/public) contem assets estaticos e referencias de design.
+- [app/vite.config.js](app/vite.config.js) configura React, Tailwind e PWA.
+- [app/PWA_AND_PUSH.md](app/PWA_AND_PUSH.md) documenta o plano operacional de PWA/push.
 
 Backend e dados:
 
-- [supabase/schema.sql](../supabase/schema.sql) contem tabelas, RLS, trigger de perfil e dados seed.
-- [supabase/functions/notify-host-on-application](../supabase/functions/notify-host-on-application) existe, mas esta vazia e deve receber a Edge Function de push.
+- [supabase/schema.sql](supabase/schema.sql) contem tabelas, RLS, trigger de perfil e dados seed.
+- [supabase/functions/notify-host-on-application](supabase/functions/notify-host-on-application) existe, mas esta vazia e deve receber a Edge Function de push.
 
 Design/reference screens:
 
-- [public/DESIGN SYSTEM.md](public/DESIGN%20SYSTEM.md)
-- [public/dashboard/code.html](public/dashboard/code.html)
-- [public/create event/code.html](public/create%20event/code.html)
-- [public/event details/code.html](public/event%20details/code.html)
-- [public/my hosted snacks/code.html](public/my%20hosted%20snacks/code.html)
-- [public/user profile/code.html](public/user%20profile/code.html)
-- [../design](../design)
+- [app/public/DESIGN SYSTEM.md](app/public/DESIGN%20SYSTEM.md)
+- [app/public/dashboard/code.html](app/public/dashboard/code.html)
+- [app/public/create event/code.html](app/public/create%20event/code.html)
+- [app/public/event details/code.html](app/public/event%20details/code.html)
+- [app/public/my hosted snacks/code.html](app/public/my%20hosted%20snacks/code.html)
+- [app/public/user profile/code.html](app/public/user%20profile/code.html)
+- [design](design)
 
 ## Fluxos principais
 
@@ -123,49 +123,49 @@ Design/reference screens:
 
 - Utilizadores fazem login e signup atraves de Supabase Auth.
 - A tabela `profiles` guarda a representacao publica do utilizador.
-- O trigger `handle_new_user()` em [supabase/schema.sql](../supabase/schema.sql) cria automaticamente um perfil quando um novo utilizador entra em `auth.users`.
-- As rotas privadas sao protegidas por [src/components/ProtectedRoute.tsx](src/components/ProtectedRoute.tsx).
+- O trigger `handle_new_user()` em [supabase/schema.sql](supabase/schema.sql) cria automaticamente um perfil quando um novo utilizador entra em `auth.users`.
+- As rotas privadas sao protegidas por [app/src/components/ProtectedRoute.tsx](app/src/components/ProtectedRoute.tsx).
 
 ### Descoberta
 
-- A pagina [src/pages/Home.tsx](src/pages/Home.tsx) apresenta eventos proximos.
+- A pagina [app/src/pages/Home.tsx](app/src/pages/Home.tsx) apresenta eventos proximos.
 - A localizacao do utilizador e pedida no arranque por `requestLocation()`.
 - A distancia e calculada no store com Haversine.
 - Eventos podem ser ordenados/filtrados por proximidade quando existe permissao de geolocalizacao.
 
 ### Criacao de evento
 
-- A pagina [src/pages/CreateEvent.tsx](src/pages/CreateEvent.tsx) gere formulario, data, hora, localizacao e imagem.
-- [src/components/AddressAutocomplete.tsx](src/components/AddressAutocomplete.tsx) suporta procura de local.
-- [src/components/ImageUpload.tsx](src/components/ImageUpload.tsx) suporta imagem de capa.
+- A pagina [app/src/pages/CreateEvent.tsx](app/src/pages/CreateEvent.tsx) gere formulario, data, hora, localizacao e imagem.
+- [app/src/components/AddressAutocomplete.tsx](app/src/components/AddressAutocomplete.tsx) suporta procura de local.
+- [app/src/components/ImageUpload.tsx](app/src/components/ImageUpload.tsx) suporta imagem de capa.
 - `uploadEventImage()` envia imagens para o bucket Supabase `event-images`.
 - `addEvent()` insere o evento na tabela `events`.
 
 ### Candidaturas
 
-- A pagina [src/pages/EventDetail.tsx](src/pages/EventDetail.tsx) permite candidatura a um evento.
+- A pagina [app/src/pages/EventDetail.tsx](app/src/pages/EventDetail.tsx) permite candidatura a um evento.
 - `applyToEvent(eventId, message)` cria uma linha em `applicants`.
 - A action impede candidaturas duplicadas no estado local.
-- O host gere candidatos em [src/pages/MyHostedSnacks.tsx](src/pages/MyHostedSnacks.tsx).
+- O host gere candidatos em [app/src/pages/MyHostedSnacks.tsx](app/src/pages/MyHostedSnacks.tsx).
 - `updateApplicantStatus(applicantId, status)` altera o estado do candidato e atualiza `events.current_snackers` quando necessario.
 
 ### Perfil e historico
 
-- [src/pages/Profile.tsx](src/pages/Profile.tsx) mostra perfil, bio, hobbies, rating e eventos passados.
-- [src/pages/ConfirmedEvents.tsx](src/pages/ConfirmedEvents.tsx) mostra eventos confirmados e serve como exemplo de fluxo offline-first.
+- [app/src/pages/Profile.tsx](app/src/pages/Profile.tsx) mostra perfil, bio, hobbies, rating e eventos passados.
+- [app/src/pages/ConfirmedEvents.tsx](app/src/pages/ConfirmedEvents.tsx) mostra eventos confirmados e serve como exemplo de fluxo offline-first.
 
 ### PWA e notificacoes
 
-- [src/components/OfflineBanner.tsx](src/components/OfflineBanner.tsx) mostra estado offline.
-- [src/components/PushPrompt.tsx](src/components/PushPrompt.tsx) pede permissao de notificacao quando suportado.
-- [src/lib/push.ts](src/lib/push.ts) guarda `push_subscription` no perfil.
-- A parte server-side de envio de push ainda precisa ser implementada em [supabase/functions/notify-host-on-application](../supabase/functions/notify-host-on-application).
+- [app/src/components/OfflineBanner.tsx](app/src/components/OfflineBanner.tsx) mostra estado offline.
+- [app/src/components/PushPrompt.tsx](app/src/components/PushPrompt.tsx) pede permissao de notificacao quando suportado.
+- [app/src/lib/push.ts](app/src/lib/push.ts) guarda `push_subscription` no perfil.
+- A parte server-side de envio de push ainda precisa ser implementada em [supabase/functions/notify-host-on-application](supabase/functions/notify-host-on-application).
 
 ## Arquitetura frontend
 
 ### Rotas
 
-As rotas principais estao em [src/App.tsx](src/App.tsx):
+As rotas principais estao em [app/src/App.tsx](app/src/App.tsx):
 
 ```tsx
 <Route path="/login" element={<Login />} />
@@ -197,7 +197,7 @@ Wrappers globais:
 
 ### Estado global
 
-O store em [src/store/useStore.ts](src/store/useStore.ts) concentra:
+O store em [app/src/store/useStore.ts](app/src/store/useStore.ts) concentra:
 
 - Sessao Supabase.
 - Listas de `users`, `events`, `pastEvents` e `applicants`.
@@ -212,7 +212,7 @@ O store em [src/store/useStore.ts](src/store/useStore.ts) concentra:
 
 O projeto usa tabelas Supabase em `snake_case` e modelos UI em `camelCase`. A normalizacao esta centralizada no store para evitar dependencias diretas das tabelas dentro dos componentes.
 
-Exemplo importante em [src/store/useStore.ts](src/store/useStore.ts):
+Exemplo importante em [app/src/store/useStore.ts](app/src/store/useStore.ts):
 
 ```ts
 const mapEvent = (e) => ({
@@ -237,7 +237,7 @@ const mapEvent = (e) => ({
 
 ### Localizacao e formato regional
 
-[src/contexts/LocaleContext.tsx](src/contexts/LocaleContext.tsx) deteta preferencia regional e disponibiliza:
+[app/src/contexts/LocaleContext.tsx](app/src/contexts/LocaleContext.tsx) deteta preferencia regional e disponibiliza:
 
 - `language`
 - `countryCode`
@@ -254,7 +254,7 @@ A preferencia fica em `localStorage` com a chave `buddies.locale.v1`.
 
 ### i18n
 
-As traducoes vivem em [src/i18n.ts](src/i18n.ts). Todas as strings visiveis ao utilizador devem usar chaves de i18n em vez de texto hardcoded nos componentes.
+As traducoes vivem em [app/src/i18n.ts](app/src/i18n.ts). Todas as strings visiveis ao utilizador devem usar chaves de i18n em vez de texto hardcoded nos componentes.
 
 Areas cobertas atualmente:
 
@@ -274,7 +274,7 @@ Areas cobertas atualmente:
 
 ## Modelo de dados Supabase
 
-O schema base esta em [supabase/schema.sql](../supabase/schema.sql).
+O schema base esta em [supabase/schema.sql](supabase/schema.sql).
 
 ### Tabelas principais
 
@@ -367,13 +367,13 @@ Bucket esperado:
 
 - `event-images`
 
-Usado por `uploadEventImage()` em [src/store/useStore.ts](src/store/useStore.ts). O helper valida tipo de ficheiro, tamanho maximo de 5 MB, faz upload e devolve URL publica.
+Usado por `uploadEventImage()` em [app/src/store/useStore.ts](app/src/store/useStore.ts). O helper valida tipo de ficheiro, tamanho maximo de 5 MB, faz upload e devolve URL publica.
 
 ## Offline, PWA e push notifications
 
 ### Query cache
 
-[src/lib/queryClient.ts](src/lib/queryClient.ts) define defaults para comportamento offline-first:
+[app/src/lib/queryClient.ts](app/src/lib/queryClient.ts) define defaults para comportamento offline-first:
 
 ```ts
 export const queryClient = new QueryClient({
@@ -397,7 +397,7 @@ A cache fica em `localStorage` com a chave `buddies-query-cache-v1`.
 
 ### Service worker
 
-[src/sw.ts](src/sw.ts) implementa:
+[app/src/sw.ts](app/src/sw.ts) implementa:
 
 - Precache dos assets de build.
 - Fallback de navegacao para deep links SPA.
@@ -410,7 +410,7 @@ A cache fica em `localStorage` com a chave `buddies-query-cache-v1`.
 
 ### Vite PWA
 
-[vite.config.js](vite.config.js) usa `VitePWA` com `injectManifest` e service worker proprio em [src/sw.ts](src/sw.ts).
+[app/vite.config.js](app/vite.config.js) usa `VitePWA` com `injectManifest` e service worker proprio em [app/src/sw.ts](app/src/sw.ts).
 
 Manifest atual:
 
@@ -422,7 +422,7 @@ Manifest atual:
 
 ### Push notifications
 
-Client-side implementado em [src/lib/push.ts](src/lib/push.ts):
+Client-side implementado em [app/src/lib/push.ts](app/src/lib/push.ts):
 
 - Verifica suporte a Service Worker, PushManager e Notification.
 - Pede permissao ao browser.
@@ -434,20 +434,20 @@ E esperado que `profiles.push_subscription` esteja `null` inicialmente. A coluna
 
 Server-side pendente:
 
-- Criar `index.ts` dentro de [supabase/functions/notify-host-on-application](../supabase/functions/notify-host-on-application).
+- Criar `index.ts` dentro de [supabase/functions/notify-host-on-application](supabase/functions/notify-host-on-application).
 - Configurar secrets VAPID no Supabase.
 - Criar webhook `applicants INSERT` para chamar a Edge Function.
 - Fazer lookup de evento, host e `push_subscription`.
 - Enviar Web Push.
 - Limpar subscriptions expiradas em erros `404` ou `410`.
 
-As notas operacionais completas estao em [PWA_AND_PUSH.md](PWA_AND_PUSH.md).
+As notas operacionais completas estao em [app/PWA_AND_PUSH.md](app/PWA_AND_PUSH.md).
 
 ## Referencias de codigo importantes
 
 ### Inicializacao da app
 
-Ver [src/App.tsx](src/App.tsx) e [src/main.tsx](src/main.tsx).
+Ver [app/src/App.tsx](app/src/App.tsx) e [app/src/main.tsx](app/src/main.tsx).
 
 Responsabilidades:
 
@@ -460,13 +460,13 @@ Responsabilidades:
 
 ### Supabase client
 
-Ver [src/utils/supabase.ts](src/utils/supabase.ts).
+Ver [app/src/utils/supabase.ts](app/src/utils/supabase.ts).
 
 Este ficheiro deve continuar a ser a unica origem do cliente Supabase. Nao espalhar `createClient()` por componentes.
 
 ### Mutation de criacao de evento
 
-Em [src/store/useStore.ts](src/store/useStore.ts):
+Em [app/src/store/useStore.ts](app/src/store/useStore.ts):
 
 ```ts
 addEvent: async (event) => {
@@ -506,7 +506,7 @@ addEvent: async (event) => {
 
 ### Mutation de candidatura
 
-Em [src/store/useStore.ts](src/store/useStore.ts):
+Em [app/src/store/useStore.ts](app/src/store/useStore.ts):
 
 ```ts
 applyToEvent: async (eventId, message) => {
@@ -553,7 +553,7 @@ O store inclui `requestLocation()` e `getNearbyEvents(radiusKm = 10)`. A distanc
 
 ### Push subscription
 
-Em [src/lib/push.ts](src/lib/push.ts), `subscribeUserToPush(profileId)` cria a subscricao browser e grava no perfil:
+Em [app/src/lib/push.ts](app/src/lib/push.ts), `subscribeUserToPush(profileId)` cria a subscricao browser e grava no perfil:
 
 ```ts
 const { error } = await supabase
@@ -581,7 +581,7 @@ npm install
 
 ### Variaveis de ambiente
 
-Criar `.env.local` na pasta [app](.):
+Criar `.env.local` na pasta [app](app):
 
 ```bash
 VITE_SUPABASE_URL=...
@@ -597,7 +597,7 @@ Notas:
 
 ### Base de dados
 
-Aplicar [supabase/schema.sql](../supabase/schema.sql) no SQL Editor do Supabase.
+Aplicar [supabase/schema.sql](supabase/schema.sql) no SQL Editor do Supabase.
 
 O schema ja inclui `profiles.push_subscription jsonb`; depois de aplicar o ficheiro, a parte client-side de subscricao push fica pronta. O envio real continua dependente da Edge Function e dos secrets VAPID.
 
@@ -644,9 +644,9 @@ npm run build
 
 Notas conhecidas:
 
-- O lint pode reportar um `ESLintEnvWarning` relacionado com o comentario `eslint-env` em [src/sw.ts](src/sw.ts), mas atualmente sai com sucesso.
+- O lint pode reportar um `ESLintEnvWarning` relacionado com o comentario `eslint-env` em [app/src/sw.ts](app/src/sw.ts), mas atualmente sai com sucesso.
 - O build pode avisar sobre chunks grandes por causa de dependencias de mapa/PWA.
-- Os assets gerados por Capacitor em [android](android) e [ios](ios) nao devem ser tratados como fonte principal para lint/refactor.
+- Os assets gerados por Capacitor em [app/android](app/android) e [app/ios](app/ios) nao devem ser tratados como fonte principal para lint/refactor.
 
 Testes manuais recomendados:
 
@@ -676,7 +676,7 @@ Testes manuais recomendados:
 
 ### Backend
 
-- Edge Function real para [supabase/functions/notify-host-on-application](../supabase/functions/notify-host-on-application).
+- Edge Function real para [supabase/functions/notify-host-on-application](supabase/functions/notify-host-on-application).
 - Edge Function e webhook para usar `profiles.push_subscription` em notificacoes reais.
 - Politicas RLS mais restritivas para `applicants`.
 - Validacao server-side de inputs importantes.
@@ -729,7 +729,7 @@ As listas abaixo separam possiveis novas funcionalidades por horizonte de desenv
 19. Parcial: validacao local e constraints SQL; validacao server-side completa fica para Edge Functions/backend.
 20. Implementado: `profiles.push_subscription` no schema principal.
 21. Implementado: duplo clique no mapa abre a pagina de criacao com localizacao preenchida.
-22. Implementado: assets PWA (icon-192, icon-512, icon-maskable) gerados a partir de SVG mestre em [public/icons](public/icons) via [scripts/generate-pwa-icons.mjs](scripts/generate-pwa-icons.mjs).
+22. Implementado: assets PWA (icon-192, icon-512, icon-maskable) gerados a partir de SVG mestre em [app/public/icons](app/public/icons) via [app/scripts/generate-pwa-icons.mjs](app/scripts/generate-pwa-icons.mjs).
 
 Proximas 20 melhorias incrementais a curto prazo:
 
@@ -836,12 +836,12 @@ Ordem sugerida para evoluir o projeto com menor risco:
 
 Ao adicionar uma nova pagina:
 
-- Criar pagina em [src/pages](src/pages).
-- Adicionar rota em [src/App.tsx](src/App.tsx).
+- Criar pagina em [app/src/pages](app/src/pages).
+- Adicionar rota em [app/src/App.tsx](app/src/App.tsx).
 - Decidir se a rota e publica ou protegida.
-- Adicionar strings em [src/i18n.ts](src/i18n.ts).
-- Reutilizar componentes de [src/components](src/components).
-- Usar selectors/actions de [src/store/useStore.ts](src/store/useStore.ts) quando fizer sentido.
+- Adicionar strings em [app/src/i18n.ts](app/src/i18n.ts).
+- Reutilizar componentes de [app/src/components](app/src/components).
+- Usar selectors/actions de [app/src/store/useStore.ts](app/src/store/useStore.ts) quando fizer sentido.
 - Evitar dependencias diretas de `snake_case` nas paginas.
 - Validar loading, erro, estado vazio e mobile.
 - Usar modais/componentes proprios para confirmacoes; nao usar `window.confirm`, `alert` ou popups nativas do browser em fluxos da app.
@@ -850,7 +850,7 @@ Ao adicionar uma nova pagina:
 
 Ao adicionar uma nova tabela/campo Supabase:
 
-- Atualizar [supabase/schema.sql](../supabase/schema.sql).
+- Atualizar [supabase/schema.sql](supabase/schema.sql).
 - Definir RLS desde o inicio.
 - Atualizar mappers no store.
 - Atualizar tipos/interfaces quando existirem.
@@ -859,7 +859,7 @@ Ao adicionar uma nova tabela/campo Supabase:
 
 Ao alterar o service worker:
 
-- Alterar [src/sw.ts](src/sw.ts).
+- Alterar [app/src/sw.ts](app/src/sw.ts).
 - Testar com `npm run build && npm run preview`.
 - Abrir DevTools, Application, Service Workers.
 - Usar hard reload durante debugging.
@@ -890,7 +890,7 @@ Limpar no browser:
 - Confirmar `VITE_SUPABASE_URL`.
 - Confirmar `VITE_SUPABASE_PUBLISHABLE_KEY`.
 - Confirmar trigger `handle_new_user()`.
-- Confirmar RLS em [supabase/schema.sql](../supabase/schema.sql).
+- Confirmar RLS em [supabase/schema.sql](supabase/schema.sql).
 - Ver erros no console do browser.
 
 ### Upload de imagem falha
