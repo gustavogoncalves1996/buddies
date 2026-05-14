@@ -729,6 +729,31 @@ As listas abaixo separam possiveis novas funcionalidades por horizonte de desenv
 19. Parcial: validacao local e constraints SQL; validacao server-side completa fica para Edge Functions/backend.
 20. Implementado: `profiles.push_subscription` no schema principal.
 21. Implementado: duplo clique no mapa abre a pagina de criacao com localizacao preenchida.
+22. Implementado: assets PWA (icon-192, icon-512, icon-maskable) gerados a partir de SVG mestre em [public/icons](public/icons) via [scripts/generate-pwa-icons.mjs](scripts/generate-pwa-icons.mjs).
+
+Proximas 20 melhorias incrementais a curto prazo:
+
+23. Adicionar shortcuts da PWA no `manifest` (criar evento, meus snacks) para arranque rapido a partir do icone instalado.
+24. Mostrar bottom-sheet de detalhes ao tocar num pin do mapa, sem mudar de pagina.
+25. Lembrar ultimo zoom/centro do mapa em `localStorage` por utilizador.
+26. Botao "centrar no meu sitio" no mapa quando ha permissao de geolocalizacao.
+27. Recolher tag de evento (ex: vegan, doce, salgado) num chip filtravel persistente na Home.
+28. Ordenar resultados por proximidade, data ou vagas restantes com selector visivel.
+29. Pre-preencher data minima do formulario de criar evento para hoje + 1h, para evitar criacao de eventos no passado.
+30. Validar que `time` + `date` do evento nao caem no passado tambem no client antes de submeter.
+31. Mostrar contagem regressiva ("daqui a 3h") nos cards de evento quando faltam menos de 24h.
+32. Marcar visualmente os eventos a que o utilizador ja se candidatou na lista da Home.
+33. Pagina dedicada `/applied` (ou tab no perfil) com candidaturas pendentes/aceites/rejeitadas do utilizador.
+34. Permitir ao candidato cancelar a propria candidatura enquanto esta `pending`.
+35. Reabrir formulario de candidatura com a mensagem anterior quando ja existe uma rejeitada e o evento ainda esta aberto.
+36. Mostrar avatar e nome do host clicaveis no `EventDetail`, abrindo um modal com perfil publico resumido.
+37. Adicionar partilha nativa (`navigator.share`) do link do evento com fallback para copiar URL.
+38. Gerar deep links que abrem direto no evento mesmo via PWA standalone.
+39. Compressao client-side de imagens (`canvas`/`createImageBitmap`) antes do upload, para reduzir tempo e cota de Storage.
+40. Pre-visualizacao da imagem de capa imediatamente apos o crop 16:9, sem esperar pelo upload.
+41. Estado de loading dedicado no botao de submeter formularios (criar evento, candidatura, perfil) com lock para impedir duplo submit.
+42. Persistir rascunhos de criacao de evento em `localStorage` para nao perder dados se a app fechar.
+43. Toggle de tema claro/escuro nas Settings, com deteccao de `prefers-color-scheme` por defeito.
 
 ### Medio prazo: 20 features possiveis
 
