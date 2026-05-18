@@ -1,5 +1,5 @@
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { Map, PlusCircle, CalendarDays, User, Search, Bell, LogOut, Sparkles, Settings } from "lucide-react";
+import { Map, PlusCircle, CalendarDays, User, Search, Bell, LogOut, Sparkles, Settings, ClipboardList } from "lucide-react";
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import useStore from "../store/useStore";
@@ -54,11 +54,12 @@ function TopNav() {
     { to: "/", label: t("nav.map") },
     { to: "/create", label: t("nav.create") },
     { to: "/manage", label: t("nav.manage") },
+    { to: "/applied", label: t("nav.applied") },
     { to: "/settings", label: t("nav.settings") },
   ];
 
   return (
-    <header className="hidden md:block sticky top-0 z-50 bg-[#ffffffcc] backdrop-blur-xl shadow-cozy">
+    <header className="hidden md:block sticky top-0 z-50 bg-surface-container-lowest/80 backdrop-blur-xl shadow-cozy">
       <div className="flex justify-between items-center px-12 py-4 w-full">
         {/* Left — Brand + Nav */}
         <div className="flex items-center gap-12">
@@ -138,6 +139,7 @@ function BottomNav() {
     { to: "/", icon: Map, label: t("nav.map") },
     { to: "/create", icon: PlusCircle, label: t("nav.create") },
     { to: "/manage", icon: CalendarDays, label: t("nav.manage") },
+    { to: "/applied", icon: ClipboardList, label: t("nav.applied") },
     { to: "/profile", icon: User, label: t("nav.profile") },
     { to: "/settings", icon: Settings, label: t("nav.settings") },
   ];

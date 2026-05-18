@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback, useMemo, useEffect } from "react";
-import { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from "react-leaflet";
 import L from "leaflet";
 import { Search, Locate, ChevronLeft, ChevronRight, Car, Footprints } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
@@ -8,6 +8,7 @@ import useStore from "../store/useStore";
 import LoadingScreen from "../components/LoadingScreen";
 import LocaleExampleCard from "../components/LocaleExampleCard";
 import { HomeSkeleton } from "../components/PageSkeletons";
+import EventBottomSheet from "../components/EventBottomSheet";
 import "leaflet/dist/leaflet.css";
 
 /* ── Travel helpers ── */
@@ -83,6 +84,17 @@ function RecenterMap() {
       map.setView([userLocation.lat, userLocation.lng], 14);
     }
   }, [userLocation, map]);
+  return null;
+}
+
+function MapPersistence() {
+  const map = useMap();
+  useMapEvents({
+    moveend: () => {
+      const c = map.getCenter();
+      localStorage.setItem('buddies-map-view', JSON.stringify({ lat: c.lat, lng: c.lng, zoom: map.getZoom() }));
+    },
+  });
   return null;
 }
 
@@ -166,6 +178,9 @@ export default function Home() {
   const [search, setSearch] = useState("");
   const [distanceKm, setDistanceKm] = useState(10);
   const [dateFilter, setDateFilter] = useState("all");
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [sortBy, setSortBy] = useState("proximity");
+  const theme = useStore((s) => s.theme);
   const events = useStore((s) => s.events);
   const users = useStore((s) => s.users);
   const searchQuery = useStore((s) => s.searchQuery);
@@ -174,11 +189,29 @@ export default function Home() {
   const requestLocation = useStore((s) => s.requestLocation);
   const pushToast = useStore((s) => s.pushToast);
   const dataReady = useStore((s) => s.dataReady);
+  const applicants = useStore((s) => s.applicants);
+  const session = useStore((s) => s.session);
+  const currentUser = useMemo(() => session ? users.find((u) => u.authId === session.user.id) : null, [users, session]);
+  const [selectedPinEvent, setSelectedPinEvent] = useState(null);
   const carouselRef = useRef(null);
 
+  const tileUrl = useMemo(() => {
+    const prefersDark = typeof window !== "undefined" && window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const isDark = theme === "dark" || (theme === "system" && prefersDark);
+    return isDark
+      ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+      : "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png";
+  }, [theme]);
+
+  const savedView = useMemo(() => {
+    try {
+      return JSON.parse(localStorage.getItem('buddies-map-view'));
+    } catch { return null; }
+  }, []);
   const center = userLocation
     ? [userLocation.lat, userLocation.lng]
-    : DEFAULT_CENTER;
+    : savedView ? [savedView.lat, savedView.lng] : DEFAULT_CENTER;
+  const initialZoom = userLocation ? 14 : savedView?.zoom ?? 14;
 
   /* On mount, ensure we ask for location and surface any failure */
   useEffect(() => {
@@ -199,9 +232,14 @@ export default function Home() {
 
   const effectiveSearch = (search || searchQuery || "").trim().toLowerCase();
 
+  const availableTags = useMemo(() =>
+    [...new Set(events.map((e) => e.tag).filter(Boolean))],
+    [events]
+  );
+
   /* Filter events: future only, searchable, date-scoped and within selected radius. */
   const nearbyEvents = useMemo(() => {
-    return events.filter((event) => {
+    const filtered = events.filter((event) => {
       if (event.status === "cancelled") return false;
       if (!matchesDateFilter(event, dateFilter)) return false;
 
@@ -213,11 +251,29 @@ export default function Home() {
         if (!haystack.includes(effectiveSearch)) return false;
       }
 
+      if (selectedTags.length > 0 && !selectedTags.includes(event.tag)) return false;
+
       if (!userLocation) return true;
       if (event.lat == null || event.lng == null) return false;
       return haversineKm(userLocation.lat, userLocation.lng, event.lat, event.lng) <= distanceKm;
     });
-  }, [dateFilter, distanceKm, effectiveSearch, events, userLocation]);
+
+    const sorted = [...filtered].sort((a, b) => {
+      if (sortBy === "date") {
+        return new Date(`${a.date}T${a.time || "00:00"}`).getTime() - new Date(`${b.date}T${b.time || "00:00"}`).getTime();
+      }
+      if (sortBy === "spots") {
+        return (b.maxSnackers - b.currentSnackers) - (a.maxSnackers - a.currentSnackers);
+      }
+      // proximity (default)
+      if (!userLocation) return 0;
+      const distA = (a.lat != null) ? haversineKm(userLocation.lat, userLocation.lng, a.lat, a.lng) : Infinity;
+      const distB = (b.lat != null) ? haversineKm(userLocation.lat, userLocation.lng, b.lat, b.lng) : Infinity;
+      return distA - distB;
+    });
+
+    return sorted;
+  }, [dateFilter, distanceKm, effectiveSearch, events, selectedTags, sortBy, userLocation]);
 
   const emptyMessage = effectiveSearch
     ? t("home.emptySearch")
@@ -243,13 +299,13 @@ export default function Home() {
     <div className="relative h-[calc(100vh-64px)] md:h-[calc(100vh-73px)] w-full overflow-hidden">
       <MapContainer
         center={center}
-        zoom={14}
+        zoom={initialZoom}
         className="absolute inset-0 z-0 h-full w-full"
         zoomControl={false}
         attributionControl={false}
       >
         <TileLayer
-          url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+          url={tileUrl}
           attribution='&copy; <a href="https://carto.com/">CARTO</a>'
         />
         <Marker position={center} icon={userIcon} />
@@ -258,15 +314,12 @@ export default function Home() {
             key={ev.id}
             position={[ev.lat, ev.lng]}
             icon={createEventMarker(ev.title)}
-          >
-            <Popup className="cozy-popup">
-              <div className="font-headline font-bold text-sm text-on-surface">{ev.title}</div>
-              <p className="text-xs text-on-surface-variant mt-1">{ev.walkTime}</p>
-            </Popup>
-          </Marker>
+            eventHandlers={{ click: () => setSelectedPinEvent(ev) }}
+          />
         ))}
         <LocateButton />
         <RecenterMap />
+        <MapPersistence />
         <MapCreateOnDoubleClick />
       </MapContainer>
 
@@ -295,6 +348,16 @@ export default function Home() {
             <option key={distance} value={distance}>{t("home.distanceKm", { distance })}</option>
           ))}
         </select>
+        <select
+          value={sortBy}
+          onChange={(e) => setSortBy(e.target.value)}
+          className="h-10 rounded-full bg-surface-container-lowest/90 backdrop-blur-xl px-4 text-xs font-bold text-on-surface shadow-cozy focus:outline-none focus:ring-2 focus:ring-primary-fixed"
+          aria-label={t("home.sortBy")}
+        >
+          <option value="proximity">{t("home.sortProximity")}</option>
+          <option value="date">{t("home.sortDate")}</option>
+          <option value="spots">{t("home.sortSpots")}</option>
+        </select>
         {[
           ["all", t("home.dateAll")],
           ["today", t("home.dateToday")],
@@ -315,6 +378,25 @@ export default function Home() {
           </button>
         ))}
       </div>
+
+      {availableTags.length > 0 && (
+        <div className="absolute top-32 md:top-16 left-4 right-4 md:left-5 md:right-auto z-1000 flex gap-2 overflow-x-auto scrollbar-hide max-w-[calc(100vw-2rem)] md:max-w-3xl">
+          {availableTags.map((tag) => (
+            <button
+              key={tag}
+              type="button"
+              onClick={() => setSelectedTags((prev) => prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag])}
+              className={`h-8 rounded-full px-3 text-[10px] font-bold tracking-wider uppercase whitespace-nowrap shadow-cozy transition-colors ${
+                selectedTags.includes(tag)
+                  ? "bg-secondary-container text-on-secondary-container"
+                  : "bg-surface-container-lowest/90 text-on-surface-variant hover:bg-surface-container-high"
+              }`}
+            >
+              {tag}
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* Bottom carousel */}
       <section className="absolute bottom-0 left-0 right-0 z-30 pb-20 md:pb-12 pt-20 px-4 md:px-12 bg-linear-to-t from-surface via-surface/90 to-transparent">
@@ -369,6 +451,9 @@ export default function Home() {
                 distanceKm != null ? (distanceKm / AVG_WALK_KMH) * 60 : null;
               const spotsLeft = Math.max(0, (ev.maxSnackers || 0) - (ev.currentSnackers || 0));
               const isFull = spotsLeft <= 0;
+              const myApp = currentUser ? applicants.find((a) => a.eventId === ev.id && a.userId === currentUser.id) : null;
+              const eventDateTime = new Date(`${ev.date}T${ev.time || "23:59"}`);
+              const hoursAway = (eventDateTime.getTime() - Date.now()) / 3600000;
               return (
                 <Link
                   key={ev.id}
@@ -387,6 +472,24 @@ export default function Home() {
                         {isFull && (
                           <span className="rounded-full bg-error text-on-error px-2.5 py-1 text-[10px] font-bold shadow-cozy">
                             {t("home.fullBadge")}
+                          </span>
+                        )}
+                        {hoursAway > 0 && hoursAway < 24 && (
+                          <span className="rounded-full bg-primary-container text-on-primary-container px-2.5 py-1 text-[10px] font-bold shadow-cozy">
+                            {hoursAway < 1
+                              ? t("home.countdownMinutes", { count: Math.max(1, Math.round(hoursAway * 60)) })
+                              : t("home.countdown", { count: Math.round(hoursAway) })}
+                          </span>
+                        )}
+                        {myApp && (
+                          <span className={`rounded-full px-2.5 py-1 text-[10px] font-bold shadow-cozy ${
+                            myApp.status === "accepted" ? "bg-primary text-on-primary" :
+                            myApp.status === "rejected" ? "bg-error text-on-error" :
+                            "bg-secondary-container text-on-secondary-container"
+                          }`}>
+                            {myApp.status === "accepted" ? t("common.accepted") :
+                             myApp.status === "rejected" ? t("common.declined") :
+                             t("common.pending")}
                           </span>
                         )}
                       </div>
@@ -458,6 +561,14 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {selectedPinEvent && (
+        <EventBottomSheet
+          event={selectedPinEvent}
+          host={users.find((u) => u.id === selectedPinEvent.hostId)}
+          onClose={() => setSelectedPinEvent(null)}
+        />
+      )}
     </div>
   );
 }

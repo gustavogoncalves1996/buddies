@@ -11,6 +11,17 @@ import ConfirmDialog from "../components/ConfirmDialog";
 import { ManageSkeleton } from "../components/PageSkeletons";
 import { getErrorMessage } from "../utils/errors";
 
+function useTileUrl() {
+  const theme = useStore((s) => s.theme);
+  return useMemo(() => {
+    const prefersDark = typeof window !== "undefined" && window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const isDark = theme === "dark" || (theme === "system" && prefersDark);
+    return isDark
+      ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+      : "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png";
+  }, [theme]);
+}
+
 const CANNABIS_SVG =
   '<svg viewBox="0 0 24 24" width="22" height="22" fill="#37602c" xmlns="http://www.w3.org/2000/svg"><path d="M12 22c-.3-1.6-.6-3.1-.9-4.6-1.4.6-2.9.9-4.5.9 1-1.3 1.7-2.7 2.1-4.3-1.6.2-3.2 0-4.7-.6 1.4-1 2.5-2.2 3.3-3.6-1.5-.4-2.9-1.1-4.1-2.1 1.6-.2 3.2-.7 4.5-1.6C6.3 5 5.3 3.5 4.7 1.9c1.5.6 2.9 1.5 4.1 2.7.6-1.5 1.5-2.9 2.7-4 .3 1.6.3 3.3 0 4.9 1.2-1.2 2.6-2.1 4.1-2.7-.6 1.6-1.6 3.1-2.9 4.2 1.3.9 2.9 1.4 4.5 1.6-1.2 1-2.6 1.7-4.1 2.1.8 1.4 1.9 2.6 3.3 3.6-1.5.6-3.1.8-4.7.6.4 1.6 1.1 3 2.1 4.3-1.6 0-3.1-.3-4.5-.9-.3 1.5-.6 3-.9 4.6Z"/></svg>';
 
@@ -54,6 +65,7 @@ function RecenterOnUser() {
 export default function MyHostedSnacks() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const tileUrl = useTileUrl();
   const [tab, setTab] = useState("upcoming");
   const [expandedId, setExpandedId] = useState(null);
   const [selectedEventId, setSelectedEventId] = useState(null);
@@ -215,7 +227,7 @@ export default function MyHostedSnacks() {
         {/* Full-screen map background */}
         <div className="absolute inset-0 z-0">
           <MapContainer center={center} zoom={12} className="h-full w-full" zoomControl={false}>
-            <TileLayer url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png" />
+            <TileLayer url={tileUrl} />
             <RecenterOnUser />
             {mappableEvents.map((e) => (
               <Marker
@@ -437,7 +449,7 @@ export default function MyHostedSnacks() {
         {/* Map section — takes remaining space */}
         <div className="flex-1 w-full relative">
           <MapContainer center={center} zoom={11} className="h-full w-full" zoomControl={false}>
-            <TileLayer url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png" />
+            <TileLayer url={tileUrl} />
             <RecenterOnUser />
             {mappableEvents.map((e) => (
               <Marker

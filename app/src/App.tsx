@@ -17,6 +17,7 @@ const EventDetail = lazy(() => import("./pages/EventDetail"));
 const MyHostedSnacks = lazy(() => import("./pages/MyHostedSnacks"));
 const Profile = lazy(() => import("./pages/Profile"));
 const ConfirmedEvents = lazy(() => import("./pages/ConfirmedEvents"));
+const MyApplications = lazy(() => import("./pages/MyApplications"));
 const Settings = lazy(() => import("./pages/Settings"));
 const Login = lazy(() => import("./pages/Login"));
 const SignUp = lazy(() => import("./pages/SignUp"));
@@ -26,11 +27,24 @@ export default function App() {
   const requestLocation = useStore((s) => s.requestLocation);
   const initAuth = useStore((s) => s.initAuth);
   const isLoading = useStore((s) => s.isLoading);
+  const theme = useStore((s) => s.theme);
 
   useEffect(() => {
     initAuth();
     requestLocation();
   }, [initAuth, requestLocation]);
+
+  useEffect(() => {
+    const applyTheme = () => {
+      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      const isDark = theme === "dark" || (theme === "system" && prefersDark);
+      document.documentElement.classList.toggle("dark", isDark);
+    };
+    applyTheme();
+    const mq = window.matchMedia("(prefers-color-scheme: dark)");
+    mq.addEventListener("change", applyTheme);
+    return () => mq.removeEventListener("change", applyTheme);
+  }, [theme]);
 
   return (
     <ErrorBoundary>
@@ -55,6 +69,7 @@ export default function App() {
               <Route path="/settings" element={<Settings />} />
               <Route path="/create/:eventId" element={<CreateEvent />} />
               <Route path="/confirmed" element={<ConfirmedEvents />} />
+              <Route path="/applied" element={<MyApplications />} />
             </Route>
           </Route>
 

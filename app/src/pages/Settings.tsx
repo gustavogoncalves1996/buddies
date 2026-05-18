@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Bell, BellOff, Globe2, Languages, Trash2, WalletCards } from "lucide-react";
+import { Bell, BellOff, Globe2, Languages, Moon, Monitor, Sun, Trash2, WalletCards } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { isPushSupported, subscribeUserToPush, unsubscribeFromPush } from "../lib/push";
 import { useLocale } from "../contexts/LocaleContext";
@@ -14,6 +14,8 @@ export default function Settings() {
   const users = useStore((s) => s.users);
   const session = useStore((s) => s.session);
   const pushToast = useStore((s) => s.pushToast);
+  const theme = useStore((s) => s.theme);
+  const setTheme = useStore((s) => s.setTheme);
   const [busy, setBusy] = useState(false);
 
   const currentUser = useMemo(
@@ -118,6 +120,31 @@ export default function Settings() {
                 }`}
               >
                 {currency}
+              </button>
+            ))}
+          </div>
+        </section>
+
+        {/* Theme */}
+        <section className="bg-surface-container-lowest rounded-2xl shadow-cozy p-5 md:p-7 space-y-5">
+          <h2 className="text-sm uppercase tracking-widest font-bold text-primary mb-3">{t("settings.themeTitle")}</h2>
+          <div className="grid grid-cols-3 gap-3">
+            {[
+              { value: "light", label: t("settings.themeLight"), icon: Sun },
+              { value: "dark", label: t("settings.themeDark"), icon: Moon },
+              { value: "system", label: t("settings.themeSystem"), icon: Monitor },
+            ].map(({ value, label, icon: Icon }) => (
+              <button
+                key={value}
+                onClick={() => { setTheme(value); pushToast(t("settings.saved"), "success"); }}
+                className={`flex flex-col items-center gap-2 py-4 rounded-2xl font-bold text-sm transition-colors ${
+                  theme === value
+                    ? "bg-primary text-on-primary"
+                    : "bg-surface-container-high text-on-surface hover:bg-surface-dim"
+                }`}
+              >
+                <Icon size={20} />
+                {label}
               </button>
             ))}
           </div>

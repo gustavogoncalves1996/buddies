@@ -754,6 +754,11 @@ Proximas 20 melhorias incrementais a curto prazo:
 41. Estado de loading dedicado no botao de submeter formularios (criar evento, candidatura, perfil) com lock para impedir duplo submit.
 42. Persistir rascunhos de criacao de evento em `localStorage` para nao perder dados se a app fechar.
 43. Toggle de tema claro/escuro nas Settings, com deteccao de `prefers-color-scheme` por defeito.
+44. Atualizar as descrições e referencias no site de bolos para CBD, e algo mais proximo desse conceito.
+45. Corrigir erro dos números na criacao de evento, ao selecionar o dia do evento. (Os números na roda são atualizados sempre que o dia é atualizado, os dias deveriam estar fixos)
+46. Corrigir o slide de escolha de hora do evento, tambem no painel de criacao de evento.
+47. Validar se apenas o host consegue ver as candidaturas ao seu evento.
+
 
 ### Medio prazo: 20 features possiveis
 

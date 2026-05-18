@@ -4,52 +4,70 @@ import { useTranslation } from "react-i18next";
 import useStore from "../store/useStore";
 import { getErrorMessage } from "../utils/errors";
 
-const COVER_RATIO = 16 / 9;
-const MAX_COVER_WIDTH = 1600;
+async function cropToCover(file) {
+  const TARGET_RATIO = 16 / 9;
+  const MAX_W = 1600;
+  const QUALITY_HIGH = 0.82;
+  const QUALITY_LOW = 0.7;
+  const MAX_SIZE = 1024 * 1024; // 1MB
 
-function cropToCover(file) {
-  return new Promise((resolve, reject) => {
-    const image = new Image();
+  let width, height, source;
+  if (typeof createImageBitmap === "function") {
+    const bitmap = await createImageBitmap(file);
+    width = bitmap.width;
+    height = bitmap.height;
+    source = bitmap;
+  } else {
+    const img = new Image();
     const url = URL.createObjectURL(file);
-    image.onload = () => {
-      const sourceRatio = image.width / image.height;
-      const sourceWidth = sourceRatio > COVER_RATIO ? image.height * COVER_RATIO : image.width;
-      const sourceHeight = sourceRatio > COVER_RATIO ? image.height : image.width / COVER_RATIO;
-      const sourceX = (image.width - sourceWidth) / 2;
-      const sourceY = (image.height - sourceHeight) / 2;
-      const targetWidth = Math.min(MAX_COVER_WIDTH, Math.round(sourceWidth));
-      const targetHeight = Math.round(targetWidth / COVER_RATIO);
-      const canvas = document.createElement("canvas");
-      canvas.width = targetWidth;
-      canvas.height = targetHeight;
-      const context = canvas.getContext("2d");
-      if (!context) {
-        URL.revokeObjectURL(url);
-        reject(new Error("Canvas is not available."));
-        return;
-      }
-      context.drawImage(image, sourceX, sourceY, sourceWidth, sourceHeight, 0, 0, targetWidth, targetHeight);
-      canvas.toBlob(
-        (blob) => {
-          URL.revokeObjectURL(url);
-          if (!blob) {
-            reject(new Error("Couldn't crop image."));
-            return;
-          }
-          const extension = file.type === "image/png" ? "png" : "jpg";
-          const name = file.name.replace(/[.][^.]+$/, `-cover.${extension}`);
-          resolve(new File([blob], name, { type: blob.type || "image/jpeg" }));
-        },
-        file.type === "image/png" ? "image/png" : "image/jpeg",
-        0.9
-      );
-    };
-    image.onerror = () => {
-      URL.revokeObjectURL(url);
-      reject(new Error("Couldn't read image."));
-    };
-    image.src = url;
-  });
+    await new Promise((resolve, reject) => {
+      img.onload = resolve;
+      img.onerror = reject;
+      img.src = url;
+    });
+    URL.revokeObjectURL(url);
+    width = img.naturalWidth;
+    height = img.naturalHeight;
+    source = img;
+  }
+
+  // Calculate crop dimensions for 16:9
+  const srcRatio = width / height;
+  let sx = 0, sy = 0, sw = width, sh = height;
+  if (srcRatio > TARGET_RATIO) {
+    sw = Math.round(height * TARGET_RATIO);
+    sx = Math.round((width - sw) / 2);
+  } else {
+    sh = Math.round(width / TARGET_RATIO);
+    sy = Math.round((height - sh) / 2);
+  }
+
+  // Scale down if needed
+  let dw = sw, dh = sh;
+  if (dw > MAX_W) {
+    dh = Math.round((MAX_W / dw) * dh);
+    dw = MAX_W;
+  }
+
+  const canvas = document.createElement("canvas");
+  canvas.width = dw;
+  canvas.height = dh;
+  const ctx = canvas.getContext("2d");
+  ctx.drawImage(source, sx, sy, sw, sh, 0, 0, dw, dh);
+
+  if (source.close) source.close(); // close ImageBitmap
+
+  const isPng = file.type === "image/png";
+  const mimeType = isPng ? "image/png" : "image/jpeg";
+
+  let blob = await new Promise((resolve) => canvas.toBlob(resolve, mimeType, QUALITY_HIGH));
+
+  // Re-encode at lower quality if too large (only for JPEG)
+  if (!isPng && blob.size > MAX_SIZE) {
+    blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/jpeg", QUALITY_LOW));
+  }
+
+  return new File([blob], file.name.replace(/\.\w+$/, isPng ? ".png" : ".jpg"), { type: mimeType });
 }
 
 /**

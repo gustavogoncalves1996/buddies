@@ -141,9 +141,21 @@ create policy "Users manage own past events"     on public.past_events for all
 
 -- Applicants
 drop policy if exists "Applicants viewable by everyone"   on public.applicants;
+drop policy if exists "Applicants visible to host and applicant" on public.applicants;
 drop policy if exists "Authenticated can apply"           on public.applicants;
 drop policy if exists "Host can update applicant status"  on public.applicants;
-create policy "Applicants viewable by everyone" on public.applicants for select using (true);
+drop policy if exists "Applicant can delete own pending"  on public.applicants;
+drop policy if exists "Applicant can delete own"         on public.applicants;
+drop policy if exists "Applicant can update own"          on public.applicants;
+create policy "Applicants visible to host and applicant" on public.applicants for select
+USING (
+  EXISTS (SELECT 1 FROM public.profiles p WHERE p.id = user_id AND p.auth_id = auth.uid())
+  OR EXISTS (
+    SELECT 1 FROM public.events e
+    JOIN public.profiles p ON p.id = e.host_id
+    WHERE e.id = event_id AND p.auth_id = auth.uid()
+  )
+);
 create policy "Authenticated can apply" on public.applicants for insert
   with check (exists (select 1 from public.profiles p where p.id = user_id and p.auth_id = auth.uid()));
 create policy "Host can update applicant status" on public.applicants for update using (
@@ -152,6 +164,14 @@ create policy "Host can update applicant status" on public.applicants for update
     join public.profiles p on p.id = e.host_id
     where e.id = event_id and p.auth_id = auth.uid()
   )
+);
+create policy "Applicant can delete own" on public.applicants for delete
+using (
+  EXISTS (SELECT 1 FROM public.profiles p WHERE p.id = user_id AND p.auth_id = auth.uid())
+);
+create policy "Applicant can update own" on public.applicants for update
+USING (
+  EXISTS (SELECT 1 FROM public.profiles p WHERE p.id = user_id AND p.auth_id = auth.uid())
 );
 
 -- =============================================================

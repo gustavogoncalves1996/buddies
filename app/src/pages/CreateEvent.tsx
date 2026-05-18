@@ -14,6 +14,7 @@ import {
   Moon,
   Plus,
   Minus,
+  Loader2,
 } from "lucide-react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -22,6 +23,8 @@ import AddressAutocomplete from "../components/AddressAutocomplete";
 import ImageUpload from "../components/ImageUpload";
 import { getErrorMessage } from "../utils/errors";
 import sessionJointImg from "../assets/session-joint.png";
+
+const DRAFT_KEY = "buddies-event-draft";
 
 const DEFAULT_EVENT_IMAGE =
   "https://lh3.googleusercontent.com/aida-public/AB6AXuCaZN-4WWPz68IO5galEggKHp4npqYWWQaCQuWND3wFUT5fh94ZDX7z3TkginTNzwxxOeXMuavXHhrAWM5VsQu6RJvMIdFr3WHY4voXMzPM6aV3BPE3iWs3O31YvpfD1qtZOaqPkULGeRZ4t9HIOA2YqiF7J1QhigpULIQwLPt1U_RaIv7PywUAyxgHNpPS68Ejqb4kdcPnI2xH7DKg-UeLeb0F9BjpwkVIGCsgJlCapg-vMNrAnHykfwCvPVBQg6Bo5J1gjoDnd-nQ";
@@ -122,9 +125,11 @@ export default function CreateEvent() {
     ? users.find((u) => u.authId === session.user.id)
     : null;
   const [snackSize, setSnackSize] = useState(20); // session intensity, in cm
+  const [isDraggingTime, setIsDraggingTime] = useState(false);
   const [maxSnackers, setMaxSnackers] = useState(8);
   const [geocoded, setGeocoded] = useState(null); // { label, lat, lng }
   const [imageFile, setImageFile] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
 
   const editingEvent = useMemo(
     () => (eventId ? events.find((event) => event.id === Number(eventId)) : null),
@@ -147,26 +152,67 @@ export default function CreateEvent() {
   const timeValue = watch("time") || "";
 
   // ---------- Defaults so form is pre-valid; user just adjusts ----------
-  const todayISO = useMemo(() => {
+  const { defaultDate, defaultTime } = useMemo(() => {
     const d = new Date();
-    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
-      d.getDate()
-    ).padStart(2, "0")}`;
+    d.setMinutes(d.getMinutes() + 60);
+    d.setMinutes(Math.ceil(d.getMinutes() / 5) * 5, 0, 0);
+    const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    const time = `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+    return { defaultDate: iso, defaultTime: time };
   }, []);
 
   useEffect(() => {
     if (!titleValue) setValue("title", t("createEvent.defaultTitle"), { shouldValidate: true });
-    if (!dateValue) setValue("date", todayISO, { shouldValidate: true });
-    if (!timeValue) setValue("time", "16:30", { shouldValidate: true });
+    if (!dateValue) setValue("date", defaultDate, { shouldValidate: true });
+    if (!timeValue) setValue("time", defaultTime, { shouldValidate: true });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Restore draft (only for new events without map pin params)
+  useEffect(() => {
+    if (editingEvent) return;
+    if (searchParams.get("lat")) return;
+    try {
+      const raw = localStorage.getItem(DRAFT_KEY);
+      if (!raw) return;
+      const draft = JSON.parse(raw);
+      if (draft.title) setValue("title", draft.title, { shouldValidate: true });
+      if (draft.description) setValue("description", draft.description);
+      if (draft.location) setValue("location", draft.location, { shouldValidate: true });
+      if (draft.date) setValue("date", draft.date, { shouldValidate: true });
+      if (draft.time) setValue("time", draft.time, { shouldValidate: true });
+      if (draft.snackSize) setSnackSize(draft.snackSize);
+      if (draft.maxSnackers) setMaxSnackers(draft.maxSnackers);
+      if (draft.geocoded) setGeocoded(draft.geocoded);
+    } catch {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Auto-save draft (debounced)
+  useEffect(() => {
+    if (editingEvent) return;
+    const timer = setTimeout(() => {
+      const draft = {
+        title: titleValue,
+        description: descriptionValue,
+        location: locationValue,
+        date: dateValue,
+        time: timeValue,
+        snackSize,
+        maxSnackers,
+        geocoded,
+      };
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [editingEvent, titleValue, descriptionValue, locationValue, dateValue, timeValue, snackSize, maxSnackers, geocoded]);
 
   useEffect(() => {
     if (!editingEvent) return;
     setValue("title", editingEvent.title || t("createEvent.defaultTitle"), { shouldValidate: true });
     setValue("description", editingEvent.description || "", { shouldValidate: false });
     setValue("location", editingEvent.location || "", { shouldValidate: true });
-    setValue("date", editingEvent.date || todayISO, { shouldValidate: true });
+    setValue("date", editingEvent.date || defaultDate, { shouldValidate: true });
     setValue("time", editingEvent.time || "16:30", { shouldValidate: true });
     setSnackSize(editingEvent.snackSize || 20);
     setMaxSnackers(editingEvent.maxSnackers || 8);
@@ -178,7 +224,7 @@ export default function CreateEvent() {
         lng: editingEvent.lng,
       });
     }
-  }, [editingEvent, setValue, t, todayISO]);
+  }, [editingEvent, setValue, t, defaultDate]);
 
   useEffect(() => {
     if (editingEvent) return;
@@ -194,6 +240,8 @@ export default function CreateEvent() {
   // ---------- Date wheel drag (angular) ----------
   const MAX_DAY_OFFSET = 180; // up to ~6 months ahead
   const [dayOffset, setDayOffset] = useState(0);
+  const dayOffsetRef = useRef(dayOffset);
+  useEffect(() => { dayOffsetRef.current = dayOffset; }, [dayOffset]);
   const wheelRef = useRef(null);
   const wheelDragRef = useRef(null);
 
@@ -224,7 +272,7 @@ export default function CreateEvent() {
     wheelRef.current?.setPointerCapture?.(e.pointerId);
     const a = angleFromCenter(e.clientX, e.clientY);
     wheelDragRef.current = {
-      startOffset: dayOffset,
+      startOffset: dayOffsetRef.current,
       lastAngle: a,
       accumulated: 0,
     };
@@ -237,6 +285,7 @@ export default function CreateEvent() {
     if (delta > 180) delta -= 360;
     if (delta < -180) delta += 360;
     drag.accumulated += delta;
+    drag.accumulated = Math.max(-MAX_DAY_OFFSET * 12, Math.min(MAX_DAY_OFFSET * 12, drag.accumulated));
     drag.lastAngle = a;
     // 12° per day → a full rotation = 30 days
     const dayDelta = Math.round(drag.accumulated / 12);
@@ -272,6 +321,7 @@ export default function CreateEvent() {
 
   const onArcPointerDown = (e) => {
     e.preventDefault();
+    setIsDraggingTime(true);
     arcRef.current?.setPointerCapture?.(e.pointerId);
     arcDragRef.current = true;
     setTimeFromClientX(e.clientX);
@@ -287,6 +337,7 @@ export default function CreateEvent() {
       /* ignore */
     }
     arcDragRef.current = false;
+    setIsDraggingTime(false);
   };
 
   const onInvalid = (formErrors) => {
@@ -304,33 +355,34 @@ export default function CreateEvent() {
 
   /* Pretty bits used by the Date Wheel & Sun-arc visuals */
   const dateMeta = useMemo(() => {
+    const buildNearby = (ref) => {
+      const daysInMonth = new Date(ref.getFullYear(), ref.getMonth() + 1, 0).getDate();
+      const step = daysInMonth / 6;
+      return Array.from({ length: 6 }, (_, i) => {
+        const d = Math.round(step * i) + 1;
+        return { day: Math.min(d, daysInMonth), active: false };
+      });
+    };
     if (!dateValue) {
       const t = new Date();
       return {
         month: t.toLocaleString("en", { month: "long" }).toUpperCase(),
         day: t.getDate(),
         weekday: t.toLocaleString("en", { weekday: "long" }),
-        nearby: [-2, -1, 0, 1, 2, 3].map((o) => {
-          const d = new Date(t);
-          d.setDate(t.getDate() + o);
-          return { day: d.getDate(), active: o === 0 };
-        }),
+        nearby: buildNearby(t),
         progressDeg: 0,
         placeholder: true,
       };
     }
     const d = new Date(dateValue + "T00:00:00");
     const day = d.getDate();
+    const daysInMonth = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
     return {
       month: d.toLocaleString("en", { month: "long" }).toUpperCase(),
       day,
       weekday: d.toLocaleString("en", { weekday: "long" }),
-      nearby: [-2, -1, 0, 1, 2, 3].map((o) => {
-        const c = new Date(d);
-        c.setDate(day + o);
-        return { day: c.getDate(), active: o === 0 };
-      }),
-      progressDeg: ((day - 1) / 30) * 360,
+      nearby: buildNearby(d),
+      progressDeg: ((day - 1) / (daysInMonth - 1)) * 360,
       placeholder: false,
     };
   }, [dateValue]);
@@ -383,14 +435,19 @@ export default function CreateEvent() {
       pushToast(t("createEvent.pickFromDropdown"), "error");
       return;
     }
-    setLoading(true);
+    const eventDateTime = new Date(`${data.date}T${data.time}`);
+    if (eventDateTime < new Date()) {
+      pushToast(t("createEvent.dateInPast"), "error");
+      return;
+    }
+    setSubmitting(true);
     try {
       let imageUrl = editingEvent?.image || DEFAULT_EVENT_IMAGE;
       if (imageFile) {
         try {
           imageUrl = await uploadEventImage(imageFile);
         } catch (err) {
-          setLoading(false);
+          setSubmitting(false);
           pushToast(t("createEvent.uploadFail", { error: getErrorMessage(err, t("common.unknownError")) }), "error");
           return;
         }
@@ -417,10 +474,11 @@ export default function CreateEvent() {
       else await addEvent(payload);
 
       pushToast(isEditing ? t("createEvent.updated") : t("createEvent.created"), "success");
+      localStorage.removeItem(DRAFT_KEY);
       navigate("/manage");
-      setTimeout(() => setLoading(false), 400);
+      setSubmitting(false);
     } catch (err) {
-      setLoading(false);
+      setSubmitting(false);
       pushToast(t(isEditing ? "createEvent.updateFail" : "createEvent.createFail", { error: getErrorMessage(err, t("common.unknownError")) }), "error");
     }
   };
@@ -596,10 +654,20 @@ export default function CreateEvent() {
             <div className="pt-4 flex flex-col items-center">
               <button
                 type="submit"
-                className="w-full py-4 bg-linear-to-br from-primary to-primary-container text-on-primary text-lg font-bold rounded-full shadow-[0_12px_40px_rgba(55,96,44,0.2)] active:scale-95 transition-all duration-300 flex items-center justify-center gap-2"
+                disabled={submitting}
+                className="w-full py-4 bg-linear-to-br from-primary to-primary-container text-on-primary text-lg font-bold rounded-full shadow-[0_12px_40px_rgba(55,96,44,0.2)] active:scale-95 transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                <span>{t("createEvent.publishEvent")}</span>
-                <Sparkles size={20} />
+                {submitting ? (
+                  <>
+                    <Loader2 size={20} className="animate-spin" />
+                    <span>{t("createEvent.publishing")}</span>
+                  </>
+                ) : (
+                  <>
+                    <span>{t("createEvent.publishEvent")}</span>
+                    <Sparkles size={20} />
+                  </>
+                )}
               </button>
               <p className="mt-4 text-sm text-on-surface-variant font-medium italic">
                 {t("createEvent.mobileFooter")}
@@ -764,9 +832,10 @@ export default function CreateEvent() {
                   <div className="w-full h-40 border-t-2 border-dashed border-primary-fixed/40 rounded-[100%] flex items-center justify-center relative">
                     {/* Selected time marker — slides along the arc with the chosen time */}
                     <div
-                      className="absolute -top-10 flex flex-col items-center transition-[left] duration-500"
+                      className={`absolute -top-10 flex flex-col items-center ${isDraggingTime ? '' : 'transition-[left] duration-500'}`}
                       style={{
-                        left: `calc(${timeMeta.ratio * 100}% - 32px)`,
+                        left: `${timeMeta.ratio * 100}%`,
+                        transform: "translateX(-50%)",
                       }}
                     >
                       <div className="w-16 h-16 bg-linear-to-tr from-primary to-primary-container rounded-full flex items-center justify-center text-white shadow-xl shadow-primary/20">
@@ -948,12 +1017,22 @@ export default function CreateEvent() {
             {/* CTA */}
             <button
               type="submit"
-              className="group relative py-6 px-12 rounded-full overflow-hidden transition-all transform active:scale-95 shadow-xl shadow-primary/20"
+              disabled={submitting}
+              className="group relative py-6 px-12 rounded-full overflow-hidden transition-all transform active:scale-95 shadow-xl shadow-primary/20 disabled:opacity-60 disabled:cursor-not-allowed"
             >
               <div className="absolute inset-0 bg-linear-to-r from-primary to-primary-container transition-transform group-hover:scale-105" />
               <div className="relative flex items-center justify-center gap-4 text-white">
-                <span className="font-display text-xl font-bold">{t("createEvent.publishGathering")}</span>
-                <Sparkles size={20} />
+                {submitting ? (
+                  <>
+                    <Loader2 size={20} className="animate-spin" />
+                    <span className="font-display text-xl font-bold">{t("createEvent.publishing")}</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="font-display text-xl font-bold">{t("createEvent.publishGathering")}</span>
+                    <Sparkles size={20} />
+                  </>
+                )}
               </div>
             </button>
           </div>

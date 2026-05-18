@@ -126,6 +126,7 @@ const useStore = create<any>((set, get) => ({
   dataReady: false,
   isLoading: false,
   toasts: [],                  // [{ id, message, type, duration }]
+  theme: localStorage.getItem("buddies-theme") || "system",
 
   /* ─────────────────── DERIVED ─────────────────── */
   getCurrentUser: () => {
@@ -157,6 +158,10 @@ const useStore = create<any>((set, get) => ({
   /* ─────────────────── UI ACTIONS ─────────────────── */
   setSearchQuery: (q) => set({ searchQuery: q }),
   setLoading: (val) => set({ isLoading: val }),
+  setTheme: (theme) => {
+    localStorage.setItem("buddies-theme", theme);
+    set({ theme });
+  },
   setUserLocation: (lat, lng) =>
     set({ userLocation: { lat, lng }, locationStatus: "granted" }),
   setLocationStatus: (status) => set({ locationStatus: status }),
@@ -498,11 +503,10 @@ const useStore = create<any>((set, get) => ({
       throw err;
     }
 
-    // Prevent duplicate applications
     const existing = get().applicants.find(
       (a) => a.eventId === eventId && a.userId === me.id
     );
-    if (existing) {
+    if (existing && existing.status === "pending") {
       const err = new Error("You've already applied to this snack.");
       err.code = "DUPLICATE_APPLICATION";
       throw err;
@@ -519,13 +523,37 @@ const useStore = create<any>((set, get) => ({
 
     const { data, error } = await supabase
       .from("applicants")
-      .insert(payload)
+      .upsert(payload, { onConflict: "event_id,user_id" })
       .select()
       .single();
     if (error) throw error;
 
-    set((s) => ({ applicants: [...s.applicants, mapApplicant(data)] }));
+    set((s) => ({
+      applicants: existing
+        ? s.applicants.map((a) => a.eventId === eventId && a.userId === me.id ? mapApplicant(data) : a)
+        : [...s.applicants, mapApplicant(data)],
+    }));
     return mapApplicant(data);
+  },
+
+  cancelApplication: async (applicantId) => {
+    const app = get().applicants.find((a) => a.id === applicantId);
+    if (!app) throw new Error("Application not found");
+
+    const { error } = await supabase.from("applicants").delete().eq("id", applicantId);
+    if (error) throw error;
+
+    set((s) => ({
+      applicants: s.applicants.filter((a) => a.id !== applicantId),
+    }));
+
+    if (app.status === "accepted") {
+      const event = get().events.find((e) => e.id === app.eventId);
+      if (event) {
+        await supabase.from("events").update({ current_snackers: Math.max(0, event.currentSnackers - 1) }).eq("id", event.id);
+        await get().fetchEvents();
+      }
+    }
   },
 }));
 

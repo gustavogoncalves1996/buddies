@@ -1,10 +1,11 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { ChevronLeft, CalendarDays, MapPin, Users, Star, MessageCircle } from "lucide-react";
-import { useState, useMemo } from "react";
+import { ChevronLeft, CalendarDays, MapPin, Users, Star, MessageCircle, Share2 } from "lucide-react";
+import { useState, useMemo, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import useStore from "../store/useStore";
 import { EventDetailSkeleton } from "../components/PageSkeletons";
 import { getErrorMessage } from "../utils/errors";
+import ProfileModal from "../components/ProfileModal";
 
 export default function EventDetail() {
   const { t } = useTranslation();
@@ -12,12 +13,14 @@ export default function EventDetail() {
   const navigate = useNavigate();
   const [message, setMessage] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [showHostProfile, setShowHostProfile] = useState(false);
 
   const events = useStore((s) => s.events);
   const users = useStore((s) => s.users);
   const applicants = useStore((s) => s.applicants);
   const session = useStore((s) => s.session);
   const applyToEvent = useStore((s) => s.applyToEvent);
+  const cancelApplication = useStore((s) => s.cancelApplication);
   const pushToast = useStore((s) => s.pushToast);
   const dataReady = useStore((s) => s.dataReady);
 
@@ -42,6 +45,14 @@ export default function EventDetail() {
   const spotsLeft = event ? Math.max(0, event.maxSnackers - event.currentSnackers) : 0;
   const fillPercent = event ? Math.min(100, (event.currentSnackers / event.maxSnackers) * 100) : 0;
   const isFull = spotsLeft <= 0;
+
+  const canReapply = myApplication?.status === "rejected" && spotsLeft > 0 && event?.status !== "cancelled";
+
+  useEffect(() => {
+    if (myApplication?.status === "rejected" && myApplication.message) {
+      setMessage(myApplication.message);
+    }
+  }, [myApplication]);
 
   const intensityLabel = useMemo(() => {
     const v = Number(event?.snackSize || 0);
@@ -75,7 +86,7 @@ export default function EventDetail() {
       pushToast(t("eventDetail.hostInfo"), "info");
       return;
     }
-    if (myApplication) {
+    if (myApplication && myApplication.status !== "rejected") {
       pushToast(t("eventDetail.alreadyApplied"), "info");
       return;
     }
@@ -89,6 +100,9 @@ export default function EventDetail() {
     }
     setSubmitting(true);
     try {
+      if (myApplication?.status === "rejected") {
+        await cancelApplication(myApplication.id);
+      }
       await applyToEvent(event.id, message?.trim() || "");
       setMessage("");
       pushToast(t("eventDetail.applicationSent"), "success");
@@ -110,6 +124,7 @@ export default function EventDetail() {
     if (submitting) return t("eventDetail.sending");
     if (isHost) return t("eventDetail.hostingThis");
     if (myApplication?.status === "accepted") return t("eventDetail.youreIn");
+    if (myApplication?.status === "rejected" && canReapply) return t("eventDetail.reapply");
     if (myApplication?.status === "rejected") return t("eventDetail.appDeclined");
     if (myApplication?.status === "pending") return t("eventDetail.appPending");
     if (event.status === "cancelled") return t("manage.cancelled");
@@ -118,7 +133,7 @@ export default function EventDetail() {
   })();
 
   const applyDisabled =
-    submitting || isHost || !!myApplication || spotsLeft <= 0 || event.status === "cancelled";
+    submitting || isHost || (!!myApplication && !canReapply) || spotsLeft <= 0 || event.status === "cancelled";
 
   return (
     <div className="min-h-screen bg-surface pb-24 md:pb-12">
@@ -138,6 +153,21 @@ export default function EventDetail() {
             className="md:hidden absolute top-4 left-4 z-10 w-10 h-10 rounded-full bg-surface-container-lowest/80 backdrop-blur flex items-center justify-center"
           >
             <ChevronLeft size={20} className="text-on-surface" />
+          </button>
+          <button
+            onClick={async (e) => {
+              e.stopPropagation();
+              const url = window.location.href;
+              if (navigator.share) {
+                try { await navigator.share({ title: event.title, url }); } catch {}
+              } else {
+                await navigator.clipboard.writeText(url);
+                pushToast(t("eventDetail.linkCopied"), "success");
+              }
+            }}
+            className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-surface-container-lowest/80 backdrop-blur flex items-center justify-center md:hidden"
+          >
+            <Share2 size={18} className="text-on-surface" />
           </button>
 
           {/* Badge + Title overlay */}
@@ -159,6 +189,21 @@ export default function EventDetail() {
               {event.title}
             </h1>
           </div>
+          <button
+            onClick={async () => {
+              const url = window.location.href;
+              if (navigator.share) {
+                try { await navigator.share({ title: event.title, url }); } catch {}
+              } else {
+                await navigator.clipboard.writeText(url);
+                pushToast(t("eventDetail.linkCopied"), "success");
+              }
+            }}
+            className="hidden md:flex absolute top-6 right-6 z-10 items-center gap-2 bg-surface-container-lowest/80 backdrop-blur px-4 py-2 rounded-full hover:bg-surface-container-low transition-colors"
+          >
+            <Share2 size={16} className="text-on-surface" />
+            <span className="text-sm font-bold text-on-surface">{t("eventDetail.share")}</span>
+          </button>
         </div>
       </section>
 
@@ -173,13 +218,30 @@ export default function EventDetail() {
           {/* Main column */}
           <div className="lg:col-span-8 flex flex-col gap-6 md:gap-8">
             {/* Desktop apply button */}
-            <button
-              onClick={handleApply}
-              disabled={applyDisabled}
-              className="hidden md:block w-full py-6 bg-primary text-on-primary text-2xl font-bold rounded-full shadow-[0_12px_40px_rgba(55,96,44,0.15)] hover:scale-[1.01] active:scale-95 transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
-            >
-              {applyButtonLabel}
-            </button>
+            <div className="hidden md:block text-center">
+              <button
+                onClick={handleApply}
+                disabled={applyDisabled}
+                className="w-full py-6 bg-primary text-on-primary text-2xl font-bold rounded-full shadow-[0_12px_40px_rgba(55,96,44,0.15)] hover:scale-[1.01] active:scale-95 transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100"
+              >
+                {applyButtonLabel}
+              </button>
+              {myApplication?.status === "pending" && (
+                <button
+                  onClick={async () => {
+                    try {
+                      await cancelApplication(myApplication.id);
+                      pushToast(t("applied.cancelled"), "success");
+                    } catch {
+                      pushToast(t("applied.cancelFail"), "error");
+                    }
+                  }}
+                  className="text-xs text-error font-medium mt-2 hover:underline"
+                >
+                  {t("applied.cancelConfirmTitle")}
+                </button>
+              )}
+            </div>
 
             {/* Quick Info Row */}
             <div className="flex flex-wrap gap-4 md:gap-8 bg-surface-container-low p-4 md:p-8 rounded-2xl md:rounded-full">
@@ -252,7 +314,7 @@ export default function EventDetail() {
             <div className="md:hidden space-y-6">
               {host && (
                 <div className="bg-surface-container-low p-5 rounded-2xl">
-                  <div className="flex items-center gap-4 mb-3">
+                  <div className="flex items-center gap-4 mb-3 cursor-pointer" onClick={() => setShowHostProfile(true)}>
                     <img
                       src={host.avatar}
                       alt={host.name}
@@ -291,6 +353,21 @@ export default function EventDetail() {
                 >
                   {applyButtonLabel === t("eventDetail.applyToJoin") ? t("eventDetail.submitApplication") : applyButtonLabel}
                 </button>
+                {myApplication?.status === "pending" && (
+                  <button
+                    onClick={async () => {
+                      try {
+                        await cancelApplication(myApplication.id);
+                        pushToast(t("applied.cancelled"), "success");
+                      } catch {
+                        pushToast(t("applied.cancelFail"), "error");
+                      }
+                    }}
+                    className="text-xs text-error font-medium mt-2 hover:underline"
+                  >
+                    {t("applied.cancelConfirmTitle")}
+                  </button>
+                )}
               </div>
             </div>
           </div>
@@ -299,7 +376,7 @@ export default function EventDetail() {
           <div className="hidden lg:block lg:col-span-4 space-y-8">
             {host && (
               <div className="bg-surface-container-low p-8 rounded-lg shadow-sm border-t-8 border-primary">
-                <div className="flex items-center gap-4 mb-6">
+                <div className="flex items-center gap-4 mb-6 cursor-pointer" onClick={() => setShowHostProfile(true)}>
                   <div className="h-20 w-20 rounded-full overflow-hidden border-4 border-surface-container-highest">
                     <img src={host.avatar} alt={host.name} className="w-full h-full object-cover" />
                   </div>
@@ -314,7 +391,7 @@ export default function EventDetail() {
                   </div>
                 </div>
                 <p className="text-on-surface-variant text-sm mb-6 leading-relaxed">{host.bio}</p>
-                <button className="w-full py-3 bg-surface-container-highest text-on-surface font-bold rounded-full hover:bg-surface-dim transition-colors">
+                <button onClick={() => setShowHostProfile(true)} className="w-full py-3 bg-surface-container-highest text-on-surface font-bold rounded-full hover:bg-surface-dim transition-colors">
                   {t("eventDetail.viewFullProfile")}
                 </button>
               </div>
@@ -326,6 +403,10 @@ export default function EventDetail() {
           </div>
         </div>
       </div>
+
+      {showHostProfile && host && (
+        <ProfileModal user={host} onClose={() => setShowHostProfile(false)} />
+      )}
     </div>
   );
 }
